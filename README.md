@@ -13,4 +13,6 @@ For now please clone this repo and place it alongside your working code to be im
 
 *date - 05.06.2025*
 
-I have a simple version of the code working in the Example_Attack_Notebook.ipynb. This pulls from some of my legacy code which we will want to remove and the new attack.py module. This is the MVP
+I have a simple version of the code working in the Example_Attack_Notebook.ipynb. This pulls from some of my legacy code which we will want to remove and the new attack.py module. 
+
+NOTE: This is the MVP and will only work for a NN with binary classification, similar to the example one. Other forms of NN should work, i.e. CNN so long it is binary classification. 
