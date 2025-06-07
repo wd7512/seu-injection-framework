@@ -9,9 +9,15 @@ For now please clone this repo and place it alongside your working code to be im
 
 # Code log
 
+### v0.0.2
+*date: 07.06.2025*
+
+Things added 
+- attack() now returns the value before and after the bitflip
+
 ### v0.0.1
 
-*date - 05.06.2025*
+*date: 05.06.2025*
 
 I have a simple version of the code working in the Example_Attack_Notebook.ipynb. This pulls from some of my legacy code which we will want to remove and the new attack.py module. 
 

@@ -9,14 +9,13 @@ def attack(trained_model, X, y, bit_i, device):
 
     # Prepare inputs as torch tensors on the correct device
     X_tensor = torch.tensor(X, dtype=torch.float32, device=device)
-    y_tensor = torch.tensor(y, device=device)
-    # If y is one-dimensional (e.g., class indices), ensure it's integer type for comparison
-    if y_tensor.dtype != torch.long:
-        y_tensor = y_tensor.long()
 
     idxs = []
     accs = []
     nams = []
+
+    val_before = []
+    val_after = []
 
     # Iterate through each named parameter (weights and biases) in the model
     for name, param in trained_model.named_parameters():
@@ -37,12 +36,14 @@ def attack(trained_model, X, y, bit_i, device):
 
             # Evaluate accuracy on the entire dataset
             with torch.no_grad():
-                preds = (trained_model(X) > 0.5).float()
+                preds = (trained_model(X_tensor) > 0.5).float()
                 accuracy = (preds.eq(y).sum() / len(y)).item()
 
             idxs.append(idx)
             accs.append(accuracy)
             nams.append(name)
+            val_before.append(orig_val)
+            val_after.append(flipped_val)
 
             # Restore the original value before the next bit flip
             with torch.no_grad():
@@ -54,7 +55,9 @@ def attack(trained_model, X, y, bit_i, device):
     result_df = pd.DataFrame({
         "IDX": idxs,
         "ACC": accs,
-        "NAME": nams
+        "NAME": nams,
+        "ORIG_VAL": val_before,
+        "FLIP_VAL": val_after
     })
 
     return result_df
