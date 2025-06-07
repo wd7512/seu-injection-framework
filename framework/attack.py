@@ -7,6 +7,8 @@ class injector():
         """
         Initlaise the injector
 
+        WARNING: this is built assuming floating point 32 values are used
+
         - [ ] Check that the model is compatitble
         - [x] Check that the X can do a forward pass
         - [x] Check that the result of the forward pass gives a result with y and criterion
@@ -21,8 +23,6 @@ class injector():
                 self.device = "cpu"
         else:
             self.device = device
-
-        # assert that the model and inputs are in float 32
 
         self.model = trained_model
         self.model.eval()
