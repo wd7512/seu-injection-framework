@@ -1,65 +1,19 @@
-# animations
-manimgl
-
-# datasets
-openml
-
-
-# Jupyter and related packages
+# Jupyter and extensions
 jupyter
 notebook
-
-# TensorFlow with GPU support (version can be adjusted)
-tensorflow
-
-# PyTorch with GPU support
-torch==2.0.0+cu117
-torchvision==0.15.1+cu117
-torchaudio==2.0.0+cu117
--f https://download.pytorch.org/whl/torch_stable.html
-
-# Common data science libraries
-numpy
-pandas
-scikit-learn
-scikit-image
-matplotlib
-seaborn
-
-# Additional useful libraries
-scipy
-h5py
-pillow
-requests
-opencv-python
-tqdm
-
-# Advanced data science libraries
-statsmodels
-xgboost
-lightgbm
-
-# Data handling
-sqlalchemy
-pyarrow
-
-# Visualization
-plotly
-bokeh
-
-# Miscellaneous
-joblib
-pyyaml
-cvxopt
-
-# Optional: Jupyter extensions and widgets
 jupyterlab
 ipywidgets
 jupyter-contrib-nbextensions
 jupyterthemes
 
-# Deep learning libraries
-keras
-tensorboard
-transformers
-datasets
+# Core data science libraries
+numpy < 2
+pandas
+scikit-learn
+scikit-image
+statsmodels
+matplotlib
+seaborn
+scipy
+tqdm
+joblib
