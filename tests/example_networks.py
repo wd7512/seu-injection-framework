@@ -9,13 +9,6 @@ from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-try:
-    from torch_geometric.data import Data
-    import torch_geometric.nn as pyg_nn
-    GNN_AVAILABLE = True
-except ImportError:
-    GNN_AVAILABLE = False
-
 
 def generate_moons_data(test_size=0.3, random_state=0):
     X, y = make_moons(n_samples=1000, noise=0.2, random_state=random_state)
@@ -75,22 +68,6 @@ class SimpleRNN(nn.Module):
         return self.fc(out)
 
 
-class SimpleGNN(torch.nn.Module):
-    def __init__(self):
-        if not GNN_AVAILABLE:
-            raise ImportError("PyTorch Geometric is required for SimpleGNN")
-        super().__init__()
-        self.conv1 = pyg_nn.GCNConv(2, 16)
-        self.conv2 = pyg_nn.GCNConv(16, 2)
-        self.softmax = nn.LogSoftmax(dim=1)
-
-    def forward(self, data):
-        x, edge_index = data.x, data.edge_index
-        x = self.conv1(x, edge_index).relu()
-        x = self.conv2(x, edge_index)
-        return self.softmax(x)
-
-
 def train_model(model, X_train, y_train, epochs=300, lr=0.01):
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
@@ -131,26 +108,13 @@ def get_example_network(net_name='simple', test_size=0.3, random_state=0, train=
         returns model, data, labels, train_fn, eval_fn (no training done internally)
     """
     nets = {
-        'simple': SimpleNN,
+        'nn': SimpleNN,
         'cnn': SimpleCNN,
         'rnn': SimpleRNN,
-        'gnn': SimpleGNN if GNN_AVAILABLE else None,
     }
 
     if net_name not in nets or nets[net_name] is None:
         raise ValueError(f"Network '{net_name}' not implemented or missing dependencies.")
-
-    if net_name == 'gnn':
-        edge_index = torch.tensor([
-            [0, 1, 2, 3, 0, 2],
-            [1, 0, 3, 2, 2, 0]
-        ], dtype=torch.long)
-        x = torch.randn((4, 2), dtype=torch.float)
-        y = torch.tensor([0, 1, 0, 1], dtype=torch.long)
-        data = Data(x=x, edge_index=edge_index)
-        model = nets[net_name]()
-        # No internal training for GNN (complex)
-        return model, data, y, train_model, evaluate_model
 
     else:
         X_train, X_test, y_train, y_test = generate_moons_data(test_size, random_state)
