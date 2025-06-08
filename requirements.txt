@@ -17,3 +17,6 @@ seaborn
 scipy
 tqdm
 joblib
+
+# datasets
+kagglehub
