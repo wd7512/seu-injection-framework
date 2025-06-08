@@ -17,6 +17,8 @@ seaborn
 scipy
 tqdm
 joblib
+pyarrow
+fastparquet
 
 # datasets
 kagglehub
