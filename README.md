@@ -13,7 +13,8 @@ For now please clone this repo and place it alongside your working code to be im
 *date: 07.06.2025*
 
 Things added 
-- attack() now returns the value before and after the bitflip
+- `attack()` is removed from framework.attack, we now have `injector`, a class to handle seu injections
+- tests added for 3 types of nn, NN, CNN, RNN
 
 ### v0.0.1
 
