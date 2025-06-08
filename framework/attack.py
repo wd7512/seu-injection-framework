@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from framework.bitflip import bitflip_float32
 
-class injector():
+class Injector():
     def __init__(self, trained_model, X, y, criterion, device = None):
         """
         Initlaise the injector
@@ -129,3 +129,4 @@ class injector():
                     results["value_after"].append(seu_val)
 
         return results
+    
