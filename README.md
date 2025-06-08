@@ -9,6 +9,12 @@ For now please clone this repo and place it alongside your working code to be im
 
 # Code log
 
+### v0.0.3
+*date: 08.06.2025*
+- allows `layer_name__` to be specified in the `.run_seu()` function of the injector
+- `.run_stochastic_seu()` function added to injector, aimed out larger models where one only wants to tests bitflips on values with probability `p`
+- added module `framework/bitflip.py` so there is no reliance on legacy code
+
 ### v0.0.2
 *date: 07.06.2025*
 
