@@ -9,6 +9,10 @@ For now please clone this repo and place it alongside your working code to be im
 
 # Code log
 
+### v0.0.4
+*date: 11.06.2025*
+- refactored criterion.py to take inputs as (model, X, y) as this is more intuitive
+
 ### v0.0.3
 *date: 08.06.2025*
 - allows `layer_name__` to be specified in the `.run_seu()` function of the injector
