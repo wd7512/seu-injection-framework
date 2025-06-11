@@ -24,22 +24,22 @@ class Injector():
         else:
             self.device = device
 
-        self.model = trained_model
+        self.criterion = criterion
+        self.model = trained_model.to(device)
         self.model.eval()
-        self.model.to(device)
+        self.y = y
+
         if isinstance(X, torch.Tensor):
             self.X = X.clone().detach().to(device=device, dtype=torch.float32)
         else:
             self.X = torch.tensor(X, dtype=torch.float32, device=device)
 
         print(f"Testing a forward pass on {self.device}...")
-        y_pred = self.model(self.X)
 
-        self.baseline_score = criterion(y, y_pred)
+        self.baseline_score = criterion(self.model, self.X, self.y, self.device)
         print("Basline Criterion Score:", self.baseline_score)
         
-        self.criterion = criterion
-        self.y = y
+
 
     def run_seu(self, bit_i: int, layer_name__ = None):
         """Perform a bitflip at index i across every variable in the nn"""
@@ -72,7 +72,7 @@ class Injector():
                     seu_val = bitflip_float32(original_val, bit_i) # perform bitfliip
 
                     tensor.data[idx] = torch.tensor(seu_val, device = self.device, dtype=tensor.dtype)
-                    criterion_score = self.criterion(self.y, self.model(self.X))
+                    criterion_score = self.criterion(self.model, self.X, self.y, self.device)
                     tensor.data[idx] = original_tensor[idx]
 
                     results["tensor_location"].append(idx)
@@ -111,15 +111,14 @@ class Injector():
                 tensor_cpu = original_tensor.cpu().numpy() # move to cpu for iteration of indexes
 
                 for idx in np.ndindex(tensor_cpu.shape):
-
-                    if np.random.uniform(0,1) > p: # only perform bitflip with probability p
+                    if np.random.uniform(0,1) > p:
                         continue
 
                     original_val = tensor_cpu[idx]
                     seu_val = bitflip_float32(original_val, bit_i) # perform bitfliip
 
                     tensor.data[idx] = torch.tensor(seu_val, device = self.device, dtype=tensor.dtype)
-                    criterion_score = self.criterion(self.y, self.model(self.X))
+                    criterion_score = self.criterion(self.model, self.X, self.y, self.device)
                     tensor.data[idx] = original_tensor[idx]
 
                     results["tensor_location"].append(idx)
@@ -129,4 +128,3 @@ class Injector():
                     results["value_after"].append(seu_val)
 
         return results
-    
