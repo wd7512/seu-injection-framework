@@ -4,7 +4,7 @@ from framework.bitflip import bitflip_float32
 from tqdm import tqdm
 
 class Injector():
-    def __init__(self, trained_model, X, y, criterion, device = None):
+    def __init__(self, trained_model, criterion, device = None, X = None, y = None, data_loader = None):
         """
         Initlaise the injector
 
@@ -28,18 +28,39 @@ class Injector():
         self.criterion = criterion
         self.model = trained_model.to(device)
         self.model.eval()
-        self.y = y
 
-        if isinstance(X, torch.Tensor):
-            self.X = X.clone().detach().to(device=device, dtype=torch.float32)
-        else:
-            self.X = torch.tensor(X, dtype=torch.float32, device=device)
-
+        self.use_data_loader = False
+        
         print(f"Testing a forward pass on {self.device}...")
 
-        self.baseline_score = criterion(self.model, self.X, self.y, self.device)
-        print("Basline Criterion Score:", self.baseline_score)
+
+        if data_loader:
+            if X or y:
+                raise ValueError("Cannot pass both a dataloader and X and y values")
+
+
+            self.use_data_loader = True
+            self.data_loader = data_loader
+            
+            self.baseline_score = criterion(self.model, self.data_loader, self.device)
+
+        else:
+            self.y = y
+
+            if isinstance(X, torch.Tensor):
+                self.X = X.clone().detach().to(device=device, dtype=torch.float32)
+            else:
+                self.X = torch.tensor(X, dtype=torch.float32, device=device)
+
+            self.baseline_score = criterion(self.model, self.X, self.y, self.device)
         
+        print("Basline Criterion Score:", self.baseline_score)
+
+    def get_criterion_score(self):
+        if self.use_data_loader:
+            return self.criterion(self.model, self.data_loader, self.device)
+        else:
+            return self.criterion(self.model, self.X, self.y, self.device)
 
 
     def run_seu(self, bit_i: int, layer_name__ = None):
@@ -76,7 +97,7 @@ class Injector():
                     seu_val = bitflip_float32(original_val, bit_i) # perform bitfliip
 
                     tensor.data[idx] = torch.tensor(seu_val, device = self.device, dtype=tensor.dtype)
-                    criterion_score = self.criterion(self.model, self.X, self.y, self.device)
+                    criterion_score = self.get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]
 
                     results["tensor_location"].append(idx)
@@ -124,7 +145,7 @@ class Injector():
                     seu_val = bitflip_float32(original_val, bit_i) # perform bitfliip
 
                     tensor.data[idx] = torch.tensor(seu_val, device = self.device, dtype=tensor.dtype)
-                    criterion_score = self.criterion(self.model, self.X, self.y, self.device)
+                    criterion_score = self.get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]
 
                     results["tensor_location"].append(idx)

@@ -3,11 +3,34 @@ from sklearn.metrics import accuracy_score
 import torch
 
 
+def classification_accuracy_loader(model, data_loader, device=None):
+    model.eval()
+    if device:
+        model = model.to(device)
+
+    y_pred_list = []
+    y_true_list = []
+
+    with torch.no_grad():
+        for batch_X, batch_y in data_loader:
+            if device:
+                batch_X = batch_X.to(device, non_blocking=True)
+                batch_y = batch_y.to(device, non_blocking=True)
+            batch_pred = model(batch_X)
+            y_pred_list.append(batch_pred)
+            y_true_list.append(batch_y)
+
+    y_pred_all = torch.cat(y_pred_list).cpu().numpy()
+    y_true_all = torch.cat(y_true_list).cpu().numpy()
+    return multiclass_classification_accuracy(y_true_all, y_pred_all)
+
 def classification_accuracy(model, X_tensor, y_true, device=None, batch_size=64):
     if device:
         model = model.to(device)
-    model.eval()
+        X_tensor = X_tensor.to(device)
+        y_true = y_true.to(device)
 
+    model.eval()
     y_pred_list = []
     y_true_list = []
 
@@ -18,14 +41,13 @@ def classification_accuracy(model, X_tensor, y_true, device=None, batch_size=64)
         for start in range(0, len(X_tensor), batch_size):
             end = start + batch_size
             batch_X = X_tensor[start:end]
-            if device:
-                batch_X = batch_X.to(device)
+            batch_y = y_true[start:end]
             batch_pred = model(batch_X)
-            y_pred_list.append(batch_pred.cpu().detach().numpy())
-            y_true_list.append(y_true[start:end].cpu().detach().numpy())
+            y_pred_list.append(batch_pred)
+            y_true_list.append(batch_y)
 
-    y_pred_all = np.concatenate(y_pred_list, axis=0)
-    y_true_all = np.concatenate(y_true_list, axis=0)
+    y_pred_all = torch.cat(y_pred_list).cpu().numpy()
+    y_true_all = torch.cat(y_true_list).cpu().numpy()
 
     return multiclass_classification_accuracy(y_true_all, y_pred_all)
 
