@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from framework.bitflip import bitflip_float32
+from tqdm import tqdm
 
 class Injector():
     def __init__(self, trained_model, X, y, criterion, device = None):
@@ -64,10 +65,13 @@ class Injector():
                     if layer_name__ != layer_name: # skip layer if not the layer name
                         continue
 
+                    
+                print("Testing Layer: ", layer_name)
+
                 original_tensor = tensor.data.clone() # copy original tensor values
                 tensor_cpu = original_tensor.cpu().numpy() # move to cpu for iteration of indexes
 
-                for idx in np.ndindex(tensor_cpu.shape):
+                for idx in tqdm(np.ndindex(tensor_cpu.shape)):
                     original_val = tensor_cpu[idx]
                     seu_val = bitflip_float32(original_val, bit_i) # perform bitfliip
 
@@ -107,10 +111,12 @@ class Injector():
                     if layer_name__ != layer_name: # skip layer if not the layer name
                         continue
 
+                print("Testing Layer: ", layer_name)
+
                 original_tensor = tensor.data.clone() # copy original tensor values
                 tensor_cpu = original_tensor.cpu().numpy() # move to cpu for iteration of indexes
 
-                for idx in np.ndindex(tensor_cpu.shape):
+                for idx in tqdm(np.ndindex(tensor_cpu.shape)):
                     if np.random.uniform(0,1) > p:
                         continue
 
