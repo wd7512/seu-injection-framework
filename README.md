@@ -13,6 +13,7 @@ For now please clone this repo and place it alongside your working code to be im
 *date: 12.06.2025* 
 - merge in changes from Research/ViT branch to enable batches during inference in `framework/criterion.py`
 - added a few more print statements in `framework/attack.py`
+- added the ability to use dataloaders in the criterion which speed up inference
 
 ### v0.0.4
 *date: 11.06.2025*
