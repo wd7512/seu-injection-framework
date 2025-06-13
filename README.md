@@ -9,6 +9,12 @@ For now please clone this repo and place it alongside your working code to be im
 
 # Code log
 
+### v0.0.6
+*date: 13/06/2025*
+- added dockerfile to test if we get a performance boost using wsl/linux
+  - added a benchamarking.py file in tests
+- removed alternative pytorch requirements
+
 ### v0.0.5
 *date: 12.06.2025* 
 - merge in changes from Research/ViT branch to enable batches during inference in `framework/criterion.py`
