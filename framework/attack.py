@@ -3,8 +3,11 @@ import torch
 from framework.bitflip import bitflip_float32
 from tqdm import tqdm
 
-class Injector():
-    def __init__(self, trained_model, criterion, device = None, X = None, y = None, data_loader = None):
+
+class Injector:
+    def __init__(
+        self, trained_model, criterion, device=None, X=None, y=None, data_loader=None
+    ):
         """
         Initlaise the injector
 
@@ -30,18 +33,16 @@ class Injector():
         self.model.eval()
 
         self.use_data_loader = False
-        
-        print(f"Testing a forward pass on {self.device}...")
 
+        print(f"Testing a forward pass on {self.device}...")
 
         if data_loader:
             if X or y:
                 raise ValueError("Cannot pass both a dataloader and X and y values")
 
-
             self.use_data_loader = True
             self.data_loader = data_loader
-            
+
             self.baseline_score = criterion(self.model, self.data_loader, self.device)
 
         else:
@@ -53,7 +54,7 @@ class Injector():
                 self.X = torch.tensor(X, dtype=torch.float32, device=device)
 
             self.baseline_score = criterion(self.model, self.X, self.y, self.device)
-        
+
         print("Basline Criterion Score:", self.baseline_score)
 
     def get_criterion_score(self):
@@ -62,11 +63,10 @@ class Injector():
         else:
             return self.criterion(self.model, self.X, self.y, self.device)
 
-
-    def run_seu(self, bit_i: int, layer_name__ = None):
+    def run_seu(self, bit_i: int, layer_name__=None):
         """Perform a bitflip at index i across every variable in the nn"""
 
-        assert bit_i in range(0,33)
+        assert bit_i in range(0, 33)
 
         self.model.eval()
 
@@ -75,28 +75,31 @@ class Injector():
             "criterion_score": [],
             "layer_name": [],
             "value_before": [],
-            "value_after": []
+            "value_after": [],
         }
 
-        with torch.no_grad(): # disable tracking gradients 
+        with torch.no_grad():  # disable tracking gradients
             # iterate though each layer of the nn
             for layer_name, tensor in self.model.named_parameters():
 
-                if layer_name__: # check if it is specified for a layer
-                    if layer_name__ != layer_name: # skip layer if not the layer name
+                if layer_name__:  # check if it is specified for a layer
+                    if layer_name__ != layer_name:  # skip layer if not the layer name
                         continue
 
-                    
                 print("Testing Layer: ", layer_name)
 
-                original_tensor = tensor.data.clone() # copy original tensor values
-                tensor_cpu = original_tensor.cpu().numpy() # move to cpu for iteration of indexes
+                original_tensor = tensor.data.clone()  # copy original tensor values
+                tensor_cpu = (
+                    original_tensor.cpu().numpy()
+                )  # move to cpu for iteration of indexes
 
                 for idx in tqdm(np.ndindex(tensor_cpu.shape)):
                     original_val = tensor_cpu[idx]
-                    seu_val = bitflip_float32(original_val, bit_i) # perform bitfliip
+                    seu_val = bitflip_float32(original_val, bit_i)  # perform bitfliip
 
-                    tensor.data[idx] = torch.tensor(seu_val, device = self.device, dtype=tensor.dtype)
+                    tensor.data[idx] = torch.tensor(
+                        seu_val, device=self.device, dtype=tensor.dtype
+                    )
                     criterion_score = self.get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]
 
@@ -107,12 +110,12 @@ class Injector():
                     results["value_after"].append(seu_val)
 
         return results
-    
-    def run_stochastic_seu(self, bit_i: int, p: float, layer_name__ = None):
+
+    def run_stochastic_seu(self, bit_i: int, p: float, layer_name__=None):
         """Perform a bitflip at index i across every variable in the nn"""
 
         assert (p >= 0) and (p <= 1)
-        assert bit_i in range(0,33)
+        assert bit_i in range(0, 33)
 
         self.model.eval()
 
@@ -121,30 +124,34 @@ class Injector():
             "criterion_score": [],
             "layer_name": [],
             "value_before": [],
-            "value_after": []
+            "value_after": [],
         }
 
-        with torch.no_grad(): # disable tracking gradients 
+        with torch.no_grad():  # disable tracking gradients
             # iterate though each layer of the nn
             for layer_name, tensor in self.model.named_parameters():
 
-                if layer_name__: # check if it is specified for a layer
-                    if layer_name__ != layer_name: # skip layer if not the layer name
+                if layer_name__:  # check if it is specified for a layer
+                    if layer_name__ != layer_name:  # skip layer if not the layer name
                         continue
 
                 print("Testing Layer: ", layer_name)
 
-                original_tensor = tensor.data.clone() # copy original tensor values
-                tensor_cpu = original_tensor.cpu().numpy() # move to cpu for iteration of indexes
+                original_tensor = tensor.data.clone()  # copy original tensor values
+                tensor_cpu = (
+                    original_tensor.cpu().numpy()
+                )  # move to cpu for iteration of indexes
 
                 for idx in tqdm(np.ndindex(tensor_cpu.shape)):
-                    if np.random.uniform(0,1) > p:
+                    if np.random.uniform(0, 1) > p:
                         continue
 
                     original_val = tensor_cpu[idx]
-                    seu_val = bitflip_float32(original_val, bit_i) # perform bitfliip
+                    seu_val = bitflip_float32(original_val, bit_i)  # perform bitfliip
 
-                    tensor.data[idx] = torch.tensor(seu_val, device = self.device, dtype=tensor.dtype)
+                    tensor.data[idx] = torch.tensor(
+                        seu_val, device=self.device, dtype=tensor.dtype
+                    )
                     criterion_score = self.get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]
 

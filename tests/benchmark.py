@@ -7,6 +7,7 @@ import torch.nn as nn
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+
 class SmallConvNet(nn.Module):
     def __init__(self, input_channels=3, num_classes=10):
         super().__init__()
@@ -27,6 +28,7 @@ class SmallConvNet(nn.Module):
     def forward(self, x):
         return self.net(x)
 
+
 input_size = (3, 64, 64)
 batch_sizes = [1, 8, 32, 128]
 
@@ -38,7 +40,7 @@ for _ in range(5):
     x = torch.randn(batch_sizes[-1], *input_size, device=device)
     with torch.no_grad():
         model(x)
-if device.type == 'cuda':
+if device.type == "cuda":
     torch.cuda.synchronize()
 
 results = []
@@ -48,19 +50,21 @@ for batch in batch_sizes:
     for _ in range(50):
         with torch.no_grad():
             model(x)
-    if device.type == 'cuda':
+    if device.type == "cuda":
         torch.cuda.synchronize()
     end = time.time()
 
     total_time = end - start
     avg_time = total_time / 50
     avg_time_per_image = avg_time / batch
-    results.append({
-        "batch_size": batch,
-        "total_time_50_forward_passes": total_time,
-        "avg_time_per_forward_pass": avg_time,
-        "avg_time_per_image": avg_time_per_image,
-    })
+    results.append(
+        {
+            "batch_size": batch,
+            "total_time_50_forward_passes": total_time,
+            "avg_time_per_forward_pass": avg_time,
+            "avg_time_per_image": avg_time_per_image,
+        }
+    )
 
 # Attempt torch.compile benchmark
 compiled_results = []
@@ -73,7 +77,7 @@ try:
         x = torch.randn(batch_sizes[-1], *input_size, device=device)
         with torch.no_grad():
             compiled_model(x)
-    if device.type == 'cuda':
+    if device.type == "cuda":
         torch.cuda.synchronize()
 
     for batch in batch_sizes:
@@ -82,19 +86,21 @@ try:
         for _ in range(50):
             with torch.no_grad():
                 compiled_model(x)
-        if device.type == 'cuda':
+        if device.type == "cuda":
             torch.cuda.synchronize()
         end = time.time()
 
         total_time = end - start
         avg_time = total_time / 50
         avg_time_per_image = avg_time / batch
-        compiled_results.append({
-            "batch_size": batch,
-            "total_time_50_forward_passes": total_time,
-            "avg_time_per_forward_pass": avg_time,
-            "avg_time_per_image": avg_time_per_image,
-        })
+        compiled_results.append(
+            {
+                "batch_size": batch,
+                "total_time_50_forward_passes": total_time,
+                "avg_time_per_forward_pass": avg_time,
+                "avg_time_per_image": avg_time_per_image,
+            }
+        )
 
 except Exception as e:
     compiled_results = [{"error": f"torch.compile failed with: {str(e)}"}]

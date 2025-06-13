@@ -14,7 +14,8 @@ def generate_moons_data(test_size=0.3, random_state=0):
     X, y = make_moons(n_samples=1000, noise=0.2, random_state=random_state)
     X = StandardScaler().fit_transform(X)
     X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state)
+        X, y, test_size=test_size, random_state=random_state
+    )
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_train = torch.tensor(y_train, dtype=torch.float32).unsqueeze(1)
@@ -26,10 +27,7 @@ class SimpleNN(nn.Module):
     def __init__(self):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(2, 8),
-            nn.ReLU(),
-            nn.Linear(8, 1),
-            nn.Sigmoid()
+            nn.Linear(2, 8), nn.ReLU(), nn.Linear(8, 1), nn.Sigmoid()
         )
 
     def forward(self, x):
@@ -44,7 +42,7 @@ class SimpleCNN(nn.Module):
             nn.ReLU(),
             nn.Flatten(),
             nn.Linear(8 * 2, 1),
-            nn.Sigmoid()
+            nn.Sigmoid(),
         )
 
     def forward(self, x):
@@ -56,10 +54,7 @@ class SimpleRNN(nn.Module):
     def __init__(self, hidden_size=8):
         super().__init__()
         self.rnn = nn.RNN(input_size=1, hidden_size=hidden_size, batch_first=True)
-        self.fc = nn.Sequential(
-            nn.Linear(hidden_size, 1),
-            nn.Sigmoid()
-        )
+        self.fc = nn.Sequential(nn.Linear(hidden_size, 1), nn.Sigmoid())
 
     def forward(self, x):
         x = x.unsqueeze(-1)
@@ -88,7 +83,9 @@ def evaluate_model(model, X_test, y_test):
     return accuracy
 
 
-def get_example_network(net_name='simple', test_size=0.3, random_state=0, train=False, epochs=300, lr=0.01):
+def get_example_network(
+    net_name="simple", test_size=0.3, random_state=0, train=False, epochs=300, lr=0.01
+):
     """
     Args:
         net_name (str): 'simple', 'cnn', 'rnn', or 'gnn'
@@ -108,13 +105,15 @@ def get_example_network(net_name='simple', test_size=0.3, random_state=0, train=
         returns model, data, labels, train_fn, eval_fn (no training done internally)
     """
     nets = {
-        'nn': SimpleNN,
-        'cnn': SimpleCNN,
-        'rnn': SimpleRNN,
+        "nn": SimpleNN,
+        "cnn": SimpleCNN,
+        "rnn": SimpleRNN,
     }
 
     if net_name not in nets or nets[net_name] is None:
-        raise ValueError(f"Network '{net_name}' not implemented or missing dependencies.")
+        raise ValueError(
+            f"Network '{net_name}' not implemented or missing dependencies."
+        )
 
     else:
         X_train, X_test, y_train, y_test = generate_moons_data(test_size, random_state)
