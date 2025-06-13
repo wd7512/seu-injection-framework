@@ -3,6 +3,8 @@ FROM python:3.11-slim
 RUN apt-get update && apt-get install -y git curl && \
     pip install --upgrade pip
 
+RUN apt install build-essential
+
 # Clone your repo first
 RUN git clone https://github.com/wd7512/seu-injection-framework /workspace
 
