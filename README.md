@@ -14,6 +14,7 @@ For now please clone this repo and place it alongside your working code to be im
 - added dockerfile to test if we get a performance boost using wsl/linux
   - added a benchamarking.py file in tests
 - removed alternative pytorch requirements
+- clean up the code with `black`
 
 ### v0.0.5
 *date: 12.06.2025* 
