@@ -1,5 +1,0 @@
-# PyTorch with GPU support (CUDA 11.8, for RTX 3070 Ti)
-torch==2.2.2+cu118
-torchvision==0.17.2+cu118
-torchaudio==2.2.2+cu118
---extra-index-url https://download.pytorch.org/whl/cu118

@@ -24,6 +24,7 @@ def classification_accuracy_loader(model, data_loader, device=None):
     y_true_all = torch.cat(y_true_list).cpu().numpy()
     return multiclass_classification_accuracy(y_true_all, y_pred_all)
 
+
 def classification_accuracy(model, X_tensor, y_true, device=None, batch_size=64):
     if device:
         model = model.to(device)
@@ -50,6 +51,7 @@ def classification_accuracy(model, X_tensor, y_true, device=None, batch_size=64)
     y_true_all = torch.cat(y_true_list).cpu().numpy()
 
     return multiclass_classification_accuracy(y_true_all, y_pred_all)
+
 
 def multiclass_classification_accuracy(y_true, model_output):
     if model_output.ndim == 1 or model_output.shape[1] == 1:
