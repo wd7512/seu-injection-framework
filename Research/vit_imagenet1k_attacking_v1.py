@@ -125,7 +125,7 @@ def main():
             # =================================================== #
             df = pd.DataFrame(results)
             df["bit_i"] = bit_i
-            df["time_per_seu_(s)"] = (s - e) / len(df)
+            df["time_per_seu_(s)"] = (e - s) / len(df)
             print(df)
 
             total_res = pd.concat([total_res, df], axis = 0)

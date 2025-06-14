@@ -43,7 +43,15 @@ class Injector:
             self.use_data_loader = True
             self.data_loader = data_loader
 
-            self.baseline_score = criterion(self.model, self.data_loader, self.device)
+
+            try:
+                compiled_model = torch.compile(self.model) 
+                self.baseline_score = criterion(compiled_model, self.data_loader, self.device)
+                print("Compiled model works")
+                self.model = compiled_model
+            except Exception as e:
+                print(f"Compilation failed: {e}")
+                self.baseline_score = criterion(self.model, self.data_loader, self.device)
 
         else:
             self.y = y
