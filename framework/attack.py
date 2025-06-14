@@ -2,6 +2,7 @@ import numpy as np
 import torch
 from framework.bitflip import bitflip_float32
 from tqdm import tqdm
+from random import sample
 
 
 class Injector:
@@ -154,6 +155,57 @@ class Injector:
                     if np.random.uniform(0, 1) > p:
                         continue
 
+                    original_val = tensor_cpu[idx]
+                    seu_val = bitflip_float32(original_val, bit_i)  # perform bitfliip
+
+                    tensor.data[idx] = torch.tensor(
+                        seu_val, device=self.device, dtype=tensor.dtype
+                    )
+                    criterion_score = self.get_criterion_score()
+                    tensor.data[idx] = original_tensor[idx]
+
+                    results["tensor_location"].append(idx)
+                    results["criterion_score"].append(criterion_score)
+                    results["layer_name"].append(layer_name)
+                    results["value_before"].append(original_val)
+                    results["value_after"].append(seu_val)
+
+        return results
+
+    def run_n_seu(self, bit_i: int, n = 1,layer_name__=None):
+        """Perform a bitflip at index i across every variable in the nn"""
+
+        assert bit_i in range(0, 33)
+
+        self.model.eval()
+
+        results = {
+            "tensor_location": [],
+            "criterion_score": [],
+            "layer_name": [],
+            "value_before": [],
+            "value_after": [],
+        }
+
+        with torch.no_grad():  # disable tracking gradients
+            # iterate though each layer of the nn
+            for layer_name, tensor in self.model.named_parameters():
+
+                if layer_name__:  # check if it is specified for a layer
+                    if layer_name__ != layer_name:  # skip layer if not the layer name
+                        continue
+
+                print("Testing Layer: ", layer_name)
+
+                original_tensor = tensor.data.clone()  # copy original tensor values
+                tensor_cpu = (
+                    original_tensor.cpu().numpy()
+                )  # move to cpu for iteration of indexes
+
+                indices = list(np.ndindex(tensor_cpu.shape))
+                indices = sample(indices, min(n, len(indices)))
+
+                for idx in tqdm(indices, desc=f"Flipping bits in {layer_name}"):
                     original_val = tensor_cpu[idx]
                     seu_val = bitflip_float32(original_val, bit_i)  # perform bitfliip
 

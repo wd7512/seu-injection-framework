@@ -1,6 +1,8 @@
 
 import os
 import sys
+import torch
+torch.set_float32_matmul_precision('high')
 
 # Save current working directory
 cwd = os.getcwd()
@@ -24,7 +26,6 @@ from framework.criterion import classification_accuracy_loader
 from framework.attack import Injector
 
 import pandas as pd
-import torch
 import time
 
 def get_best_device():
@@ -111,14 +112,13 @@ def main():
             size = tensor.numel()
 
             n_attacks = min(10,int(size * 0.1))
-            p = n_attacks / size
 
             # =================================================== #
             # Evaluate the model with errors
             # =================================================== #
-            print("Attacking:", [bit_i, p, n_attacks,layer_name])
+            print("Attacking:", [bit_i, n_attacks,layer_name])
             s = time.perf_counter()
-            results = inj.run_stochastic_seu(bit_i=bit_i,p= p, layer_name__=layer_name)
+            results = inj.run_n_seu(bit_i=bit_i,n=n_attacks, layer_name__=layer_name)
             e = time.perf_counter()
             # =================================================== #
             # Print results (pandas maybe prettier)
