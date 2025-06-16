@@ -74,7 +74,7 @@ def main():
     # Load the ImageNet validation set
     # =================================================== #
     batch_size = 256
-    num_workers= 4
+    num_workers= 0
     val_dataset = datasets.ImageNet(root=data_root_dir, split='val', transform=transform)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers, pin_memory=True)
 
