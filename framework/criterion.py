@@ -11,11 +11,18 @@ def classification_accuracy_loader(model, data_loader, device=None):
     y_pred_list = []
     y_true_list = []
 
+    # So non_blocking is not supported for MPS, spurious results, avoid using
+    non_blocking = ((device == "cuda") or (device == "cpu"))
+    # Sanity check, only use non_blocking=True for device="cuda" or "cpu"
+    # print(f"CRITERION batch device={device} non_blocking={non_blocking}")
+    if non_blocking and device == "mps":
+        raise ValueError("Can only use non_blocking=True with device cuda or cpu, device=mps")
+
     with torch.no_grad():
         for batch_X, batch_y in data_loader:
             if device:
-                batch_X = batch_X.to(device, non_blocking=True)
-                batch_y = batch_y.to(device, non_blocking=True)
+                batch_X = batch_X.to(device, non_blocking=non_blocking)
+                batch_y = batch_y.to(device, non_blocking=non_blocking)
             batch_pred = model(batch_X)
             y_pred_list.append(batch_pred)
             y_true_list.append(batch_y)
