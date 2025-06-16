@@ -222,3 +222,61 @@ class Injector:
                     results["value_after"].append(seu_val)
 
         return results
+
+    def run_stochastic_seu_layer(self, bit_i: int, k: int):
+        """Perform a bitflip at index i across k randomly selected variables in each layer of the nn"""
+
+        assert bit_i in range(0, 33)
+
+        self.model.eval()
+
+        results = {
+            "tensor_location": [],
+            "criterion_score": [],
+            "layer_name": [],
+            "value_before": [],
+            "value_after": []
+        }
+
+        with torch.no_grad():  # disable tracking gradients
+            # iterate though each layer of the nn
+            num_layers = 0
+            total_k = 0
+            for layer_name, tensor in tqdm(self.model.named_parameters(), desc="Layers"):
+                # model.named_parameters() iterates layers in the model in order
+                # We are adding the layer_name to a list, the list preserves the order
+                num_layers += 1
+
+                original_tensor = tensor.data.clone()  # copy original tensor values
+                tensor_cpu = original_tensor.cpu().numpy()  # move to cpu for iteration of indexes
+
+                # Generate all possible indices
+                #   e.g. (4,2) =[(0,0), (0,1), (1,0),(1,1), (2,0),(2,1), (3,0),(3,1)]
+                shape = tensor_cpu.shape
+                all_indices = list(np.ndindex(shape))  # list of tuples
+                if k > tensor_cpu.size:
+                    # in case k > num params
+                    print(
+                        f"Given k {k}, not enough samples {tensor_cpu.size} for layer {layer_name}, sampling all {tensor_cpu.size} instead")
+                    k = tensor_cpu.size
+                selected_indices = list()
+                #print(f"Selecting {k} from Layer: {layer_name}")
+                total_k += k
+                for i in np.random.choice(len(all_indices), k):
+                    selected_indices.append(all_indices[i])
+
+                for idx in tqdm(selected_indices, desc="k bitflips", leave=False):
+                    original_val = tensor_cpu[idx]
+                    seu_val = bitflip_float32(original_val, bit_i)  # perform bitfliip
+
+                    tensor.data[idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
+                    criterion_score = self.get_criterion_score()
+                    tensor.data[idx] = original_tensor[idx]
+
+                    results["tensor_location"].append(idx)
+                    results["criterion_score"].append(criterion_score)
+                    results["layer_name"].append(layer_name)
+                    results["value_before"].append(original_val)
+                    results["value_after"].append(seu_val)
+        #print(f"Selected {total_k} from {num_layers} layers")
+        return results
