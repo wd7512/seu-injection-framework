@@ -13,43 +13,80 @@ class ModelSplitter:
         with torch.no_grad():
             self.baseline_output = self.model(self.sample_input)
 
-        self.forward_modules = self._get_ordered_modules()
+        self.ordered_ops = self._trace_forward()
 
-    def _get_ordered_modules(self):
-        if isinstance(self.model, nn.Sequential):
-            return list(self.model._modules.items())
-        elif hasattr(self.model, 'net') and isinstance(self.model.net, nn.Sequential):
-            return list(self.model.net._modules.items())
-        else:
-            raise NotImplementedError("Only supports models or model.net of type nn.Sequential")
+    def _trace_forward(self):
+        traced = []
+        hooks = []
 
-    def _map_params_to_layers(self):
-        param_to_module_idx = {}
-        modules = self.forward_modules
-        net_prefix = "net." if hasattr(self.model, 'net') else ""
+        def hook_fn(module, input, output):
+            traced.append((module, input, output))
 
-        for idx, (mod_name, layer) in enumerate(modules):
-            for pname, _ in layer.named_parameters():
-                full_name = f"{net_prefix}{mod_name}.{pname}"
-                param_to_module_idx[full_name] = idx
-
-        return param_to_module_idx
-
-    def split_from_param(self, param_name: str) -> Tuple[torch.Tensor, nn.Module]:
-        param_map = self._map_params_to_layers()
-        if param_name not in param_map:
-            raise ValueError(f"Parameter '{param_name}' not found in model.")
-
-        split_idx = param_map[param_name]
-        modules = self.forward_modules
-        layers1 = nn.Sequential(*[layer for _, layer in modules[:split_idx]])
-        layers2 = nn.Sequential(*[layer for _, layer in modules[split_idx:]])
+        for module in self.model.modules():
+            if len(list(module.children())) == 0:  # leaf modules only
+                hooks.append(module.register_forward_hook(hook_fn))
 
         with torch.no_grad():
-            part1_out = layers1(self.sample_input)
-            recombined_output = layers2(part1_out)
+            self.model(self.sample_input)
 
-        if not torch.allclose(self.baseline_output, recombined_output, atol=1e-6):
-            raise ValueError("Split model output does not match full model output.")
+        for h in hooks:
+            h.remove()
 
-        return part1_out, layers2
+        return traced
+
+    def split_from_param(self, param_name: str) -> Tuple[torch.Tensor, nn.Module]:
+        name_to_module = {name: mod for name, mod in self.model.named_modules()}
+        param_to_module = {}
+
+        for name, param in self.model.named_parameters():
+            mod_name = ".".join(name.split(".")[:-1])
+            param_to_module[name] = name_to_module.get(mod_name)
+
+        if param_name not in param_to_module:
+            raise ValueError(f"Parameter '{param_name}' not found.")
+
+        target_module = param_to_module[param_name]
+
+        # Find split index in ordered_ops
+        for idx, (mod, _, _) in enumerate(self.ordered_ops):
+            if mod is target_module:
+                split_idx = idx
+                break
+        else:
+            raise RuntimeError("Split point not found in forward trace.")
+
+        # Compose partial models
+        class Part1(nn.Module):
+            def __init__(self, ops):
+                super().__init__()
+                self.ops = ops
+
+            def forward(self, x):
+                for mod, _, _ in self.ops:
+                    x = mod(x)
+                return x
+
+        class Part2(nn.Module):
+            def __init__(self, ops):
+                super().__init__()
+                self.ops = ops
+
+            def forward(self, x):
+                for mod, _, _ in self.ops:
+                    x = mod(x)
+                return x
+
+        ops1 = self.ordered_ops[:split_idx]
+        ops2 = self.ordered_ops[split_idx:]
+
+        model1 = Part1(ops1)
+        model2 = Part2(ops2)
+
+        with torch.no_grad():
+            part1_out = model1(self.sample_input)
+            recombined_out = model2(part1_out)
+
+        if not torch.allclose(recombined_out, self.baseline_output, atol=1e-6):
+            raise ValueError("Split model output does not match baseline.")
+
+        return part1_out, model2
