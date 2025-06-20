@@ -76,11 +76,31 @@ def main():
     for idx in idx2df.keys():
         df = idx2df[idx]
         # Add the index to the dataframe
-        df['index'] = idx
+        df['bitidx'] = idx
         print(f"[{idx}] = {len(df)} rows")
         dfs.append(df)
     # Dataframe with all
     df_all = pd.concat(dfs, ignore_index=True)
+
+    # df_all = None
+    # for idx in idx2df.keys():
+    #     df = idx2df[idx]
+    #     # Add the index to the dataframe
+    #     df['bitidx'] = idx
+    #     print(f"[{idx}] = {len(df)} rows")
+    #     if df_all is None:
+    #         df_all = df
+    #     else:
+    #         df_all = pd.concat([df_all, df], axis=0, ignore_index=True)
+
+    df_all.sort_values(by='bitidx', inplace=True)
+
+    # Critical, make bitidx str, does odd things when it is an integer
+    df_all['bitidx'] = df_all['bitidx'].astype(str)
+
+    print(df_all.head())
+    print(f"Indices {df_all['bitidx'].unique()}")
+    print(f"Length {len(df_all)}")
 
 
 
@@ -96,7 +116,7 @@ def main():
 
     # Plot 1: Stripplot - layer_name vs criterion_score
     plt.figure(figsize=(14, 6))
-    sns.stripplot(data=df_all, x='layer_name', y='criterion_score', hue='index', jitter=True, dodge=True)
+    sns.stripplot(data=df_all, x='layer_name', y='abs_change', hue='bitidx', jitter=True, dodge=True)
     plt.xticks(rotation=90)
     plt.title("Criterion Score by Layer Name")
     plt.tight_layout()
@@ -105,7 +125,7 @@ def main():
 
     # Plot 2: Lineplot - index vs criterion_score (row index as x-axis)
     plt.figure(figsize=(8, 4))
-    sns.lineplot(data=df_all.reset_index(), x='index', y='criterion_score', hue='index', marker='o')
+    sns.lineplot(data=df_all.reset_index(), x='bitidx', y='abs_change', hue='bitidx', marker='o')
     plt.title("Criterion Score by Dataset Index")
     plt.tight_layout()
     plt.savefig(f"fig_lineplot.pdf", dpi=300)  # Save as publication-quality PDF
