@@ -60,7 +60,6 @@ class ModelSplitter:
         mod_path = ".".join(param_name.split(".")[:-1])
         split_module = name_to_module[mod_path]
 
-        # Find split index
         for idx, (mod, _, _) in enumerate(self.ordered_ops):
             if mod is split_module:
                 split_idx = idx
@@ -86,13 +85,26 @@ class ModelSplitter:
 
         with torch.no_grad():
             part1_out = model1(self.sample_input)
-            recombined = model2(part1_out)
+
+            try:
+                recombined = model2(part1_out)
+            except RuntimeError as e:
+                # Check if shape error occurred and model2 starts with Linear
+                first_op = model2.ops[0][0] if model2.ops else None
+                if isinstance(first_op, nn.Linear) and part1_out.dim() > 2:
+                    try:
+                        part1_out = part1_out.view(part1_out.size(0), -1)
+                        recombined = model2(part1_out)
+                    except Exception as e2:
+                        raise RuntimeError(f"Automatic reshape failed: {e2}") from e
+                else:
+                    raise e
 
         if not torch.allclose(recombined, self.baseline_output, atol=1e-6):
             raise ValueError("Split model output does not match full output.")
 
         return part1_out, model2
-
+    
     def available_split_points(self):
         return sorted(self.legal_splits)
 
@@ -105,4 +117,14 @@ class ModelSplitter:
                 continue
             else:
                 safe_points.append(param_name)
+        return safe_points
+    
+    def get_structure_safe_split_points(self):
+        safe_points = []
+        for name in self.legal_splits:
+            # Only split at top-level blocks or classification head
+            if name.startswith("blocks.") and name.count('.') <= 2:
+                safe_points.append(name)
+            elif name.startswith("head.") or name.startswith("norm."):
+                safe_points.append(name)
         return safe_points
