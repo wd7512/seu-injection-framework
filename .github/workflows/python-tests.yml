@@ -1,6 +1,6 @@
-name: Pylint
+name: Python Tests
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -23,6 +23,6 @@ jobs:
         pip install -r requirements.txt
         pip install pylint 
 
-    - name: Analysing the code with pylint
+    - name: Run tests in tests/ folder
       run: |
-        pylint $(git ls-files '*.py')
+        pytest tests
