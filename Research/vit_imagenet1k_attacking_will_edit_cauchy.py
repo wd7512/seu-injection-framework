@@ -60,7 +60,7 @@ def get_best_device():
 def main():
     if len(sys.argv) != 2:
         print("Usage <data root dir> <k errors per layer> <index>")
-        print("Example python vit_imagenet1k_attacking_will_edit.py ./data/ILSVRC2012_5K")
+        print("Example python vit_imagenet1k_attacking_will_edit_cauchy.py ./data/ILSVRC2012_5K")
         return
     data_root_dir = sys.argv[1]
 
