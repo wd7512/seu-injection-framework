@@ -1,0 +1,1 @@
+{"tensor_location": [[0, 6, 210]], "criterion_score": [0.7606], "layer_name": ["encoder.pos_embedding"], "value_before": [0.05358351022005081], "value_after": [-0.3162631172910643]}
