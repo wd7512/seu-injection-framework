@@ -63,7 +63,7 @@ def main():
         print("Example python vit_imagenet1k_attacking_will_edit.py ./data/ILSVRC2012_5K 1")
         return
     data_root_dir = sys.argv[1]
-    delta     = int(sys.argv[2]) # which index is affected
+    delta     = float(sys.argv[2]) # which index is affected
 
     # =================================================== #
     # Define the backend
