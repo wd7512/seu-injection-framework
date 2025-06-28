@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-from framework.bitflip import bitflip_float32
+from framework.bitflip import bitflip_float32, cauchy
 from tqdm import tqdm
 from random import sample
 
@@ -313,6 +313,59 @@ class Injector:
                 for idx in tqdm(np.ndindex(tensor_cpu.shape)):
                     original_val = tensor_cpu[idx]
                     seu_val = original_val + delta
+
+                    tensor.data[idx] = torch.tensor(
+                        seu_val, device=self.device, dtype=tensor.dtype
+                    )
+                    criterion_score = self.get_criterion_score()
+                    tensor.data[idx] = original_tensor[idx]
+
+                    results["tensor_location"].append(idx)
+                    results["criterion_score"].append(criterion_score)
+                    results["layer_name"].append(layer_name)
+                    results["value_before"].append(original_val)
+                    results["value_after"].append(seu_val)
+
+                    break # only do it once 
+
+        return results
+
+    def run_singular_seu_cauchy(self, layer_name__):
+        """Performs a cauchy delta to a random bit in each layer"""
+
+
+        self.model.eval()
+
+        results = {
+            "tensor_location": [],
+            "criterion_score": [],
+            "layer_name": [],
+            "value_before": [],
+            "value_after": [],
+        }
+
+        with torch.no_grad():  # disable tracking gradients
+            # iterate though each layer of the nn
+            for layer_name, tensor in self.model.named_parameters():
+
+                if layer_name__:  # check if it is specified for a layer
+                    if layer_name__ != layer_name:  # skip layer if not the layer name
+                        continue
+
+                print("Testing Layer: ", layer_name)
+
+                original_tensor = tensor.data.clone()  # copy original tensor values
+                tensor_cpu = (
+                    original_tensor.cpu().numpy()
+                )  # move to cpu for iteration of indexes
+
+                indexes = list(np.ndindex(tensor_cpu.shape))
+                np.random.shuffle(indexes)
+                
+
+                for idx in tqdm(indexes):
+                    original_val = tensor_cpu[idx]
+                    seu_val = cauchy(original_val)
 
                     tensor.data[idx] = torch.tensor(
                         seu_val, device=self.device, dtype=tensor.dtype

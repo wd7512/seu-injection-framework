@@ -1,0 +1,1 @@
+{"tensor_location": [[0]], "criterion_score": [0.7606], "layer_name": ["encoder.layers.encoder_layer_8.ln_2.bias"], "value_before": [0.03615707531571388], "value_after": [1.0361571311950684]}

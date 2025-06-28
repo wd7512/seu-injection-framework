@@ -30,3 +30,7 @@ def binary_to_float32(binary_str):
     bits = int(binary_str, 2)
     # Pack the integer into bytes, then unpack as a float
     return struct.unpack("!f", struct.pack("!I", bits))[0]
+
+
+def cauchy(x, scale = 1):
+    return x + np.random.standard_cauchy() * scale
