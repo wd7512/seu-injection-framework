@@ -3,7 +3,7 @@ import torch
 from framework.bitflip import bitflip_float32, cauchy
 from tqdm import tqdm
 from random import sample
-
+torch.set_float32_matmul_precision("high")
 
 class Injector:
     def __init__(
@@ -359,26 +359,22 @@ class Injector:
                     original_tensor.cpu().numpy()
                 )  # move to cpu for iteration of indexes
 
-                indexes = list(np.ndindex(tensor_cpu.shape))
-                np.random.shuffle(indexes)
-                
+                idx = tuple(np.random.randint(s) for s in tensor_cpu.shape)
 
-                for idx in tqdm(indexes):
-                    original_val = tensor_cpu[idx]
-                    seu_val = cauchy(original_val)
 
-                    tensor.data[idx] = torch.tensor(
-                        seu_val, device=self.device, dtype=tensor.dtype
-                    )
-                    criterion_score = self.get_criterion_score()
-                    tensor.data[idx] = original_tensor[idx]
+                original_val = tensor_cpu[idx]
+                seu_val = cauchy(original_val)
 
-                    results["tensor_location"].append(idx)
-                    results["criterion_score"].append(criterion_score)
-                    results["layer_name"].append(layer_name)
-                    results["value_before"].append(original_val)
-                    results["value_after"].append(seu_val)
+                tensor.data[idx] = torch.tensor(
+                    seu_val, device=self.device, dtype=tensor.dtype
+                )
+                criterion_score = self.get_criterion_score()
+                tensor.data[idx] = original_tensor[idx]
 
-                    break # only do it once 
+                results["tensor_location"].append(idx)
+                results["criterion_score"].append(criterion_score)
+                results["layer_name"].append(layer_name)
+                results["value_before"].append(original_val)
+                results["value_after"].append(seu_val)
 
         return results
