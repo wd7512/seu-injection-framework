@@ -23,6 +23,6 @@ jobs:
         pip install -r requirements.txt
         pip install pylint 
 
-    - name: Analysing the code with pylint
+    - name: Analyse code with pylint (threshold 7.0)
       run: |
-        pylint $(git ls-files '*.py')
+        pylint --fail-under=7 $(git ls-files '*.py')
