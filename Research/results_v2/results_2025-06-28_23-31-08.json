@@ -1,0 +1,1 @@
+{"tensor_location": [[493]], "criterion_score": [0.7612], "layer_name": ["encoder.layers.encoder_layer_8.self_attention.out_proj.bias"], "value_before": [-0.006522170267999172], "value_after": [0.133493571971605]}

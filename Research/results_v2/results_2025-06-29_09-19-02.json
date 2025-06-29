@@ -1,0 +1,1 @@
+{"tensor_location": [[143]], "criterion_score": [0.7608], "layer_name": ["heads.head.bias"], "value_before": [-0.017132479697465897], "value_after": [-2.862775521029476]}

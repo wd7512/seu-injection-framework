@@ -130,24 +130,28 @@ def main():
     # =================================================== #
 
     params = model.named_parameters()
-    for layer_name, tensor in params:
-        stopwatch = Stopwatch()
+    while True:
+        for layer_name, tensor in params:
+            if "encoder.layers.encoder_layer" in layer_name:
+                continue
 
-        results = inj.run_singular_seu_cauchy(layer_name__=layer_name)
-        df = pd.DataFrame(results)
-        print(f"Dataframe")
-        print(df)
-        bitflips = len(df)
+            stopwatch = Stopwatch()
 
-        current_datetime = datetime.now()
-        #date_string = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
-        date_string = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
-        filename = f"results_v2/results_{date_string}.json"
-        with open(filename, 'w') as fp:
-            json.dump(results, fp, cls=NumpyTypeEncoder)
+            results = inj.run_singular_seu_cauchy(layer_name__=layer_name)
+            df = pd.DataFrame(results)
+            print(f"Dataframe")
+            print(df)
+            bitflips = len(df)
 
-        print(f"Inference for {bitflips} bitflips took {stopwatch.elapsedTime()/60:.1f} minutes")
-        print(f"Average {stopwatch.elapsedTime()/bitflips} seconds/bitflip")
+            current_datetime = datetime.now()
+            #date_string = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+            date_string = current_datetime.strftime("%Y-%m-%d_%H-%M-%S")
+            filename = f"results_v2/results_{date_string}.json"
+            with open(filename, 'w') as fp:
+                json.dump(results, fp, cls=NumpyTypeEncoder)
+
+            print(f"Inference for {bitflips} bitflips took {stopwatch.elapsedTime()/60:.1f} minutes")
+            print(f"Average {stopwatch.elapsedTime()/bitflips} seconds/bitflip")
 
 
 if __name__ == "__main__":

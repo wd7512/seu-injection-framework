@@ -1,0 +1,1 @@
+{"tensor_location": [[0, 0, 406]], "criterion_score": [0.0938], "layer_name": ["class_token"], "value_before": [-0.0009697730420157313], "value_after": [-0.6234429641971924]}

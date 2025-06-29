@@ -1,0 +1,1 @@
+{"tensor_location": [[601, 2, 5, 8]], "criterion_score": [0.7626], "layer_name": ["conv_proj.weight"], "value_before": [-0.002254573628306389], "value_after": [-1.4674272913073005]}

@@ -363,7 +363,7 @@ class Injector:
 
 
                 original_val = tensor_cpu[idx]
-                seu_val = cauchy(original_val)
+                seu_val = cauchy(original_val, bound=10)
 
                 tensor.data[idx] = torch.tensor(
                     seu_val, device=self.device, dtype=tensor.dtype

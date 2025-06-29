@@ -1,0 +1,1 @@
+{"tensor_location": [[463, 375]], "criterion_score": [0.7606], "layer_name": ["encoder.layers.encoder_layer_3.self_attention.out_proj.weight"], "value_before": [0.0030387332662940025], "value_after": [-1.0049722725922843]}

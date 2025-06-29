@@ -32,5 +32,9 @@ def binary_to_float32(binary_str):
     return struct.unpack("!f", struct.pack("!I", bits))[0]
 
 
-def cauchy(x, scale = 1):
-    return x + np.random.standard_cauchy() * scale
+def cauchy(x, scale = 1, bound=None):
+    add = np.random.standard_cauchy() * scale
+    if bound is not None:
+        while np.abs(add) > bound:
+            add = np.random.standard_cauchy() * scale
+    return x + add

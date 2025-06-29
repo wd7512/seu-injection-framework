@@ -1,0 +1,1 @@
+{"tensor_location": [[594]], "criterion_score": [0.7604], "layer_name": ["encoder.layers.encoder_layer_5.ln_1.weight"], "value_before": [0.2605525553226471], "value_after": [1.9967211750660154]}

@@ -1,0 +1,1 @@
+{"tensor_location": [[2854]], "criterion_score": [0.7608], "layer_name": ["encoder.layers.encoder_layer_8.mlp.0.bias"], "value_before": [-0.05333689972758293], "value_after": [-3.2353827780981184]}

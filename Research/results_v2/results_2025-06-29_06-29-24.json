@@ -1,0 +1,1 @@
+{"tensor_location": [[470]], "criterion_score": [0.76], "layer_name": ["conv_proj.bias"], "value_before": [0.0014647014904767275], "value_after": [0.769323642099404]}
