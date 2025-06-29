@@ -1,0 +1,1 @@
+{"tensor_location": [[495, 256]], "criterion_score": [0.7608], "layer_name": ["heads.head.weight"], "value_before": [0.014462383463978767], "value_after": [0.6040007165607482]}
