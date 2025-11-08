@@ -41,8 +41,11 @@ def bitflip_float32(
         >>> bitflip_float32([1.0, 2.0], 0)  # Flip sign bit in array
         array([-1., -2.])
     """
+    # Validate bit position
     if bit_i is None:
         bit_i = np.random.randint(0, 32)
+    elif not (0 <= bit_i <= 31):
+        raise ValueError(f"Bit position must be between 0 and 31, got {bit_i}")
 
     if hasattr(x, "__iter__"):
         # Handle arrays/iterables
