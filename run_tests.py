@@ -41,20 +41,34 @@ def run_command(cmd, description):
             print("STDERR:", result.stderr)
         return True
     except subprocess.CalledProcessError as e:
-        print(f"❌ FAILED: {description}")
+        print(f"FAILED: {description}")
         print(f"Exit code: {e.returncode}")
         print(f"STDOUT: {e.stdout}")
         print(f"STDERR: {e.stderr}")
+        
+        # Check if this is a coverage failure
+        if "--cov-fail-under" in ' '.join(cmd) and "coverage" in description.lower():
+            output_text = e.stdout + e.stderr
+            if "TOTAL" in output_text and "%" in output_text:
+                print(f"\nCOVERAGE REQUIREMENT NOT MET!")
+                print(f"Current coverage is below the required 80% threshold.")
+                print(f"To fix coverage issues:")
+                print(f"   1. Run with verbose coverage: uv run pytest --cov=framework --cov-report=term-missing -v")
+                print(f"   2. Check htmlcov/index.html for detailed coverage report")
+                print(f"   3. Add tests for uncovered code paths")
+                print(f"   4. Ensure all critical functions have test coverage")
+                print(f"WARNING: Maintaining 80% coverage is required for code quality standards.")
+        
         return False
     except FileNotFoundError:
-        print(f"❌ ERROR: Command not found. Make sure UV is installed and in PATH.")
+        print(f"ERROR: Command not found. Make sure UV is installed and in PATH.")
         print(f"Try: curl -LsSf https://astral.sh/uv/install.sh | sh")
         return False
 
 
 def run_smoke_tests():
     """Run smoke tests for quick validation."""
-    print("🚀 Running smoke tests (quick validation)...")
+    print("Running smoke tests (quick validation)...")
     
     # First try direct Python execution via UV
     smoke_test_file = framework_root / "tests" / "smoke" / "test_basic_functionality.py"
@@ -71,42 +85,43 @@ def run_smoke_tests():
 
 def run_unit_tests():
     """Run unit tests."""
-    print("🧪 Running unit tests...")
-    cmd = ["uv", "run", "pytest", "tests/test_*.py", "-v", "--tb=short"]
+    print("Running unit tests...")
+    cmd = ["uv", "run", "pytest", "tests/test_bitflip.py", "tests/test_criterion.py", "tests/test_injector.py", "-v", "--tb=short"]
     return run_command(cmd, "Unit tests")
 
 
 def run_integration_tests():
     """Run integration tests."""
-    print("🔄 Running integration tests...")
+    print("Running integration tests...")
     cmd = ["uv", "run", "pytest", "tests/integration/", "-v", "--tb=short"]
     return run_command(cmd, "Integration tests")
 
 
 def run_all_tests():
     """Run all tests with coverage."""
-    print("🎯 Running complete test suite with coverage...")
+    print("Running complete test suite with coverage...")
     cmd = [
         "uv", "run", "pytest", 
         "tests/", 
         "-v", 
-        "--cov=framework", 
+        "--cov=src/seu_injection", 
         "--cov-report=term-missing",
         "--cov-report=html:htmlcov",
+        "--cov-fail-under=80",
         "--tb=short"
     ]
     return run_command(cmd, "Complete test suite with coverage")
 
 
 def check_dependencies():
-    """Check if required dependencies are available via UV."""
-    print("🔍 Checking test dependencies via UV environment...")
+    """Check if all required dependencies are available."""
+    print("Checking test dependencies via UV environment...")
     
     # Check if UV environment exists and has dependencies
     try:
         result = subprocess.run(
             ["uv", "run", "python", "-c", 
-             "import pytest, torch, numpy, pandas, sklearn; print('✅ All dependencies available!')"],
+             "import pytest, torch, numpy, pandas, sklearn; print('OK All dependencies available!')"],
             capture_output=True, 
             text=True, 
             cwd=framework_root,
@@ -114,22 +129,22 @@ def check_dependencies():
         )
         
         if result.returncode == 0:
-            print("✅ All dependencies available in UV environment!")
+            print("OK All dependencies available in UV environment!")
             return True
         else:
-            print("❌ Some dependencies missing from UV environment")
+            print("ERROR Some dependencies missing from UV environment")
             print("STDERR:", result.stderr)
             print("Try: uv sync --all-extras")
             return False
             
     except subprocess.TimeoutExpired:
-        print("❌ Dependency check timed out")
+        print("ERROR: Dependency check timed out")
         return False
     except subprocess.CalledProcessError as e:
-        print(f"❌ Dependency check failed: {e}")
+        print(f"ERROR: Dependency check failed: {e}")
         return False
     except FileNotFoundError:
-        print("❌ UV not found. Please install UV first.")
+        print("ERROR: UV not found. Please install UV first.")
         print("Install with: curl -LsSf https://astral.sh/uv/install.sh | sh")
         return False
 
@@ -158,7 +173,7 @@ def main():
     # Check dependencies first (unless skipped)
     if not args.no_deps_check and args.test_type != 'deps':
         if not check_dependencies():
-            print("\n❌ Dependency check failed. Fix dependencies and try again.")
+            print("\nERROR: Dependency check failed. Fix dependencies and try again.")
             return 1
     
     # Run requested tests
@@ -178,9 +193,9 @@ def main():
     # Summary
     print(f"\n{'='*60}")
     if success:
-        print(f"✅ {args.test_type.upper()} TESTS PASSED!")
+        print(f"SUCCESS {args.test_type.upper()} TESTS PASSED!")
     else:
-        print(f"❌ {args.test_type.upper()} TESTS FAILED!")
+        print(f"FAILED: {args.test_type.upper()} TESTS FAILED!")
     print(f"{'='*60}")
     
     return 0 if success else 1

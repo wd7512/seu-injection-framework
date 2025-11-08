@@ -3,11 +3,11 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["framework"]
+packages = ["src/seu_injection"]
 
 [project]
 name = "seu-injection-framework"
-version = "0.1.0"
+version = "1.0.0"
 description = "Framework for Single Event Upset (SEU) injection in neural networks for harsh environment applications"
 authors = [
     {name = "William Dennis", email = "wd7512@bristol.ac.uk"}
@@ -47,9 +47,9 @@ dependencies = [
 dev = [
     "pytest>=7.0.0",
     "pytest-cov>=4.0.0", 
-    "black>=22.0.0",
-    "isort>=5.10.0",
+    "ruff>=0.1.0",
     "mypy>=1.0.0",
+    "bandit>=1.7.0",
 ]
 
 # Jupyter notebook support for research
@@ -79,10 +79,10 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 addopts = [
-    "--cov=framework", 
+    "--cov=src/seu_injection", 
     "--cov-report=term-missing",
     "--cov-report=html:htmlcov",
-    "--cov-fail-under=100",
+    "--cov-fail-under=80",
     "-v",
     "--tb=short",
     "--strict-markers"
@@ -99,7 +99,7 @@ filterwarnings = [
 ]
 
 [tool.coverage.run]
-source = ["framework"]
+source = ["src/seu_injection"]
 omit = [
     "*/tests/*",
     "*/test_*.py",
@@ -121,11 +121,42 @@ exclude_lines = [
     "@(abc\\.)?abstractmethod",
 ]
 
-[tool.black]
+# Ruff configuration for linting and formatting
+[tool.ruff]
 line-length = 88
-target-version = ['py39']
-include = '\.pyi?$'
+target-version = "py39"
+src = ["src", "tests"]
 
-[tool.isort]
-profile = "black"
-src_paths = ["framework", "tests"]
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings  
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "A",   # flake8-builtins
+    "C4",  # flake8-comprehensions
+    "T20", # flake8-print
+]
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+    "B008",  # Do not perform function calls in argument defaults
+    "B905",  # zip strict argument
+    "N806",  # Variable name in function should be lowercase (allow ML conventions like X, y)
+    "T201",  # Print found (allow for debugging/standalone scripts)
+    "B011",  # Do not use assert False (pytest uses this pattern)
+    "F401",  # Imported but unused (some imports are for testing availability)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true

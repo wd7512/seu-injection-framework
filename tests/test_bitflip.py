@@ -1,13 +1,11 @@
-import pytest
-import sys
-import os
 import numpy as np
-import struct
 
-# Add the parent directory to sys.path so we can import from framework/
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-from framework.bitflip import bitflip_float32, float32_to_binary, binary_to_float32
+# Import from the new seu_injection package
+from seu_injection.bitops.float32 import (
+    binary_to_float32,
+    bitflip_float32,
+    float32_to_binary,
+)
 
 
 class TestBitflipOperations:
@@ -22,12 +20,12 @@ class TestBitflipOperations:
     def test_bitflip_reversibility(self):
         """Test that flipping the same bit twice returns original value."""
         test_values = [1.0, -1.0, 0.5, -0.5, 3.14159, -2.71828]
-        
+
         for value in test_values:
             for bit_pos in [0, 1, 15, 16, 31]:  # Test various bit positions
                 flipped_once = bitflip_float32(value, bit_pos)
                 flipped_twice = bitflip_float32(flipped_once, bit_pos)
-                
+
                 # Handle NaN cases (some bit patterns may produce NaN)
                 if np.isnan(value) and np.isnan(flipped_twice):
                     continue
@@ -63,11 +61,11 @@ class TestBitflipOperations:
         # The current implementation doesn't validate bit positions,
         # but we test the behavior for edge cases
         test_val = 1.0
-        
+
         # Test boundary positions
         result_0 = bitflip_float32(test_val, 0)
         result_31 = bitflip_float32(test_val, 31)
-        
+
         assert result_0 is not None
         assert result_31 is not None
 
@@ -86,7 +84,7 @@ class TestBitflipOperations:
         """Test binary string to float32 conversion."""
         # Test round-trip conversion
         test_values = [1.0, -1.0, 0.5, 3.14159, -2.71828]
-        
+
         for value in test_values:
             binary = float32_to_binary(value)
             converted_back = binary_to_float32(binary)
@@ -99,7 +97,7 @@ class TestBitflipOperations:
         value = 1.0
         result1 = bitflip_float32(value)  # Should use random bit
         result2 = bitflip_float32(value)  # Should use different random bit (potentially)
-        
+
         # Results should be valid floats
         assert isinstance(result1, (float, np.floating))
         assert isinstance(result2, (float, np.floating))
@@ -107,13 +105,13 @@ class TestBitflipOperations:
     def test_performance_basic(self):
         """Basic performance test to ensure operations complete in reasonable time."""
         import time
-        
+
         # Test single value performance
         start_time = time.time()
         for _ in range(1000):
             bitflip_float32(1.0, 15)
         end_time = time.time()
-        
+
         # Should complete 1000 operations in under 1 second (very generous)
         assert (end_time - start_time) < 1.0, "Bitflip operations are too slow"
 
@@ -122,6 +120,6 @@ class TestBitflipOperations:
         start_time = time.time()
         result = bitflip_float32(values, 15)
         end_time = time.time()
-        
+
         assert len(result) == len(values), "Array output length mismatch"
         assert (end_time - start_time) < 0.1, "Array bitflip operations are too slow"

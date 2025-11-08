@@ -1,14 +1,15 @@
 # Test configuration for pytest
-import sys
 import os
+import sys
+
 import torch
-import numpy as np
 
 # Add the framework to the Python path for all tests
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # Test fixtures and common utilities
 import pytest
+
 
 @pytest.fixture
 def device():
@@ -33,7 +34,7 @@ def simple_model():
                 torch.nn.init.zeros_(layer.bias)
     return model
 
-@pytest.fixture 
+@pytest.fixture
 def sample_data():
     """Fixture to provide sample input data and labels."""
     torch.manual_seed(42)

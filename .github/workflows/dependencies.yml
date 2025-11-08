@@ -1,0 +1,48 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    # Run weekly on Sundays at 6 AM UTC
+    - cron: '0 6 * * 0'
+  workflow_dispatch:
+
+jobs:
+  update-deps:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install UV
+      uses: astral-sh/setup-uv@v3
+
+    - name: Set up Python 3.11
+      run: uv python install 3.11
+
+    - name: Update dependencies
+      run: |
+        uv lock --upgrade
+        uv sync --all-extras
+
+    - name: Run tests to verify updates
+      run: |
+        uv run python run_tests.py smoke
+        uv run python run_tests.py unit
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: "chore: update dependencies"
+        title: "Automated dependency update"
+        body: |
+          This is an automated pull request to update project dependencies.
+          
+          Please review the changes and run the full test suite before merging.
+          
+          - Dependencies updated via `uv lock --upgrade`
+          - Smoke and unit tests passed
+        branch: deps/auto-update
+        delete-branch: true
