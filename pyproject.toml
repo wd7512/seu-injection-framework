@@ -1,1 +1,131 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["framework"]
+
+[project]
+name = "seu-injection-framework"
+version = "0.1.0"
+description = "Framework for Single Event Upset (SEU) injection in neural networks for harsh environment applications"
+authors = [
+    {name = "William Dennis", email = "wd7512@bristol.ac.uk"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+homepage = "https://github.com/wd7512/seu-injection-framework"
+repository = "https://github.com/wd7512/seu-injection-framework"
+keywords = ["machine-learning", "robustness", "fault-tolerance", "seu", "radiation", "neural-networks"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.9"
+
+# Core dependencies for SEU injection framework
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0", 
+    "numpy>=1.21.0,<2.0.0",
+    "scikit-learn>=1.1.0",
+    "pandas>=1.4.0",
+    "tqdm>=4.60.0",
+    "matplotlib>=3.5.0",
+    "scipy>=1.8.0",
+]
+
+[project.optional-dependencies]
+# Development and testing dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0", 
+    "black>=22.0.0",
+    "isort>=5.10.0",
+    "mypy>=1.0.0",
+]
+
+# Jupyter notebook support for research
+notebooks = [
+    "jupyter>=1.0.0",
+    "jupyterlab>=3.0.0",
+    "ipywidgets>=7.0.0",
+    "seaborn>=0.11.0",
+]
+
+# Additional data science tools
+extras = [
+    "scikit-image>=0.19.0",
+    "statsmodels>=0.13.0",
+    "joblib>=1.1.0",
+]
+
+[project.urls]
+"Bug Tracker" = "https://github.com/wd7512/seu-injection-framework/issues"
+"Documentation" = "https://github.com/wd7512/seu-injection-framework"
+"Research Paper" = "https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars"
+
+# Tool configurations for code quality
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=framework", 
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    "--cov-fail-under=100",
+    "-v",
+    "--tb=short",
+    "--strict-markers"
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "smoke: marks tests as smoke tests for quick validation",
+    "gpu: marks tests that require GPU/CUDA",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["framework"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/conftest.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+src_paths = ["framework", "tests"]

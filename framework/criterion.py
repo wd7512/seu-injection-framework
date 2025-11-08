@@ -25,7 +25,12 @@ def classification_accuracy_loader(model, data_loader, device=None):
     return multiclass_classification_accuracy(y_true_all, y_pred_all)
 
 
-def classification_accuracy(model, X_tensor, y_true, device=None, batch_size=64):
+def classification_accuracy(model, X_tensor, y_true=None, device=None, batch_size=64):
+    # Check if X_tensor is actually a DataLoader
+    if hasattr(X_tensor, '__iter__') and hasattr(X_tensor, 'dataset'):
+        # It's a DataLoader, use the loader function
+        return classification_accuracy_loader(model, X_tensor, device)
+    
     if device:
         model = model.to(device)
         X_tensor = X_tensor.to(device)

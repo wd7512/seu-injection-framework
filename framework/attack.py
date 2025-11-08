@@ -37,7 +37,7 @@ class Injector:
         print(f"Testing a forward pass on {self.device}...")
 
         if data_loader:
-            if X or y:
+            if X is not None or y is not None:
                 raise ValueError("Cannot pass both a dataloader and X and y values")
 
             self.use_data_loader = True
@@ -46,12 +46,15 @@ class Injector:
             self.baseline_score = criterion(self.model, self.data_loader, self.device)
 
         else:
-            self.y = y
-
             if isinstance(X, torch.Tensor):
                 self.X = X.clone().detach().to(device=device, dtype=torch.float32)
             else:
                 self.X = torch.tensor(X, dtype=torch.float32, device=device)
+                
+            if isinstance(y, torch.Tensor):
+                self.y = y.clone().detach().to(device=device, dtype=torch.float32)
+            else:
+                self.y = torch.tensor(y, dtype=torch.float32, device=device)
 
             self.baseline_score = criterion(self.model, self.X, self.y, self.device)
 
