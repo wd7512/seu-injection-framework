@@ -5,7 +5,7 @@ import sys
 import torch
 
 # Add the framework to the Python path for all tests
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 # Test fixtures and common utilities
 import pytest
@@ -14,7 +14,8 @@ import pytest
 @pytest.fixture
 def device():
     """Fixture to provide the best available device (CUDA if available, otherwise CPU)."""
-    return torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
 
 @pytest.fixture
 def simple_model():
@@ -23,16 +24,17 @@ def simple_model():
         torch.nn.Linear(2, 4),
         torch.nn.ReLU(),
         torch.nn.Linear(4, 1),
-        torch.nn.Sigmoid()
+        torch.nn.Sigmoid(),
     )
     # Initialize weights for reproducible tests
     torch.manual_seed(42)
     for layer in model:
-        if hasattr(layer, 'weight'):
+        if hasattr(layer, "weight"):
             torch.nn.init.normal_(layer.weight, 0, 0.1)
-            if hasattr(layer, 'bias'):
+            if hasattr(layer, "bias"):
                 torch.nn.init.zeros_(layer.bias)
     return model
+
 
 @pytest.fixture
 def sample_data():
@@ -41,6 +43,7 @@ def sample_data():
     X = torch.randn(100, 2, dtype=torch.float32)
     y = torch.randint(0, 2, (100, 1), dtype=torch.float32)
     return X, y
+
 
 @pytest.fixture
 def sample_dataloader(sample_data):

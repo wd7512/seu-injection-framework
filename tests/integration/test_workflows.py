@@ -15,18 +15,17 @@ class TestSEUInjectionWorkflows:
     def test_complete_nn_workflow(self):
         """Test complete workflow with neural network."""
         # Get a trained neural network
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn",
-            train=True,
-            epochs=1  # Ultra-minimal epochs for fast testing
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(
+                net_name="nn",
+                train=True,
+                epochs=1,  # Ultra-minimal epochs for fast testing
+            )
         )
 
         # Create injector
         injector = Injector(
-            trained_model=model,
-            criterion=classification_accuracy,
-            X=X_test,
-            y=y_test
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
         )
 
         # Test basic injection
@@ -51,17 +50,12 @@ class TestSEUInjectionWorkflows:
 
     def test_complete_cnn_workflow(self):
         """Test complete workflow with CNN."""
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="cnn",
-            train=True,
-            epochs=1
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="cnn", train=True, epochs=1)
         )
 
         injector = Injector(
-            trained_model=model,
-            criterion=classification_accuracy,
-            X=X_test,
-            y=y_test
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
         )
 
         # Test stochastic injection (faster for CNNs)
@@ -75,17 +69,12 @@ class TestSEUInjectionWorkflows:
 
     def test_complete_rnn_workflow(self):
         """Test complete workflow with RNN."""
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="rnn",
-            train=True,
-            epochs=1
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="rnn", train=True, epochs=1)
         )
 
         injector = Injector(
-            trained_model=model,
-            criterion=classification_accuracy,
-            X=X_test,
-            y=y_test
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
         )
 
         # Test layer-specific injection
@@ -99,10 +88,8 @@ class TestSEUInjectionWorkflows:
 
     def test_dataloader_workflow(self):
         """Test complete workflow using DataLoader."""
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn",
-            train=True,
-            epochs=1
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="nn", train=True, epochs=1)
         )
 
         # Create DataLoader
@@ -112,7 +99,7 @@ class TestSEUInjectionWorkflows:
         injector = Injector(
             trained_model=model,
             criterion=classification_accuracy,
-            data_loader=dataloader
+            data_loader=dataloader,
         )
 
         # Test with dataloader
@@ -123,17 +110,12 @@ class TestSEUInjectionWorkflows:
 
     def test_multiple_bit_positions(self):
         """Test injection across multiple bit positions."""
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn",
-            train=True,
-            epochs=1
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="nn", train=True, epochs=1)
         )
 
         injector = Injector(
-            trained_model=model,
-            criterion=classification_accuracy,
-            X=X_test,
-            y=y_test
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
         )
 
         baseline = injector.baseline_score
@@ -141,7 +123,9 @@ class TestSEUInjectionWorkflows:
 
         # Test different bit positions with higher probability to ensure results
         for bit_pos in [0, 1, 15, 31]:  # Sign, low bits, middle, LSB
-            results = injector.run_stochastic_seu(bit_i=bit_pos, p=0.5)  # Higher probability
+            results = injector.run_stochastic_seu(
+                bit_i=bit_pos, p=0.5
+            )  # Higher probability
             if len(results["criterion_score"]) > 0:
                 avg_accuracy = np.mean(results["criterion_score"])
                 bit_results[bit_pos] = avg_accuracy
@@ -151,22 +135,19 @@ class TestSEUInjectionWorkflows:
 
         # Results should be reasonable
         for bit_pos, accuracy in bit_results.items():
-            assert 0.0 <= accuracy <= 1.0, f"Bit {bit_pos} gave invalid accuracy {accuracy}"
+            assert 0.0 <= accuracy <= 1.0, (
+                f"Bit {bit_pos} gave invalid accuracy {accuracy}"
+            )
 
     def test_robustness_analysis_pipeline(self):
         """Test a complete robustness analysis pipeline."""
         # Test with small network for speed
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn",
-            train=True,
-            epochs=1
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="nn", train=True, epochs=1)
         )
 
         injector = Injector(
-            trained_model=model,
-            criterion=classification_accuracy,
-            X=X_test,
-            y=y_test
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
         )
 
         baseline_accuracy = injector.baseline_score
@@ -182,8 +163,7 @@ class TestSEUInjectionWorkflows:
 
         for scenario in scenarios:
             results = injector.run_stochastic_seu(
-                bit_i=scenario["bit"],
-                p=scenario["p"]
+                bit_i=scenario["bit"], p=scenario["p"]
             )
 
             if len(results["criterion_score"]) > 0:
@@ -194,13 +174,13 @@ class TestSEUInjectionWorkflows:
                     "baseline": baseline_accuracy,
                     "mean_degraded": mean_degraded,
                     "degradation": degradation,
-                    "num_injections": len(results["criterion_score"])
+                    "num_injections": len(results["criterion_score"]),
                 }
 
         # Validate analysis results
         assert len(analysis_results) > 0, "Should have at least some analysis results"
 
-        for name, metrics in analysis_results.items():
+        for _name, metrics in analysis_results.items():
             assert 0.0 <= metrics["baseline"] <= 1.0
             assert 0.0 <= metrics["mean_degraded"] <= 1.0
             # Degradation can be negative if injections accidentally improve performance
@@ -209,20 +189,15 @@ class TestSEUInjectionWorkflows:
 
     def test_framework_reproducibility(self):
         """Test that results are reproducible with same random seed."""
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn",
-            train=True,
-            epochs=1
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="nn", train=True, epochs=1)
         )
 
         # Run 1 with seed
         torch.manual_seed(42)
         np.random.seed(42)
         injector1 = Injector(
-            trained_model=model,
-            criterion=classification_accuracy,
-            X=X_test,
-            y=y_test
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
         )
         results1 = injector1.run_stochastic_seu(bit_i=0, p=0.2)
 
@@ -230,10 +205,7 @@ class TestSEUInjectionWorkflows:
         torch.manual_seed(42)
         np.random.seed(42)
         injector2 = Injector(
-            trained_model=model,
-            criterion=classification_accuracy,
-            X=X_test,
-            y=y_test
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
         )
         results2 = injector2.run_stochastic_seu(bit_i=0, p=0.2)
 
@@ -241,6 +213,9 @@ class TestSEUInjectionWorkflows:
         assert len(results1["criterion_score"]) == len(results2["criterion_score"])
 
         # Compare first few results (may vary due to randomness in injection selection)
-        if len(results1["criterion_score"]) > 0 and len(results2["criterion_score"]) > 0:
+        if (
+            len(results1["criterion_score"]) > 0
+            and len(results2["criterion_score"]) > 0
+        ):
             # At least baseline scores should be identical
             assert abs(injector1.baseline_score - injector2.baseline_score) < 1e-6

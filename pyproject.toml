@@ -128,6 +128,7 @@ exclude_lines = [
 line-length = 88
 target-version = "py39"
 src = ["src", "tests"]
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = [

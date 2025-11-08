@@ -33,8 +33,9 @@ class TestBitflipOperations:
                     # This is acceptable - some bit patterns produce NaN
                     continue
                 else:
-                    assert abs(value - flipped_twice) < 1e-6, \
+                    assert abs(value - flipped_twice) < 1e-6, (
                         f"Reversibility failed for value {value}, bit {bit_pos}: {value} -> {flipped_once} -> {flipped_twice}"
+                    )
 
     def test_bitflip_array_input(self):
         """Test bitflip with array input."""
@@ -74,11 +75,11 @@ class TestBitflipOperations:
         # Test known values
         result = float32_to_binary(1.0)
         assert len(result) == 32, "Binary representation should be 32 bits"
-        assert result[0] == '0', "Sign bit of 1.0 should be 0"
+        assert result[0] == "0", "Sign bit of 1.0 should be 0"
 
         result_neg = float32_to_binary(-1.0)
         assert len(result_neg) == 32, "Binary representation should be 32 bits"
-        assert result_neg[0] == '1', "Sign bit of -1.0 should be 1"
+        assert result_neg[0] == "1", "Sign bit of -1.0 should be 1"
 
     def test_binary_float32_conversion(self):
         """Test binary string to float32 conversion."""
@@ -88,15 +89,18 @@ class TestBitflipOperations:
         for value in test_values:
             binary = float32_to_binary(value)
             converted_back = binary_to_float32(binary)
-            assert abs(value - converted_back) < 1e-6, \
+            assert abs(value - converted_back) < 1e-6, (
                 f"Round-trip conversion failed: {value} -> {binary} -> {converted_back}"
+            )
 
     def test_random_bit_position(self):
         """Test that random bit position works when no position is specified."""
         # This tests the default behavior with random bit selection
         value = 1.0
         result1 = bitflip_float32(value)  # Should use random bit
-        result2 = bitflip_float32(value)  # Should use different random bit (potentially)
+        result2 = bitflip_float32(
+            value
+        )  # Should use different random bit (potentially)
 
         # Results should be valid floats
         assert isinstance(result1, (float, np.floating))

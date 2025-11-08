@@ -3,6 +3,7 @@ Additional tests for testing/example_networks.py to complete coverage.
 
 These tests focus on error handling and edge cases not covered by integration tests.
 """
+
 import pytest
 import torch
 from testing.example_networks import get_example_network
@@ -18,8 +19,8 @@ class TestExampleNetworks:
 
     def test_get_example_network_without_training(self):
         """Test getting untrained networks."""
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn", train=False
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="nn", train=False)
         )
 
         assert model is not None
@@ -31,8 +32,12 @@ class TestExampleNetworks:
 
     def test_get_example_network_with_training(self):
         """Test getting trained networks (quick training for test)."""
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn", train=True, epochs=1  # Quick training
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(
+                net_name="nn",
+                train=True,
+                epochs=1,  # Quick training
+            )
         )
 
         assert model is not None
@@ -45,9 +50,7 @@ class TestExampleNetworks:
     def test_different_data_split_params(self):
         """Test different data splitting parameters."""
         model, X_train, X_test, y_train, y_test, _, _ = get_example_network(
-            net_name="nn",
-            test_size=0.2,
-            random_state=42
+            net_name="nn", test_size=0.2, random_state=42
         )
 
         # With test_size=0.2, we should have 80% training, 20% test

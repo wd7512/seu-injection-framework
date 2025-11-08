@@ -15,7 +15,7 @@ from .float32 import (
 
 __all__ = [
     "bitflip_float32",
-    "bitflip_float32_fast", 
+    "bitflip_float32_fast",
     "bitflip_float32_optimized",
     "float32_to_binary",
     "binary_to_float32",

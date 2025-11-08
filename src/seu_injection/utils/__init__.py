@@ -5,11 +5,10 @@ This module provides common utilities for device management, tensor operations,
 logging, and other supporting functionality.
 """
 
-# For now, we don't expose device functions to avoid complex dependencies
-# from .device import detect_device, ensure_tensor, get_model_info
+# Import device utilities for common use
+from .device import detect_device, ensure_tensor
 
 __all__ = [
-    # "detect_device",
-    # "ensure_tensor", 
-    # "get_model_info",
+    "detect_device",
+    "ensure_tensor",
 ]

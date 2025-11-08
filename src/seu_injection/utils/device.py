@@ -5,21 +5,23 @@ This module provides helper functions for device detection, tensor operations,
 and other common utilities used throughout the SEU injection framework.
 """
 
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 import torch
 
 
-def detect_device(preferred_device: Optional[Union[str, torch.device]] = None) -> torch.device:
+def detect_device(
+    preferred_device: Optional[Union[str, torch.device]] = None,
+) -> torch.device:
     """
     Detect the best available computing device.
-    
+
     Args:
         preferred_device: Preferred device specification ('cpu', 'cuda', or torch.device)
-        
+
     Returns:
         Detected or specified torch.device
-        
+
     Example:
         >>> device = detect_device()  # Auto-detect
         >>> device = detect_device('cuda')  # Force CUDA if available
@@ -34,18 +36,18 @@ def detect_device(preferred_device: Optional[Union[str, torch.device]] = None) -
 
 
 def ensure_tensor(
-    data: Union[torch.Tensor, 'np.ndarray'],  # Quote to avoid import
+    data: Union[torch.Tensor, Any],  # Any for numpy arrays or other array-like
     dtype: torch.dtype = torch.float32,
-    device: Optional[torch.device] = None
+    device: Optional[torch.device] = None,
 ) -> torch.Tensor:
     """
     Ensure input data is a PyTorch tensor with specified dtype and device.
-    
+
     Args:
         data: Input data (tensor or numpy array)
         dtype: Target tensor dtype
         device: Target device (None for current device)
-        
+
     Returns:
         PyTorch tensor with specified properties
     """
@@ -65,10 +67,10 @@ def ensure_tensor(
 def get_model_info(model: torch.nn.Module) -> dict:
     """
     Extract comprehensive information about a PyTorch model.
-    
+
     Args:
         model: PyTorch model to analyze
-        
+
     Returns:
         Dictionary with model statistics and layer information
     """
@@ -77,18 +79,20 @@ def get_model_info(model: torch.nn.Module) -> dict:
 
     layer_info = []
     for name, param in model.named_parameters():
-        layer_info.append({
-            'name': name,
-            'shape': tuple(param.shape),
-            'params': param.numel(),
-            'requires_grad': param.requires_grad,
-            'dtype': str(param.dtype),
-        })
+        layer_info.append(
+            {
+                "name": name,
+                "shape": tuple(param.shape),
+                "params": param.numel(),
+                "requires_grad": param.requires_grad,
+                "dtype": str(param.dtype),
+            }
+        )
 
     return {
-        'total_parameters': total_params,
-        'trainable_parameters': trainable_params,
-        'frozen_parameters': total_params - trainable_params,
-        'layer_count': len(layer_info),
-        'layers': layer_info,
+        "total_parameters": total_params,
+        "trainable_parameters": trainable_params,
+        "frozen_parameters": total_params - trainable_params,
+        "layer_count": len(layer_info),
+        "layers": layer_info,
     }

@@ -24,7 +24,9 @@ class TestCriterionFunctions:
         accuracy = classification_accuracy(simple_model, X, y, device)
 
         assert isinstance(accuracy, (float, np.floating))
-        assert 0.0 <= accuracy <= 1.0, f"Accuracy should be between 0 and 1, got {accuracy}"
+        assert 0.0 <= accuracy <= 1.0, (
+            f"Accuracy should be between 0 and 1, got {accuracy}"
+        )
 
     def test_classification_accuracy_perfect_model(self, device):
         """Test accuracy computation with a perfect model."""
@@ -33,10 +35,9 @@ class TestCriterionFunctions:
         y = torch.tensor([[1.0], [0.0]], dtype=torch.float32, device=device)
 
         # Create a model that should predict perfectly
-        model = torch.nn.Sequential(
-            torch.nn.Linear(2, 1),
-            torch.nn.Sigmoid()
-        ).to(device)
+        model = torch.nn.Sequential(torch.nn.Linear(2, 1), torch.nn.Sigmoid()).to(
+            device
+        )
 
         # Set weights to make perfect predictions
         with torch.no_grad():
@@ -46,7 +47,9 @@ class TestCriterionFunctions:
         accuracy = classification_accuracy(model, X, y, device)
 
         # Should be perfect or very close
-        assert accuracy > 0.9, f"Perfect model should have high accuracy, got {accuracy}"
+        assert accuracy > 0.9, (
+            f"Perfect model should have high accuracy, got {accuracy}"
+        )
 
     def test_classification_accuracy_with_batching(self, simple_model, device):
         """Test accuracy computation with different batch sizes."""
@@ -60,20 +63,32 @@ class TestCriterionFunctions:
         # Test with different batch sizes
         accuracy_32 = classification_accuracy(simple_model, X, y, device, batch_size=32)
         accuracy_64 = classification_accuracy(simple_model, X, y, device, batch_size=64)
-        accuracy_all = classification_accuracy(simple_model, X, y, device, batch_size=None)
+        accuracy_all = classification_accuracy(
+            simple_model, X, y, device, batch_size=None
+        )
 
         # Results should be identical regardless of batch size
-        assert abs(accuracy_32 - accuracy_64) < 1e-6, "Batch size should not affect accuracy"
-        assert abs(accuracy_32 - accuracy_all) < 1e-6, "Batch size should not affect accuracy"
+        assert abs(accuracy_32 - accuracy_64) < 1e-6, (
+            "Batch size should not affect accuracy"
+        )
+        assert abs(accuracy_32 - accuracy_all) < 1e-6, (
+            "Batch size should not affect accuracy"
+        )
 
-    def test_classification_accuracy_loader(self, simple_model, sample_dataloader, device):
+    def test_classification_accuracy_loader(
+        self, simple_model, sample_dataloader, device
+    ):
         """Test accuracy computation using DataLoader."""
         simple_model = simple_model.to(device)
 
-        accuracy = classification_accuracy_loader(simple_model, sample_dataloader, device)
+        accuracy = classification_accuracy_loader(
+            simple_model, sample_dataloader, device
+        )
 
         assert isinstance(accuracy, (float, np.floating))
-        assert 0.0 <= accuracy <= 1.0, f"Accuracy should be between 0 and 1, got {accuracy}"
+        assert 0.0 <= accuracy <= 1.0, (
+            f"Accuracy should be between 0 and 1, got {accuracy}"
+        )
 
     def test_multiclass_classification_accuracy_binary(self):
         """Test multiclass accuracy function with binary classification."""
@@ -89,13 +104,15 @@ class TestCriterionFunctions:
     def test_multiclass_classification_accuracy_multiclass(self):
         """Test multiclass accuracy function with multi-class classification."""
         y_true = np.array([0, 1, 2, 0, 1])
-        y_pred_probs = np.array([
-            [0.8, 0.1, 0.1],  # Predicts class 0 ✓
-            [0.2, 0.7, 0.1],  # Predicts class 1 ✓
-            [0.1, 0.1, 0.8],  # Predicts class 2 ✓
-            [0.6, 0.3, 0.1],  # Predicts class 0 ✓
-            [0.1, 0.8, 0.1]   # Predicts class 1 ✓
-        ])
+        y_pred_probs = np.array(
+            [
+                [0.8, 0.1, 0.1],  # Predicts class 0 ✓
+                [0.2, 0.7, 0.1],  # Predicts class 1 ✓
+                [0.1, 0.1, 0.8],  # Predicts class 2 ✓
+                [0.6, 0.3, 0.1],  # Predicts class 0 ✓
+                [0.1, 0.8, 0.1],  # Predicts class 1 ✓
+            ]
+        )
 
         accuracy = multiclass_classification_accuracy(y_true, y_pred_probs)
 
@@ -104,12 +121,14 @@ class TestCriterionFunctions:
     def test_multiclass_classification_accuracy_imperfect(self):
         """Test multiclass accuracy with some incorrect predictions."""
         y_true = np.array([0, 1, 2, 0])
-        y_pred_probs = np.array([
-            [0.8, 0.1, 0.1],  # Predicts class 0 ✓
-            [0.7, 0.2, 0.1],  # Predicts class 0 ✗ (should be 1)
-            [0.1, 0.1, 0.8],  # Predicts class 2 ✓
-            [0.6, 0.3, 0.1]   # Predicts class 0 ✓
-        ])
+        y_pred_probs = np.array(
+            [
+                [0.8, 0.1, 0.1],  # Predicts class 0 ✓
+                [0.7, 0.2, 0.1],  # Predicts class 0 ✗ (should be 1)
+                [0.1, 0.1, 0.8],  # Predicts class 2 ✓
+                [0.6, 0.3, 0.1],  # Predicts class 0 ✓
+            ]
+        )
 
         accuracy = multiclass_classification_accuracy(y_true, y_pred_probs)
 
@@ -140,7 +159,9 @@ class TestCriterionFunctions:
     def test_criterion_edge_cases(self, device):
         """Test criterion functions with edge cases."""
         # Test with very small model and data
-        tiny_model = torch.nn.Sequential(torch.nn.Linear(1, 1), torch.nn.Sigmoid()).to(device)
+        tiny_model = torch.nn.Sequential(torch.nn.Linear(1, 1), torch.nn.Sigmoid()).to(
+            device
+        )
         X_tiny = torch.tensor([[1.0]], dtype=torch.float32, device=device)
         y_tiny = torch.tensor([[1.0]], dtype=torch.float32, device=device)
 
@@ -148,7 +169,9 @@ class TestCriterionFunctions:
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
 
-    def test_criterion_consistency_tensor_vs_loader(self, simple_model, sample_data, sample_dataloader, device):
+    def test_criterion_consistency_tensor_vs_loader(
+        self, simple_model, sample_data, sample_dataloader, device
+    ):
         """Test that tensor-based and loader-based accuracy give same results."""
         X, y = sample_data
         X = X.to(device)
@@ -156,8 +179,11 @@ class TestCriterionFunctions:
         simple_model = simple_model.to(device)
 
         accuracy_tensor = classification_accuracy(simple_model, X, y, device)
-        accuracy_loader = classification_accuracy_loader(simple_model, sample_dataloader, device)
+        accuracy_loader = classification_accuracy_loader(
+            simple_model, sample_dataloader, device
+        )
 
         # Should be very close (allowing for small floating point differences)
-        assert abs(accuracy_tensor - accuracy_loader) < 1e-4, \
+        assert abs(accuracy_tensor - accuracy_loader) < 1e-4, (
             f"Tensor and loader accuracies differ: {accuracy_tensor} vs {accuracy_loader}"
+        )

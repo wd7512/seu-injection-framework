@@ -42,10 +42,7 @@ def test_basic_bitflip_functionality():
 def test_basic_model_creation():
     """Test that we can create simple models for testing."""
     # Create a minimal model
-    model = torch.nn.Sequential(
-        torch.nn.Linear(2, 1),
-        torch.nn.Sigmoid()
-    )
+    model = torch.nn.Sequential(torch.nn.Linear(2, 1), torch.nn.Sigmoid())
 
     # Test forward pass
     x = torch.randn(5, 2)
@@ -67,10 +64,7 @@ def test_basic_injector_creation():
 
     # Create injector - should not raise errors
     injector = Injector(
-        trained_model=model,
-        criterion=classification_accuracy,
-        X=X,
-        y=y
+        trained_model=model, criterion=classification_accuracy, x=X, y=y
     )
 
     assert injector.model is not None
@@ -92,7 +86,7 @@ def test_basic_criterion_functionality():
 
 def test_device_compatibility():
     """Test basic device (CPU/CUDA) compatibility."""
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # Create model and move to device
     model = torch.nn.Linear(2, 1)
@@ -111,7 +105,8 @@ def test_example_networks_import():
         # Add testing directory to path if not already there
         import os
         import sys
-        testing_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'testing')
+
+        testing_dir = os.path.join(os.path.dirname(__file__), "..", "..", "testing")
         if testing_dir not in sys.path:
             sys.path.insert(0, testing_dir)
 
@@ -121,9 +116,8 @@ def test_example_networks_import():
         assert get_example_network is not None
 
         # Quick test of network creation (without training)
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(
-            net_name="nn",
-            train=False
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
+            get_example_network(net_name="nn", train=False)
         )
 
         assert model is not None
@@ -142,7 +136,7 @@ def test_framework_version_info():
     assert seu_injection is not None
 
     # Key modules should be accessible
-    assert hasattr(seu_injection, '__version__')
+    assert hasattr(seu_injection, "__version__")
 
 
 def test_dependencies_available():
@@ -155,8 +149,8 @@ def test_dependencies_available():
         import tqdm
 
         # Check versions are reasonable
-        assert hasattr(torch, '__version__')
-        assert hasattr(np, '__version__')
+        assert hasattr(torch, "__version__")
+        assert hasattr(np, "__version__")
 
     except ImportError as e:
         assert False, f"Required dependency missing: {e}"
@@ -179,7 +173,9 @@ def test_performance_smoke():
     duration = end_time - start_time
 
     # Should complete in well under a second
-    assert duration < 1.0, f"Performance smoke test too slow: {duration}s for 100 operations"
+    assert duration < 1.0, (
+        f"Performance smoke test too slow: {duration}s for 100 operations"
+    )
 
 
 if __name__ == "__main__":
@@ -196,7 +192,7 @@ if __name__ == "__main__":
         test_example_networks_import,
         test_framework_version_info,
         test_dependencies_available,
-        test_performance_smoke
+        test_performance_smoke,
     ]
 
     for test in tests:
