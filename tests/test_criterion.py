@@ -1,4 +1,5 @@
 import numpy as np
+import pytest
 import torch
 
 # Import from the new seu_injection package
@@ -187,3 +188,67 @@ class TestCriterionFunctions:
         assert abs(accuracy_tensor - accuracy_loader) < 1e-4, (
             f"Tensor and loader accuracies differ: {accuracy_tensor} vs {accuracy_loader}"
         )
+
+    def test_classification_accuracy_dataloader_with_y_true_error(
+        self, simple_model, sample_dataloader, device
+    ):
+        """Test that providing y_true with DataLoader raises ValueError."""
+        simple_model = simple_model.to(device)
+        dummy_y = torch.tensor([1, 0], device=device)
+
+        with pytest.raises(ValueError, match="When using DataLoader, do not specify y_true separately"):
+            classification_accuracy(simple_model, sample_dataloader, dummy_y, device)
+
+    def test_classification_accuracy_no_device(self, simple_model, sample_data):
+        """Test accuracy computation without device specification."""
+        X, y = sample_data
+        
+        accuracy = classification_accuracy(simple_model, X, y, device=None)
+        assert isinstance(accuracy, (float, np.floating))
+        assert 0.0 <= accuracy <= 1.0
+
+    def test_classification_accuracy_batch_size_none(self, simple_model, sample_data, device):
+        """Test accuracy computation with batch_size=None."""
+        X, y = sample_data
+        X = X.to(device)
+        y = y.to(device)
+        simple_model = simple_model.to(device)
+        
+        accuracy = classification_accuracy(simple_model, X, y, device, batch_size=None)
+        assert isinstance(accuracy, (float, np.floating))
+        assert 0.0 <= accuracy <= 1.0
+
+    def test_classification_accuracy_loader_no_device(self, simple_model, sample_dataloader):
+        """Test loader accuracy computation without device specification."""
+        accuracy = classification_accuracy_loader(simple_model, sample_dataloader, device=None)
+        assert isinstance(accuracy, (float, np.floating))
+        assert 0.0 <= accuracy <= 1.0
+
+    def test_multiclass_classification_accuracy_1d_output(self):
+        """Test multiclass accuracy with 1D model output (edge case)."""
+        y_true = np.array([0, 1, 0, 1])
+        # 1D output that should be treated as binary
+        model_output = np.array([0.3, 0.7, 0.2, 0.8])  
+        
+        accuracy = multiclass_classification_accuracy(y_true, model_output)
+        assert isinstance(accuracy, (float, np.floating))
+        assert 0.0 <= accuracy <= 1.0
+
+    def test_multiclass_classification_accuracy_single_column(self):
+        """Test multiclass accuracy with single column output."""
+        y_true = np.array([0, 1, 0, 1])
+        # 2D output with single column (binary case)
+        model_output = np.array([[0.3], [0.7], [0.2], [0.8]])
+        
+        accuracy = multiclass_classification_accuracy(y_true, model_output)
+        assert isinstance(accuracy, (float, np.floating))  
+        assert 0.0 <= accuracy <= 1.0
+
+    def test_classification_accuracy_dataloader_return_path(self, simple_model, sample_dataloader, device):
+        """Test that DataLoader path returns classification_accuracy_loader result."""
+        simple_model = simple_model.to(device)
+        
+        # This should trigger the return path at line 100
+        accuracy = classification_accuracy(simple_model, sample_dataloader, device=device)
+        assert isinstance(accuracy, (float, np.floating))
+        assert 0.0 <= accuracy <= 1.0

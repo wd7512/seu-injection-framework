@@ -1161,23 +1161,28 @@ Key Files to Understand:
 # 1. ALWAYS validate current state first
 uv run python run_tests.py all   # Must show 102 tests (100 passed, 2 skipped) - Phase 3 COMPLETE
 
-# 2. Create feature branch for changes  
-git checkout -b feature/your-changes
-
-# 3. Make incremental changes with testing
+# 2. Make incremental changes with testing
 # ... implement changes ...
 uv run python run_tests.py smoke # Quick validation after each change (10 tests)
 uv run python run_tests.py all   # Full validation before commit (102 tests)
 
-# 4. Ensure coverage standards maintained
+# 3. Ensure coverage standards maintained
 uv run pytest --cov=src/seu_injection --cov-fail-under=50   # 92% coverage achieved
 
-# 5. Document changes comprehensively
+# 4. Document changes comprehensively
 # Update relevant .md files with technical details
 
-# 6. Clean commit with descriptive message
-git add . && git commit -m "feat: detailed description of changes"
+# 5. Provide commit message for human review
+# AI agents MUST NOT use git commands (add, commit, push, etc.)
+# Human will handle all git operations after reviewing changes
 ```
+
+#### **🚨 CRITICAL: Git Command Restrictions for AI Agents**
+- **❌ NEVER use git add, git commit, git push, or any git commands**
+- **❌ NEVER create branches or modify repository state** 
+- **✅ ONLY provide suggested commit messages for human review**
+- **✅ ONLY modify files using file editing tools**
+- **✅ Human will handle all repository operations after code review**
 
 #### **Critical Bug Patterns to Avoid (Learned in Phase 1)**
 1. **Tensor Validation**: Always use `if X is not None` not `if X:` (boolean ambiguity)
@@ -1235,6 +1240,8 @@ uv lock                              # Update uv.lock after changes
 - **Technical Issues**: Include exact error messages and file locations
 - **Change Documentation**: Always provide before/after code examples
 - **Performance Claims**: Back with concrete metrics (timing, memory usage)
+- **Commit Messages**: Provide detailed commit messages for human to execute
+- **Git Operations**: NEVER execute git commands - human handles all repository operations
 
 #### **Research Context Maintenance**  
 - **SEU Injection**: Single Event Upset simulation for harsh environments

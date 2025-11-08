@@ -156,22 +156,25 @@ uv run pytest --cov=src/seu_injection --cov-report=html:htmlcov
 ### **Mandatory Workflow for Changes**
 ```bash
 # 1. Validate current state
-uv run python run_tests.py all   # Must show 63/64 tests passing
+uv run python run_tests.py all   # Must show current test status
 
-# 2. Create feature branch
-git checkout -b feature/your-changes
-
-# 3. Incremental development with testing
+# 2. Incremental development with testing
 # ... implement changes ...
 uv run python run_tests.py smoke # Quick validation after each change
 uv run python run_tests.py all   # Full validation before commit
 
-# 4. Ensure coverage requirement maintained  
+# 3. Ensure coverage requirement maintained  
 uv run pytest --cov=src/seu_injection --cov-fail-under=80
 
-# 5. Document changes and commit
-git add . && git commit -m "feat: detailed description"
+# 4. Document changes and provide commit message
+# AI agents MUST NOT use git commands - human handles repository operations
 ```
+
+### **🚨 CRITICAL: AI Agent Git Restrictions**
+- **❌ AI agents MUST NEVER use git add, commit, push, or any git commands**
+- **❌ AI agents MUST NEVER create branches or modify repository state**
+- **✅ AI agents should ONLY provide suggested commit messages**
+- **✅ Human will execute all git operations after reviewing changes**
 
 ### **Package Management**
 ```bash
