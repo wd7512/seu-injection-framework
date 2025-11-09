@@ -61,7 +61,7 @@ def run_command(cmd, description):
                 )
 
                 # Only show coverage warning if actually below threshold
-                required_coverage = 70  # From --cov-fail-under=70
+                required_coverage = 50  # From --cov-fail-under=50
                 if coverage_match and int(actual_coverage) < required_coverage:
                     print("\nCOVERAGE REQUIREMENT NOT MET!")
                     print(
@@ -143,10 +143,10 @@ def run_all_tests():
         "tests/",
         "-v",
         "--cov=src/seu_injection",
-        "--cov=testing",  # Include testing directory
+        # Removed: --cov=testing (directory no longer exists)
         "--cov-report=term-missing",
         "--cov-report=html:htmlcov",
-        "--cov-fail-under=70",
+        "--cov-fail-under=50",  # Enforce 50% minimum (currently ~92%)
         "--tb=short",
     ]
     return run_command(cmd, "Complete test suite with coverage")

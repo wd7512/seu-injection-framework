@@ -244,11 +244,11 @@ class TestInjector:
             results = injector.run_seu(bit_i=bit_pos)
             assert len(results["tensor_location"]) > 0
 
-        # Test invalid bit positions should raise AssertionError
-        with pytest.raises(AssertionError):
+        # Test invalid bit positions should raise ValueError
+        with pytest.raises(ValueError):
             injector.run_seu(bit_i=-1)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             injector.run_seu(bit_i=33)
 
     def test_run_seu_layer_targeting(self, simple_model, sample_data, device):
@@ -375,10 +375,10 @@ class TestInjector:
             assert isinstance(results, dict)
 
         # Test invalid probabilities
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             injector.run_stochastic_seu(bit_i=0, p=-0.1)
 
-        with pytest.raises(AssertionError):
+        with pytest.raises(ValueError):
             injector.run_stochastic_seu(bit_i=0, p=1.1)
 
     def test_stochastic_seu_probability_effects(

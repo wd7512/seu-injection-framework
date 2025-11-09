@@ -1,12 +1,12 @@
 """
-Additional tests for testing/example_networks.py to complete coverage.
+Additional tests for tests/fixtures/example_networks.py to complete coverage.
 
 These tests focus on error handling and edge cases not covered by integration tests.
 """
 
 import pytest
 import torch
-from testing.example_networks import get_example_network
+from tests.fixtures.example_networks import get_example_network
 
 
 class TestExampleNetworks:

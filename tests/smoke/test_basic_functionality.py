@@ -105,12 +105,13 @@ def test_example_networks_import():
         # Ensure the repository root is in the path for direct execution
         import os
         import sys
+
         repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
         if repo_root not in sys.path:
             sys.path.insert(0, repo_root)
-        
-        # The testing module should now be importable as a proper package
-        from testing import get_example_network
+
+        # The fixtures module should now be importable as a proper package
+        from tests.fixtures.example_networks import get_example_network
 
         # Test that function exists
         assert get_example_network is not None
