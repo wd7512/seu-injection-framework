@@ -41,6 +41,26 @@ The SEU Injection Framework serves the research community by providing:
    uv run python run_tests.py smoke
    ```
 
+### **Essential Development Commands**
+
+```bash
+# Standard development workflow:
+uv sync --all-extras                       # Install dependencies
+uv run python run_tests.py smoke          # Quick validation (10 tests, ~30s)
+uv run python run_tests.py unit           # Unit tests (43 tests, ~2min)  
+uv run python run_tests.py integration    # Integration tests (7 tests, ~5min)
+uv run python run_tests.py all            # Full suite (109 tests, ~10s)
+uv run pytest --cov=src/seu_injection --cov-fail-under=70   # Coverage validation (94% achieved)
+
+# Code quality checks:
+uv run ruff check                          # Linting
+uv run ruff format                         # Code formatting
+uv run mypy src/seu_injection             # Type checking (future)
+
+# Performance testing:
+uv run python run_tests.py benchmarks     # Performance validation
+```
+
 ## 🧪 Quality Standards & Requirements
 
 ### Code Quality Gates

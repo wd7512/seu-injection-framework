@@ -118,51 +118,12 @@ This framework implements the methodology described in:
 }
 ```
 
-## Installation
+## Installation & Usage
 
-### Quick Install
-```bash
-pip install seu-injection-framework
-```
-
-### Development Install
-```bash
-git clone https://github.com/wd7512/seu-injection-framework.git
-cd seu-injection-framework
-uv sync --all-extras
-```
-
-## Quick Start Example
-
-```python
-import torch
-from seu_injection import SEUInjector, classification_accuracy
-
-# Create a simple model and data
-model = torch.nn.Sequential(
-    torch.nn.Linear(784, 128),
-    torch.nn.ReLU(),
-    torch.nn.Linear(128, 10)
-)
-data = torch.randn(100, 784)
-targets = torch.randint(0, 10, (100,))
-
-# Initialize SEU injector
-injector = SEUInjector(model)
-
-# Run deterministic SEU injection
-results = injector.run_seu(
-    data=data,
-    targets=targets,
-    criterion=classification_accuracy,
-    bit_position=15,  # Target mantissa bit
-    target_layers=['0.weight']  # Target first layer
-)
-
-print(f"Baseline accuracy: {results['baseline_accuracy']:.3f}")
-print(f"Post-SEU accuracy: {results['corrupted_accuracy']:.3f}")
-print(f"Accuracy drop: {results['accuracy_drop']:.3f}")
-```
+For installation instructions and usage examples, see:
+- [Installation Guide](docs/installation.md) - Comprehensive setup instructions
+- [Quick Start Guide](docs/quickstart.md) - 10-minute tutorial
+- [Main README](README.md) - Project overview and basic usage
 
 ## Support
 

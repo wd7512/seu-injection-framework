@@ -10,15 +10,13 @@
 - **Installation Guide**: [`installation.md`](installation.md) - Comprehensive setup instructions
 
 ### **📖 Comprehensive Guides** 
-- **Basic Usage**: [`tutorials/basic_usage.md`](tutorials/basic_usage.md) - Complete workflow tutorial
-- **API Reference**: [`api/`](api/) - Detailed function and class documentation
+- **API Reference**: [`api/seu_injection.md`](api/seu_injection.md) - Complete function and class documentation
 - **Examples**: [`../examples/`](../examples/) - Production-ready research examples
+- **Project Roadmap**: [`PRODUCTION_READINESS_PLAN.md`](PRODUCTION_READINESS_PLAN.md) - Phase tracking and future plans
 
 ### **🔧 Development & Contributing**
-- **Development Workflow**: [`development/README.md`](development/README.md) - Setup and commands
-- **Contributing Guide**: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) - Community guidelines and standards
-- **Project Roadmap**: [`PRODUCTION_READINESS_PLAN.md`](PRODUCTION_READINESS_PLAN.md) - Phase tracking and future plans
-- **Change History**: [`development/MIGRATION_HISTORY.md`](development/MIGRATION_HISTORY.md) - Development evolution
+- **Contributing Guide**: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) - Development workflow and community guidelines
+- **Change History**: [`../MIGRATION_HISTORY.md`](../MIGRATION_HISTORY.md) - Development evolution
 
 ## 🎯 Current Status (November 2025)
 
