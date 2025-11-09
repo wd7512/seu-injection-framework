@@ -13,17 +13,107 @@ A production-ready Python framework for **Single Event Upset (SEU) injection** i
 
 ### Installation
 
-**Development Install (Current)**
+**Step 1: Clone Repository**
 ```bash
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
+git checkout ai_refactor  # Use latest development branch
+```
 
-# Option 1: UV (Recommended)
+**Step 2: Install Dependencies**
+
+**Option 1: UV (Recommended - Faster & More Reliable)**
+```bash
+# For development and testing (includes pytest, etc.)
 uv sync --all-extras
 
-# Option 2: pip
-pip install -e ".[dev,notebooks,extras]"
+# For production use only
+uv sync
 ```
+
+**Option 2: pip**
+```bash
+# For development and testing  
+pip install -e ".[dev,notebooks,extras]"
+
+# For production use only
+pip install -e .
+```
+
+**Step 3: Verify Installation**
+```bash
+# Test that everything works
+uv run python run_tests.py smoke
+
+# Or run a quick test manually
+uv run python -c "from seu_injection import SEUInjector; print('✅ Installation successful!')"
+```
+
+### 🚨 Common Setup Issues & Solutions
+
+<details>
+<summary><b>❌ "No module named pytest" or test failures</b></summary>
+
+**Problem**: You ran `uv sync` without the `--all-extras` flag, so development dependencies aren't installed.
+
+**Solution**:
+```bash
+# Install all dependencies including testing tools
+uv sync --all-extras
+
+# Or specifically install dev dependencies
+uv sync --extra dev
+```
+</details>
+
+<details>
+<summary><b>❌ "No module named 'testing'" import errors</b></summary>
+
+**Problem**: Older version of the repository missing the testing package structure.
+
+**Solution**:
+```bash
+# Make sure you're on the latest branch
+git checkout ai_refactor
+git pull origin ai_refactor
+
+# Reinstall dependencies
+uv sync --all-extras
+```
+</details>
+
+<details>
+<summary><b>❌ Individual test files failing with coverage errors</b></summary>
+
+**Problem**: Running single test files with pytest may fail coverage thresholds.
+
+**Solution**:
+```bash
+# Run individual tests without coverage requirements
+uv run pytest tests/test_injector.py --no-cov
+
+# Or run the full test suite which meets coverage requirements
+uv run pytest tests/
+```
+</details>
+
+<details>
+<summary><b>❌ PyTorch installation issues</b></summary>
+
+**Problem**: PyTorch might not install correctly on some systems.
+
+**Solution**:
+```bash
+# Force reinstall PyTorch
+uv sync --all-extras --reinstall
+
+# Or install PyTorch manually first
+pip install torch torchvision
+uv sync --all-extras
+```
+</details>
+
+> **💡 Tip**: Always use `uv run` before commands to ensure you're using the correct virtual environment.
 
 > **Note**: PyPI distribution is planned for future releases. Currently install from source.
 

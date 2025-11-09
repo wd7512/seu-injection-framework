@@ -428,6 +428,32 @@ print(f"Most vulnerable bits: {vulnerable_bits}")
 
 ## Troubleshooting
 
+### Issue: "No module named pytest" when running examples
+**Problem:** Missing development dependencies.
+**Solution:** 
+```bash
+# Install all dependencies including testing tools
+uv sync --all-extras
+```
+
+### Issue: "No module named 'testing'" import errors
+**Problem:** Using older version without proper package structure.
+**Solution:**
+```bash
+# Switch to the latest development branch
+git checkout ai_refactor
+git pull origin ai_refactor
+uv sync --all-extras
+```
+
+### Issue: Individual test files fail with coverage errors
+**Problem:** Coverage requirements too strict for single test files.
+**Solution:**
+```bash
+# Run tests without coverage requirements
+uv run pytest tests/test_injector.py --no-cov
+```
+
 ### Issue: Low baseline accuracy
 **Solution:** Train longer or adjust hyperparameters (learning rate, epochs, architecture).
 
@@ -438,7 +464,7 @@ print(f"Most vulnerable bits: {vulnerable_bits}")
 ### Issue: SEU injection very slow
 **Solution:** 
 - Use GPU: `device='cuda'`
-- Use stochastic sampling: `injector.run_seu_stochastic(num_injections=100)`
+- Use stochastic sampling: `injector.run_stochastic_seu(bit_i=31, p=0.01)`
 - Reduce test set size
 
 ### Issue: Results seem random

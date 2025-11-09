@@ -350,7 +350,8 @@ class SEUInjector:
             get_criterion_score: Manual evaluation without injection
             bitops.float32.flip_bit: Underlying bit manipulation function
         """
-        assert bit_i in range(0, 33), f"bit_i must be in range [0, 32], got {bit_i}"
+        if bit_i not in range(0, 33):
+            raise ValueError(f"bit_i must be in range [0, 32], got {bit_i}")
 
         self.model.eval()
 
@@ -492,8 +493,10 @@ class SEUInjector:
             get_criterion_score: Direct evaluation without injection
             numpy.random: Underlying random sampling implementation
         """
-        assert 0.0 <= p <= 1.0, f"Probability p must be in [0, 1], got {p}"
-        assert bit_i in range(0, 33), f"bit_i must be in range [0, 32], got {bit_i}"
+        if not (0.0 <= p <= 1.0):
+            raise ValueError(f"Probability p must be in [0, 1], got {p}")
+        if bit_i not in range(0, 33):
+            raise ValueError(f"bit_i must be in range [0, 32], got {bit_i}")
 
         self.model.eval()
 

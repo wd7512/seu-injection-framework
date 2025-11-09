@@ -102,15 +102,15 @@ def test_device_compatibility():
 def test_example_networks_import():
     """Test that example networks module can be imported."""
     try:
-        # Add testing directory to path if not already there
+        # Ensure the repository root is in the path for direct execution
         import os
         import sys
-
-        testing_dir = os.path.join(os.path.dirname(__file__), "..", "..", "testing")
-        if testing_dir not in sys.path:
-            sys.path.insert(0, testing_dir)
-
-        from testing.example_networks import get_example_network
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+        if repo_root not in sys.path:
+            sys.path.insert(0, repo_root)
+        
+        # The testing module should now be importable as a proper package
+        from testing import get_example_network
 
         # Test that function exists
         assert get_example_network is not None

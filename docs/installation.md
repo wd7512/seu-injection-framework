@@ -15,10 +15,16 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
 # Clone the repository
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
+git checkout ai_refactor  # Use the latest development branch
 
-# Install all dependencies
+# Install all dependencies (IMPORTANT: Use --all-extras for full functionality)
 uv sync --all-extras
+
+# Verify installation
+uv run python run_tests.py smoke
 ```
+
+> **⚠️ Important**: Always use `--all-extras` when running `uv sync` to avoid missing dependencies that cause test failures. See troubleshooting section below for common setup issues.
 
 ## Installation Methods
 
@@ -239,7 +245,60 @@ print(f'MPS available: {torch.backends.mps.is_available()}')
 
 ### Common Issues
 
-#### Issue: ModuleNotFoundError
+#### Issue: "No module named pytest" or Tests Fail Immediately
+
+**Problem:** You ran `uv sync` without `--all-extras`, missing development dependencies
+
+**Solution:**
+```bash
+# Install ALL dependencies including testing tools
+uv sync --all-extras
+
+# Verify testing tools are available
+uv run pytest --version
+uv run python -c "import pytest; print('pytest available')"
+```
+
+#### Issue: "No module named 'testing'" Import Errors
+
+**Problem:** Using an older version of the repository that lacks proper package structure
+
+**Solution:**
+```bash
+# Switch to latest development branch
+git checkout ai_refactor
+git pull origin ai_refactor
+
+# Reinstall with all dependencies
+uv sync --all-extras
+
+# Verify the testing module is importable
+uv run python -c "from testing import get_example_network; print('testing module available')"
+```
+
+#### Issue: Individual Test Files Fail with Coverage Errors
+
+**Problem:** Running single test files may fail coverage requirements even though code is correct
+
+**Solutions:**
+```bash
+# Option 1: Run tests without coverage
+uv run pytest tests/test_injector.py --no-cov -v
+
+# Option 2: Run full test suite (recommended)
+uv run pytest tests/ -v
+
+# Option 3: Use the custom test runner
+uv run python run_tests.py unit
+```
+
+#### Issue: Assert vs ValueError Security Warnings
+
+**Problem:** Static analysis tools warn about assert statements in production code
+
+**Solution:** This has been fixed in the ai_refactor branch. The framework now uses proper `if/raise ValueError` patterns instead of `assert` statements for input validation, ensuring validation works even with Python optimization flags.
+
+#### Issue: ModuleNotFoundError for seu_injection
 
 **Problem:** Python cannot find the seu_injection module
 
@@ -252,7 +311,7 @@ cd seu-injection-framework
 pip install -e .
 
 # Or verify UV environment
-uv sync
+uv sync --all-extras
 ```
 
 #### Issue: CUDA out of memory
