@@ -19,6 +19,11 @@ python architecture_comparison.py
 
 ## 📋 Example Overview
 
+### **📓 Interactive Jupyter Notebook**
+- **[Example_Attack_Notebook.ipynb](Example_Attack_Notebook.ipynb)** - Comprehensive interactive tutorial covering all framework capabilities with visualizations
+
+### **🔬 Python Scripts**
+
 ### 1. `basic_cnn_robustness.py` - Space Mission CNN Analysis
 
 **Research Focus**: Mars rover image classification robustness assessment

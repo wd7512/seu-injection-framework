@@ -59,6 +59,10 @@ uv run mypy src/seu_injection             # Type checking (future)
 
 # Performance testing:
 uv run python run_tests.py benchmarks     # Performance validation
+
+# Documentation generation:
+# API documentation is automatically generated from docstrings in src/seu_injection/
+# Ensure all public functions and classes have comprehensive docstrings
 ```
 
 ## 🧪 Quality Standards & Requirements

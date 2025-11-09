@@ -10,8 +10,8 @@
 - **Installation Guide**: [`installation.md`](installation.md) - Comprehensive setup instructions
 
 ### **📖 Comprehensive Guides** 
-- **API Reference**: [`api/seu_injection.md`](api/seu_injection.md) - Complete function and class documentation
-- **Examples**: [`../examples/`](../examples/) - Production-ready research examples
+- **API Reference**: See docstrings in `src/seu_injection/` - Complete function and class documentation
+- **Examples**: [`../examples/`](../examples/) - Production-ready research examples including interactive notebook
 - **Project Roadmap**: [`PRODUCTION_READINESS_PLAN.md`](PRODUCTION_READINESS_PLAN.md) - Phase tracking and future plans
 
 ### **🔧 Development & Contributing**
