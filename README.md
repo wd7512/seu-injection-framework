@@ -49,7 +49,7 @@ For detailed examples, see the `docs/examples/` directory.
 - **Multiple injection strategies**: exhaustive and stochastic sampling  
 - **GPU acceleration** support via CUDA
 - **Layer-specific targeting** for focused robustness analysis
-- **Comprehensive test coverage** with 102 tests and 93.6% code coverage
+- **Comprehensive test coverage** with 109 tests and 94% code coverage
 - **Support for NN, CNN, and RNN architectures**
 - **CI/CD pipeline** with automated testing across platforms
 - **Enterprise-grade codebase** with zero linting violations and automated quality enforcement
@@ -69,7 +69,7 @@ This framework enables researchers to:
 
 ### Phase 3 ✅ (November 2025) - Performance Optimization & Quality Complete
 - **10-100x performance improvement** in bitflip operations via NumPy vectorization
-- **102 comprehensive tests** with **93.6% code coverage**
+- **109 comprehensive tests** with **94% code coverage**
 - **Modern package structure** with `src/seu_injection/` layout  
 - **CI/CD pipeline** with cross-platform testing (Ubuntu/Windows/macOS)
 - **Zero linting violations** with automated code quality enforcement

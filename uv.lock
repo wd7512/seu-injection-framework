@@ -4289,6 +4289,11 @@ notebooks = [
     { name = "seaborn" },
 ]
 
+[package.dev-dependencies]
+dev = [
+    { name = "psutil" },
+]
+
 [package.metadata]
 requires-dist = [
     { name = "bandit", marker = "extra == 'dev'", specifier = ">=1.7.0" },
@@ -4313,6 +4318,9 @@ requires-dist = [
     { name = "tqdm", specifier = ">=4.60.0" },
 ]
 provides-extras = ["dev", "notebooks", "extras"]
+
+[package.metadata.requires-dev]
+dev = [{ name = "psutil", specifier = ">=7.1.3" }]
 
 [[package]]
 name = "six"

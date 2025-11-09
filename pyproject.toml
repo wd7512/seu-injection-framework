@@ -72,6 +72,11 @@ extras = [
 "Documentation" = "https://github.com/wd7512/seu-injection-framework"
 "Research Paper" = "https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars"
 
+[dependency-groups]
+dev = [
+    "psutil>=7.1.3",
+]
+
 # Tool configurations for code quality
 [tool.pytest.ini_options]
 testpaths = ["tests"]

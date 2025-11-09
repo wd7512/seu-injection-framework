@@ -48,22 +48,39 @@ def run_command(cmd, description):
         print(f"STDOUT: {e.stdout}")
         print(f"STDERR: {e.stderr}")
 
-        # Check if this is a coverage failure
+        # Check if this is a coverage failure (but the test output shows we already have good coverage)
         if "--cov-fail-under" in " ".join(cmd) and "coverage" in description.lower():
             output_text = e.stdout + e.stderr
             if "TOTAL" in output_text and "%" in output_text:
-                print("\nCOVERAGE REQUIREMENT NOT MET!")
-                print("Current coverage is below the required 50% threshold.")
-                print("To fix coverage issues:")
-                print(
-                    "   1. Run with verbose coverage: uv run pytest --cov=src/seu_injection --cov-report=term-missing -v"
+                # Extract actual coverage percentage from output
+                import re
+
+                coverage_match = re.search(r"TOTAL\s+\d+\s+\d+\s+(\d+)%", output_text)
+                actual_coverage = (
+                    coverage_match.group(1) if coverage_match else "unknown"
                 )
-                print("   2. Check htmlcov/index.html for detailed coverage report")
-                print("   3. Add tests for uncovered code paths")
-                print("   4. Ensure all critical functions have test coverage")
-                print(
-                    "NOTE: Current target is 70% coverage with Phase 3 achieving 91%+"
-                )
+
+                # Only show coverage warning if actually below threshold
+                required_coverage = 70  # From --cov-fail-under=70
+                if coverage_match and int(actual_coverage) < required_coverage:
+                    print(f"\nCOVERAGE REQUIREMENT NOT MET!")
+                    print(
+                        f"Current coverage is {actual_coverage}%, required: {required_coverage}%"
+                    )
+                    print("To fix coverage issues:")
+                    print(
+                        "   1. Run with verbose coverage: uv run pytest --cov=src/seu_injection --cov-report=term-missing -v"
+                    )
+                    print("   2. Check htmlcov/index.html for detailed coverage report")
+                    print("   3. Add tests for uncovered code paths")
+                    print("   4. Ensure all critical functions have test coverage")
+                else:
+                    print(
+                        f"\nNote: Coverage is actually {actual_coverage}% which meets the {required_coverage}% requirement."
+                    )
+                    print(
+                        "The test failure was likely due to other issues (see above)."
+                    )
 
         return False
     except FileNotFoundError:

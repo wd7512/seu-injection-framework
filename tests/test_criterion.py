@@ -196,7 +196,9 @@ class TestCriterionFunctions:
         simple_model = simple_model.to(device)
         dummy_y = torch.tensor([1, 0], device=device)
 
-        with pytest.raises(ValueError, match="When using DataLoader, do not specify y_true separately"):
+        with pytest.raises(
+            ValueError, match="When using DataLoader, do not specify y_true separately"
+        ):
             classification_accuracy(simple_model, sample_dataloader, dummy_y, device)
 
     def test_classification_accuracy_no_device(self, simple_model, sample_data):
@@ -207,7 +209,9 @@ class TestCriterionFunctions:
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
 
-    def test_classification_accuracy_batch_size_none(self, simple_model, sample_data, device):
+    def test_classification_accuracy_batch_size_none(
+        self, simple_model, sample_data, device
+    ):
         """Test accuracy computation with batch_size=None."""
         X, y = sample_data
         X = X.to(device)
@@ -218,9 +222,13 @@ class TestCriterionFunctions:
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
 
-    def test_classification_accuracy_loader_no_device(self, simple_model, sample_dataloader):
+    def test_classification_accuracy_loader_no_device(
+        self, simple_model, sample_dataloader
+    ):
         """Test loader accuracy computation without device specification."""
-        accuracy = classification_accuracy_loader(simple_model, sample_dataloader, device=None)
+        accuracy = classification_accuracy_loader(
+            simple_model, sample_dataloader, device=None
+        )
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
 
@@ -244,11 +252,15 @@ class TestCriterionFunctions:
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
 
-    def test_classification_accuracy_dataloader_return_path(self, simple_model, sample_dataloader, device):
+    def test_classification_accuracy_dataloader_return_path(
+        self, simple_model, sample_dataloader, device
+    ):
         """Test that DataLoader path returns classification_accuracy_loader result."""
         simple_model = simple_model.to(device)
 
         # This should trigger the return path at line 100
-        accuracy = classification_accuracy(simple_model, sample_dataloader, device=device)
+        accuracy = classification_accuracy(
+            simple_model, sample_dataloader, device=device
+        )
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
