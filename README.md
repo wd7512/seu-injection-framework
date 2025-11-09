@@ -33,7 +33,7 @@ import torch
 model = torch.load('your_model.pth')
 
 # Set up SEU injection
-injector = SEUInjector(model, X=test_data, y=test_labels, criterion=classification_accuracy)
+injector = SEUInjector(model, x=test_data, y=test_labels, criterion=classification_accuracy)
 
 # Run SEU analysis
 results = injector.run_seu(bit_position=0)  # Test sign bit flips

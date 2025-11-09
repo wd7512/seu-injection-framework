@@ -202,7 +202,7 @@ class TestCriterionFunctions:
     def test_classification_accuracy_no_device(self, simple_model, sample_data):
         """Test accuracy computation without device specification."""
         X, y = sample_data
-        
+
         accuracy = classification_accuracy(simple_model, X, y, device=None)
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
@@ -213,7 +213,7 @@ class TestCriterionFunctions:
         X = X.to(device)
         y = y.to(device)
         simple_model = simple_model.to(device)
-        
+
         accuracy = classification_accuracy(simple_model, X, y, device, batch_size=None)
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
@@ -228,8 +228,8 @@ class TestCriterionFunctions:
         """Test multiclass accuracy with 1D model output (edge case)."""
         y_true = np.array([0, 1, 0, 1])
         # 1D output that should be treated as binary
-        model_output = np.array([0.3, 0.7, 0.2, 0.8])  
-        
+        model_output = np.array([0.3, 0.7, 0.2, 0.8])
+
         accuracy = multiclass_classification_accuracy(y_true, model_output)
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
@@ -239,15 +239,15 @@ class TestCriterionFunctions:
         y_true = np.array([0, 1, 0, 1])
         # 2D output with single column (binary case)
         model_output = np.array([[0.3], [0.7], [0.2], [0.8]])
-        
+
         accuracy = multiclass_classification_accuracy(y_true, model_output)
-        assert isinstance(accuracy, (float, np.floating))  
+        assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
 
     def test_classification_accuracy_dataloader_return_path(self, simple_model, sample_dataloader, device):
         """Test that DataLoader path returns classification_accuracy_loader result."""
         simple_model = simple_model.to(device)
-        
+
         # This should trigger the return path at line 100
         accuracy = classification_accuracy(simple_model, sample_dataloader, device=device)
         assert isinstance(accuracy, (float, np.floating))

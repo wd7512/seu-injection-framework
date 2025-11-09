@@ -44,12 +44,12 @@ class SEUInjector:
             trained_model: PyTorch model to inject faults into
             criterion: Function to evaluate model performance
             device: Computing device ('cpu', 'cuda', or torch.device)
-            X: Input data tensor (mutually exclusive with data_loader)
+            x: Input data tensor (mutually exclusive with data_loader)
             y: Target labels tensor (mutually exclusive with data_loader)
-            data_loader: PyTorch DataLoader (mutually exclusive with X, y)
+            data_loader: PyTorch DataLoader (mutually exclusive with x, y)
 
         Raises:
-            ValueError: If both data_loader and X/y are provided
+            ValueError: If both data_loader and x/y are provided
 
         Note:
             This implementation assumes float32 precision. Other precisions
