@@ -95,7 +95,7 @@ body:
       label: Installation Method
       description: How did you install the framework?
       options:
-        - PyPI (pip install seu-injection-framework)
+        - Source install (git clone + uv/pip install -e)
         - Development install (git clone + uv/pip install -e)
         - Other
     validations:

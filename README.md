@@ -1,7 +1,6 @@
 # SEU Injection Framework
 
-[![PyPI version](https://img.shields.io/pypi/v/seu-injection-framework)](https://pypi.org/project/seu-injection-framework/)
-[![Python versions](https://img.shields.io/pypi/pyversions/seu-injection-framework)](https://pypi.org/project/seu-injection-framework/)
+[![Python versions](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue)](https://github.com/wd7512/seu-injection-framework)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-109%20passed-green)](https://github.com/wd7512/seu-injection-framework)
 [![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](https://github.com/wd7512/seu-injection-framework)
@@ -14,24 +13,19 @@ A production-ready Python framework for **Single Event Upset (SEU) injection** i
 
 ### Installation
 
-**Option 1: PyPI (Recommended)**
-```bash
-pip install seu-injection-framework
-```
-
-**Option 2: Development Install**
+**Development Install (Current)**
 ```bash
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
+
+# Option 1: UV (Recommended)
+uv sync --all-extras
+
+# Option 2: pip
 pip install -e ".[dev,notebooks,extras]"
 ```
 
-**Option 3: UV (Modern Python Package Manager)**
-```bash
-uv add seu-injection-framework
-# or for development:
-uv sync --all-extras
-```
+> **Note**: PyPI distribution is planned for future releases. Currently install from source.
 
 ### Basic Usage
 
@@ -104,7 +98,7 @@ For comprehensive documentation, visit the [`docs/`](docs/) directory.
 ### 🌐 **Cross-Platform & Integration**
 - **🐍 Python 3.9-3.12**: Full support for modern Python versions
 - **🔥 PyTorch Integration**: Native support for PyTorch tensors and models
-- **📦 Easy Distribution**: Available on PyPI with comprehensive dependency management
+- **📦 Easy Installation**: Simple source installation with comprehensive dependency management
 - **🔗 Research Ready**: Reproducible experiments with deterministic random seeds
 
 ## 🔬 Research Applications
@@ -186,7 +180,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🚀 Development Status
 
 **v1.0.0 - Production Ready** ✅
-- Complete PyPI distribution with professional packaging
+- Professional packaging ready for PyPI distribution (planned)
 - Comprehensive documentation and examples  
 - Community infrastructure and contribution guidelines
 - Enterprise-grade quality standards maintained

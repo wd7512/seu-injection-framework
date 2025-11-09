@@ -685,7 +685,7 @@ jobs:
    uv publish
    
    # Verify public installation
-   pip install seu-injection-framework
+   pip install seu-injection-framework  # When published to PyPI
    ```
 
 #### 5.2 Community Launch Strategy
@@ -872,7 +872,7 @@ docs/
 - **Reproducibility**: All examples produce consistent results
 
 ##### **Distribution Requirements**
-- **PyPI Release**: Successfully installable via `pip install seu-injection-framework`
+- **PyPI Release**: Distribution infrastructure ready for future PyPI publication
 - **Docker Support**: Containerized environment for reproducible research
 - **Cross-Platform**: Validated on Windows, macOS, and Linux
 - **Version Compatibility**: Python 3.9-3.12 support confirmed
