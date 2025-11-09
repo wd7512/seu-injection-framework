@@ -5,6 +5,18 @@ SEU Injection Framework
 A comprehensive framework for Single Event Upset (SEU) injection in neural networks
 for studying fault tolerance in harsh environments.
 
+# TODO PRODUCTION READINESS: Public API improvements per PRODUCTION_READINESS_PLAN.md
+# ISSUE: Current API requires deep understanding (IEEE 754, layer names, device management)
+# NEEDED: High-level convenience functions for common scenarios:
+#   - quick_robustness_check(model, test_data) -> simple robustness score
+#   - compare_architectures(models_dict, test_data) -> comparative analysis
+#   - space_mission_simulation(model, radiation_level) -> space-specific testing
+# TYPE SAFETY: Add comprehensive type stubs for better IDE support
+# ERROR MESSAGES: Custom exception types with helpful guidance for beginners
+# EXAMPLES: In-docstring examples need to be more comprehensive and tested
+# COMPATIBILITY: Ensure consistent device handling across all functions
+# PRIORITY: MEDIUM - Improve user onboarding experience
+
 This package provides tools for:
 - Systematic SEU injection in PyTorch models
 - Performance evaluation under radiation-induced bit flips

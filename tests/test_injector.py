@@ -12,6 +12,19 @@ from seu_injection import classification_accuracy
 class TestInjector:
     """Test suite for the SEU Injector class."""
 
+    # TODO TESTING IMPROVEMENTS: Test coverage gaps and enhancements per improvement plans
+    # COVERAGE GAPS:
+    #   - Edge cases: NaN/Inf handling in bitflip operations
+    #   - Error conditions: Invalid bit positions, incompatible devices
+    #   - Performance: Large model injection scenarios (memory/speed)
+    #   - Integration: Real model architectures (ResNet, EfficientNet)
+    # MISSING TESTS:
+    #   - Multi-GPU device handling and tensor movement
+    #   - Custom criterion function validation
+    #   - Layer-specific injection with complex model hierarchies
+    #   - Stochastic injection reproducibility with different random seeds
+    # PRIORITY: MEDIUM - Current 94% coverage good, but edge cases important for production
+
     def test_injector_initialization_with_tensor_data(
         self, simple_model, sample_data, device
     ):

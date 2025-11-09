@@ -12,11 +12,11 @@
 ### **📖 Comprehensive Guides** 
 - **API Reference**: See docstrings in `src/seu_injection/` - Complete function and class documentation
 - **Examples**: [`../examples/`](../examples/) - Production-ready research examples including interactive notebook
-- **Project Roadmap**: [`PRODUCTION_READINESS_PLAN.md`](PRODUCTION_READINESS_PLAN.md) - Phase tracking and future plans
+- **Implementation TODOs**: See code comments in source files - Living development priorities embedded in relevant modules
 
 ### **🔧 Development & Contributing**
 - **Contributing Guide**: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) - Development workflow and community guidelines
-- **Change History**: [`MIGRATION_HISTORY.md`](MIGRATION_HISTORY.md) - Development evolution
+- **Development Archive**: [`DEVELOPMENT_ARCHIVE.md`](DEVELOPMENT_ARCHIVE.md) - Historical development phases and achievements
 - **Known Issues**: [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) - Non-critical issue tracking
 
 ## 🎯 Current Status (November 2025)

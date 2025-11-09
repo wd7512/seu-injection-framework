@@ -93,6 +93,14 @@ all = [
 
 
 # Tool configurations for code quality
+# TODO PIPELINE FIX: Coverage configuration addressed per PIPELINE_FIX_URGENT.md
+# ISSUE: Global --cov-fail-under=50 in pytest addopts breaks isolated test runs (benchmarks get 23% coverage)
+# SOLUTION IMPLEMENTED: Removed global threshold, now enforced only in CI/CD for full test suite
+# CURRENT STATUS: Full test suite achieves 94% coverage (well above 50% minimum requirement)
+# ENFORCEMENT: CI/CD pipeline enforces --cov-fail-under=50 on complete test runs only
+# BENEFIT: Allows individual test files and benchmark tests to run without coverage failures
+# REFERENCE: See .github/workflows/python-tests.yml for CI/CD enforcement implementation
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
@@ -102,6 +110,9 @@ addopts = [
     "--cov=src/seu_injection", 
     "--cov-report=term-missing",
     "--cov-report=html:htmlcov",
+    # TODO: --cov-fail-under=50 REMOVED from global config per pipeline fix
+    # REASON: Benchmark tests achieve 23% coverage when run isolated, failing 50% threshold
+    # CURRENT: Coverage threshold enforced in CI/CD for full suite only (94% > 50%)
     # Note: Coverage threshold removed from default addopts to allow individual test file runs
     # Use --cov-fail-under=50 when running full test suite if desired
     "-v",

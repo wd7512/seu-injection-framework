@@ -3,6 +3,24 @@ Core SEU injection functionality.
 
 This module provides the main SEUInjector class for systematic fault injection
 in PyTorch neural networks to study robustness in harsh environments.
+
+# TODO PRODUCTION READINESS: Major architectural improvements needed per PRODUCTION_READINESS_PLAN.md
+# WORKING DOCUMENTS CONVERTED TO TODOS (can be archived):
+#   - PIPELINE_FIX_URGENT.md -> Converted to TODOs in pyproject.toml, CI workflow, run_tests.py
+#   - COVERAGE_FIX_SUMMARY.md -> Implementation complete, coverage threshold fixed
+#   - DOCS_REVIEW_COMPLETE.md -> Temporary review file, content extracted
+#   - USER_EXPERIENCE_IMPROVEMENT_PLAN.md -> Key items extracted to code TODOs
+#   - Parts of PRODUCTION_READINESS_PLAN.md -> Architectural TODOs extracted here
+# IMPLEMENTATION PRIORITIES:
+# TYPE SAFETY: Add comprehensive type hints throughout class (currently missing)
+# API COMPLEXITY: High learning curve - need simplified "quick analysis" functions
+# ERROR HANDLING: Limited custom exception types for better user experience
+# DEVICE MANAGEMENT: Inconsistent string vs torch.device object handling
+# PERFORMANCE: GPU operations could be optimized further for large models
+# EXTENSIBILITY: Rigid architecture - need plugin system for custom metrics/strategies
+# DOCUMENTATION: Missing comprehensive docstrings for production API
+# VALIDATION: Input validation using Pydantic models for better error messages
+# PRIORITY: HIGH - Core user-facing API needs enhancement for v1.0 release
 """
 
 from typing import Any, Optional, Union
@@ -86,6 +104,18 @@ class SEUInjector:
         y: Optional[Union[torch.Tensor, np.ndarray]] = None,
         data_loader: Optional[torch.utils.data.DataLoader] = None,
     ) -> None:
+        # TODO API COMPLEXITY: Constructor requires too much domain knowledge per improvement plans
+        # ISSUES:
+        #   - Users must understand criterion functions (no sensible defaults)
+        #   - Device management confusing (string vs torch.device)
+        #   - Mutually exclusive x/y vs data_loader not clear from signature
+        #   - No convenience constructors for common scenarios
+        # IMPROVEMENTS NEEDED:
+        #   - Add SEUInjector.from_model(model) with classification_accuracy default
+        #   - Add SEUInjector.quick_setup(model, test_data) for simple cases
+        #   - Better error messages when x/y and data_loader both provided
+        #   - Auto-detect device if None provided (already implemented)
+        # PRIORITY: MEDIUM - Affects new user onboarding
         """
         Initialize the SEU injector with model, data, and evaluation criterion.
 
@@ -372,9 +402,30 @@ class SEUInjector:
 
                 print(f"Testing Layer: {current_layer_name}")
 
+                # TODO PERFORMANCE: Unnecessary CPU tensor conversion creates memory bottleneck
+                # PROBLEM: Converting GPU tensors to CPU numpy arrays for bit manipulation
+                # INEFFICIENCIES:
+                #   - GPU→CPU memory transfer latency (can be 100s of μs per transfer)
+                #   - CPU numpy processing instead of GPU-accelerated operations
+                #   - Memory duplication (original tensor + CPU copy)
+                # BETTER APPROACH: Keep tensors on GPU, use torch tensor operations for bit manipulation
+                # IMPACT: Additional overhead on top of already slow bitflip operations
+
                 # Store original tensor values for restoration
                 original_tensor = tensor.data.clone()
-                tensor_cpu = original_tensor.cpu().numpy()
+                tensor_cpu = original_tensor.cpu().numpy()  # <-- MEMORY INEFFICIENCY
+
+                # TODO PERFORMANCE CRITICAL: This loop is the main performance bottleneck for SEU injection
+                # PROBLEM: Uses slowest bitflip_float32() in performance-critical injection loop
+                # CURRENT IMPACT:
+                #   - ResNet-18 (11M params): 30-60 minutes per bit position
+                #   - ResNet-50 (25M params): 1-2 hours per bit position
+                #   - Each iteration: O(32) string manipulation instead of O(1) bit operation
+                # CALCULATIONS: 11M params × 100μs per bitflip = 18+ minutes of pure bit operations
+                #              Add model evaluation overhead = 30-60 minutes total
+                # SOLUTION: Replace with bitflip_float32_optimized() or direct vectorized operations
+                # VECTORIZATION OPPORTUNITY: Could flip entire tensor at once instead of per-element
+                # PRIORITY: HIGHEST - This is why the framework doesn't scale to production use
 
                 # Iterate through every parameter in the tensor
                 for idx in tqdm(
@@ -382,7 +433,9 @@ class SEUInjector:
                     desc=f"Injecting into {current_layer_name}",
                 ):
                     original_val = tensor_cpu[idx]
-                    seu_val = bitflip_float32(original_val, bit_i)
+                    seu_val = bitflip_float32(
+                        original_val, bit_i
+                    )  # <-- PERFORMANCE BOTTLENECK
 
                     # Inject fault, evaluate, restore
                     tensor.data[idx] = torch.tensor(
@@ -521,6 +574,12 @@ class SEUInjector:
                 original_tensor = tensor.data.clone()
                 tensor_cpu = original_tensor.cpu().numpy()
 
+                # TODO PERFORMANCE: Stochastic sampling still uses same inefficient per-element approach
+                # PROBLEM: Even with probability sampling, each selected parameter uses slow bitflip_float32()
+                # MISSED OPPORTUNITY: Could vectorize by creating boolean mask and applying bitflips in parallel
+                # APPROACH: mask = np.random.random(tensor.shape) < p; tensor[mask] = vectorized_bitflip(tensor[mask])
+                # CURRENT: O(p×n×32) string operations, POSSIBLE: O(1) vectorized + O(p×n) selection
+
                 # Iterate through parameters with stochastic sampling
                 for idx in tqdm(
                     np.ndindex(tensor_cpu.shape),
@@ -531,7 +590,9 @@ class SEUInjector:
                         continue
 
                     original_val = tensor_cpu[idx]
-                    seu_val = bitflip_float32(original_val, bit_i)
+                    seu_val = bitflip_float32(
+                        original_val, bit_i
+                    )  # <-- SAME BOTTLENECK AS run_seu()
 
                     # Inject fault, evaluate, restore
                     tensor.data[idx] = torch.tensor(

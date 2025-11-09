@@ -144,10 +144,17 @@ class TestOptimizedBitflipOperations:
             f"\nScalar speedup: {speedup:.1f}x (original: {original_time:.4f}s, optimized: {optimized_time:.4f}s)"
         )
 
+        # TODO BENCHMARKING WEAKNESS: Performance assertions are too lenient and misleading
+        # PROBLEM: Allows 0.8x performance (20% SLOWER!) as "acceptable"
+        # MISLEADING: Comments claim "target 32x" but only requires 0.8x (40x gap!)
+        # REAL ISSUE: Scalar operations have high overhead, should test with larger batches
+        # MISSING: Memory allocation benchmarks, real-world injection scenario timing
+        # BETTER APPROACH: Test with realistic neural network parameter arrays, not single scalars
+
         # Should be significantly faster (at least 5x, target 32x)
         # Note: Scalar operations may not show dramatic speedup due to overhead
         # The real performance gains are in array operations (vectorization)
-        assert speedup >= 0.8, (
+        assert speedup >= 0.8, (  # <-- TOO LENIENT: Allows slower performance!
             f"Performance should not degrade significantly, got {speedup:.1f}x"
         )
 
@@ -172,6 +179,15 @@ class TestOptimizedBitflipOperations:
         print(
             f"\nArray speedup: {speedup:.1f}x (original: {original_time:.4f}s, optimized: {optimized_time:.4f}s)"
         )
+
+        # TODO BENCHMARKING: Test arrays are too small to reveal real-world performance issues
+        # PROBLEM: 1K element arrays don't show scalability problems that affect ResNet-18 (11M params)
+        # MISSING BENCHMARKS:
+        #   - Large tensor injection scenarios (1M+ parameters)
+        #   - GPU tensor injection vs CPU conversion overhead
+        #   - Memory usage patterns during injection campaigns
+        #   - Comparison with string-based implementation on realistic workloads
+        # IMPACT: Tests pass but real usage takes 30-60 minutes per bit position
 
         # Array operations should have much higher speedup due to vectorization
         assert speedup > 10.0, f"Expected significant array speedup, got {speedup:.1f}x"

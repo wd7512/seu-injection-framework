@@ -70,6 +70,15 @@ def bitflip_float32(
     """
     Flip a specific bit in IEEE 754 float32 values using string-based manipulation.
 
+    # TODO PERFORMANCE CRITICAL: This function is the PRIMARY PERFORMANCE BOTTLENECK
+    # Current implementation uses O(32) string manipulation per bitflip:
+    # - float32_to_binary(): struct.pack/unpack + format() creates 32-char string
+    # - String indexing and character replacement
+    # - binary_to_float32(): int() parsing + struct.pack/unpack
+    # IMPACT: 100-500μs per scalar (should be ~3μs), 50ms-2s for 1K arrays (should be ~1ms)
+    # SOLUTION: Direct IEEE 754 bit manipulation using XOR operations on uint32 view
+    # PRIORITY: HIGH - Used in critical injection loops, affects all performance claims
+
     This function performs Single Event Upset (SEU) simulation by flipping a specific
     bit in the IEEE 754 float32 binary representation. It uses a string-based approach
     for maximum clarity and educational value, making the bit manipulation process
@@ -176,6 +185,12 @@ def bitflip_float32(
 
     if hasattr(x, "__iter__"):
         # Handle arrays/iterables
+        # TODO PERFORMANCE: Array processing uses inefficient Python loops preventing vectorization
+        # Current: O(n) loop with 32 string operations per element = O(32n) complexity
+        # Each iteration: float32_to_binary() + list() + string manipulation + binary_to_float32()
+        # BOTTLENECK: No SIMD/vectorization, high Python overhead, memory allocations per element
+        # SOLUTION: Use numpy.ndarray.view(uint32) for zero-copy bit manipulation + vectorized XOR
+        # IMPACT: 50-2000x slower than possible, prevents scaling to large neural networks
         x_ = np.zeros_like(x, dtype=np.float32)
         for i, item in enumerate(x):
             string = list(float32_to_binary(item))
@@ -184,6 +199,9 @@ def bitflip_float32(
         return x_
     else:
         # Handle single values
+        # TODO PERFORMANCE: Scalar processing uses O(32) string manipulation per bit flip
+        # INEFFICIENCY: 3 function calls + string allocation/parsing for single XOR operation
+        # SOLUTION: Use struct.pack/unpack with direct bit manipulation (see bitflip_float32_optimized)
         string = list(float32_to_binary(x))
         string[bit_i] = "0" if string[bit_i] == "1" else "1"
         return binary_to_float32("".join(string))
@@ -235,6 +253,20 @@ def binary_to_float32(binary_str: str) -> float:
     bits = int(binary_str, 2)
     # Pack the integer into bytes, then unpack as a float
     return struct.unpack("!f", struct.pack("!I", bits))[0]
+
+
+# TODO ARCHITECTURE: Multiple bitflip implementations create code duplication and maintenance burden
+# PROBLEM: 3 separate implementations (~500 lines) for same core functionality:
+#   1. bitflip_float32() - string-based, slow, "educational"
+#   2. bitflip_float32_optimized() - claims performance but has limitations
+#   3. bitflip_float32_fast() - "intelligent dispatch" but defaults to slow path
+# ISSUES:
+#   - Code duplication makes bug fixes require 3 updates
+#   - User confusion about which function to actually use
+#   - Performance claims inconsistent across implementations
+#   - Critical injection loops still use slowest implementation
+# SOLUTION: Single high-performance implementation with educational examples in docs
+# PRIORITY: MEDIUM - affects maintainability and user experience
 
 
 # Optimized version - O(1) bitflip implementation (Phase 3)
@@ -405,6 +437,13 @@ def _bitflip_array_optimized(
     else:
         work_array = values.copy()
 
+    # TODO VECTORIZATION SUCCESS: This demonstrates optimal vectorized bit manipulation approach
+    # EXCELLENT: Zero-copy uint32 view + single vectorized XOR operation
+    # PERFORMANCE: O(1) complexity regardless of array size (SIMD parallelization)
+    # COMPARISON: This is 50-2000x faster than string-based per-element processing
+    # OPPORTUNITY: This pattern should be used throughout framework instead of bitflip_float32()
+    # NOTE: This is the implementation that achieves claimed 10-100x speedup
+
     # Create uint32 view for bit manipulation (zero-copy)
     uint_view = work_array.view(np.uint32)
 
@@ -545,6 +584,11 @@ def bitflip_float32_fast(
     # For arrays or array-like inputs
     if hasattr(x, "__iter__") and not isinstance(x, str):
         try:
+            # TODO VECTORIZATION OPPORTUNITY: This function should be the default in all injection loops
+            # PROBLEM: SEUInjector still calls slow bitflip_float32() instead of this optimized version
+            # IMPACT: Users get 10-100x speedup if they use this function, but critical paths don't
+            # SOLUTION: Make this the default import, deprecate string-based version for educational use
+
             # Try optimized vectorized approach
             return bitflip_float32_optimized(x, bit_i, inplace=False)
         except (ValueError, TypeError):

@@ -1,4 +1,17 @@
 # Test configuration for pytest
+# TODO DIRECTORY STRUCTURE: Testing organization improvements per USER_EXPERIENCE_IMPROVEMENT_PLAN.md
+# RESOLVED: testing/ vs tests/ directory confusion has been cleaned up
+# CURRENT: Single tests/ directory with clear organization:
+#   - tests/unit/ - Individual component testing
+#   - tests/integration/ - End-to-end workflow testing
+#   - tests/smoke/ - Quick validation testing
+#   - tests/benchmarks/ - Performance testing
+# IMPROVEMENT OPPORTUNITIES:
+#   - Consider tests/fixtures/ subdirectory for shared test models/data
+#   - Add tests/regression/ for catching performance regressions
+#   - Move example_networks.py to tests/fixtures/models.py for clarity
+# PRIORITY: LOW - Current structure is functional, improvements can wait
+
 import os
 import sys
 
