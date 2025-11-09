@@ -700,7 +700,7 @@ Typical performance on Intel i7-10700K (8 cores, 3.8 GHz):
 
 | Version | Release Date | Key Changes |
 |---------|--------------|-------------|
-| 1.0.0 | Nov 2025 | Production release, 10-100x performance, 102 tests |
+| 1.0.0 | Nov 2025 | Production release, 10-100x performance, 109 tests |
 | 0.0.6 | Legacy | Research prototype |
 
 ---
