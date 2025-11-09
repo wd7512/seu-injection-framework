@@ -63,7 +63,7 @@ def run_command(cmd, description):
                 # Only show coverage warning if actually below threshold
                 required_coverage = 70  # From --cov-fail-under=70
                 if coverage_match and int(actual_coverage) < required_coverage:
-                    print(f"\nCOVERAGE REQUIREMENT NOT MET!")
+                    print("\nCOVERAGE REQUIREMENT NOT MET!")
                     print(
                         f"Current coverage is {actual_coverage}%, required: {required_coverage}%"
                     )

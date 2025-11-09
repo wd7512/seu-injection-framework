@@ -1,0 +1,17 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/wd7512/seu-injection-framework/blob/main/README.md
+    about: Read the documentation and examples
+  - name: 🚀 Quick Start Guide
+    url: https://github.com/wd7512/seu-injection-framework/blob/main/docs/quickstart.md
+    about: Get started with basic usage examples
+  - name: 🛠️ Development Setup
+    url: https://github.com/wd7512/seu-injection-framework/blob/main/CONTRIBUTING.md
+    about: Contributing guidelines and development workflow
+  - name: 📊 Research Paper
+    url: https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars
+    about: Read the research methodology and validation
+  - name: ✉️ Direct Contact
+    url: mailto:wd7512@bristol.ac.uk
+    about: Email for security issues or direct communication

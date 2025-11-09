@@ -1,0 +1,145 @@
+name: Feature Request
+description: Suggest a new feature or enhancement for the SEU Injection Framework
+title: "[FEATURE] "
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new feature! Please provide detailed information to help us understand your needs.
+        
+        **Before submitting**: Please check existing issues and discussions for similar requests.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Feature Summary
+      description: A clear and concise description of the feature you'd like to see
+      placeholder: Brief summary of the proposed feature...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Feature Category
+      description: What type of feature is this?
+      options:
+        - Core SEU Injection (new injection methods)
+        - Performance Optimization
+        - API Enhancement
+        - Documentation/Examples
+        - Testing/Quality Assurance
+        - Research Tools
+        - Integration (ML frameworks)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem Statement
+      description: What problem does this feature solve? What use case does it address?
+      placeholder: |
+        Describe the problem or limitation you're facing...
+        - What research scenario requires this feature?
+        - What current workarounds are you using?
+        - How would this improve your workflow?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed solution in detail
+      placeholder: |
+        Detailed description of the proposed solution:
+        - API design (if applicable)
+        - Expected behavior
+        - Integration with existing features
+        - Performance considerations
+
+  - type: textarea
+    id: api-example
+    attributes:
+      label: Proposed API (if applicable)
+      description: Show how the feature would be used
+      placeholder: |
+        # Example usage:
+        from seu_injection import SEUInjector
+        
+        injector = SEUInjector(model)
+        result = injector.new_feature(...)
+      render: python
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How important is this feature for your work?
+      options:
+        - Critical (blocking current research)
+        - High (significantly improves workflow)
+        - Medium (nice to have improvement)
+        - Low (minor enhancement)
+
+  - type: textarea
+    id: research-impact
+    attributes:
+      label: Research Impact
+      description: How would this feature benefit the research community?
+      placeholder: |
+        - What research questions could this enable?
+        - Which domains would benefit (space, nuclear, etc.)?
+        - How many researchers might use this feature?
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: What alternatives have you considered?
+      placeholder: |
+        - Other approaches you've tried
+        - Existing tools that partially solve this
+        - Workarounds currently in use
+
+  - type: checkboxes
+    id: implementation
+    attributes:
+      label: Implementation Considerations
+      description: Check all that apply
+      options:
+        - label: This feature requires new dependencies
+        - label: This feature affects performance-critical paths
+        - label: This feature requires GPU/CUDA support
+        - label: This feature needs extensive testing
+        - label: This feature affects the public API
+        - label: I would be interested in implementing this feature
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, references, or examples
+      placeholder: |
+        - Links to relevant papers or methodologies
+        - Screenshots or diagrams
+        - Related issues or discussions
+        - Comparison with other frameworks
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm you have completed these steps
+      options:
+        - label: I have searched existing issues for similar requests
+          required: true
+        - label: I have provided sufficient detail about the use case
+          required: true
+        - label: I have considered the impact on existing users
+          required: true
+        - label: I have thought about backward compatibility
+          required: true
