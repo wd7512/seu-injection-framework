@@ -16,7 +16,8 @@
 
 ### **🔧 Development & Contributing**
 - **Contributing Guide**: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) - Development workflow and community guidelines
-- **Change History**: [`../MIGRATION_HISTORY.md`](../MIGRATION_HISTORY.md) - Development evolution
+- **Change History**: [`MIGRATION_HISTORY.md`](MIGRATION_HISTORY.md) - Development evolution
+- **Known Issues**: [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) - Non-critical issue tracking
 
 ## 🎯 Current Status (November 2025)
 
