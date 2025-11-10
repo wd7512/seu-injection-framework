@@ -1,5 +1,6 @@
 # SEU Injection Framework
 
+[![PyPI version](https://img.shields.io/pypi/v/seu-injection-framework.svg)](https://pypi.org/project/seu-injection-framework/)
 [![Python versions](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue)](https://github.com/wd7512/seu-injection-framework)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Tests](https://img.shields.io/badge/tests-109%20passed-green)](https://github.com/wd7512/seu-injection-framework)
@@ -13,42 +14,41 @@ Please reach out to me if you find this interesting!
 
 ## 🚀 Quick Start
 
-### Installation
+### Installation (PyPI)
 
-**Step 1: Clone Repository**
+Install the minimal core (fast, few dependencies):
+```bash
+pip install seu-injection-framework
+```
+
+Install with extended analysis stack (metrics, plots, data science helpers):
+```bash
+pip install "seu-injection-framework[analysis]"
+```
+
+Install everything (development, notebooks, vision models, docs toolchain):
+```bash
+pip install "seu-injection-framework[all]"
+```
+
+If you need GPU-specific PyTorch wheels, install PyTorch first following
+the official instructions (e.g. CUDA):
+```bash
+# Example for CUDA 12.x (adjust per your system)
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+pip install seu-injection-framework
+```
+
+### Development Setup (from source with uv)
 ```bash
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
-git checkout ai_refactor  # Use latest development branch
+uv sync --extra dev --extra analysis --extra vision --extra notebooks
 ```
 
-**Step 2: Install Dependencies**
-
-**Option 1: UV (Recommended - Faster & More Reliable)**
+### Verify Installation
 ```bash
-# For development and testing (includes pytest, etc.)
-uv sync --all-extras
-
-# For production use only
-uv sync
-```
-
-**Option 2: pip**
-```bash
-# For development and testing  
-pip install -e ".[dev,notebooks,extras]"
-
-# For production use only
-pip install -e .
-```
-
-**Step 3: Verify Installation**
-```bash
-# Test that everything works
-uv run python run_tests.py smoke
-
-# Or run a quick test manually
-uv run python -c "from seu_injection import SEUInjector; print('✅ Installation successful!')"
+python -c "from seu_injection import SEUInjector; print('✅ SEU Injection Framework ready')"
 ```
 
 ### 🚨 Common Setup Issues & Solutions
@@ -119,7 +119,7 @@ uv sync --all-extras
 
 > **💡 Tip**: Always use `uv run` before commands to ensure you're using the correct virtual environment.
 
-> **Note**: PyPI distribution is planned for future releases. Currently install from source.
+> **Note**: This README reflects PyPI distribution. Source installs remain fully supported.
 
 ### Basic Usage
 
@@ -210,7 +210,7 @@ If you use this framework in your research, please cite:
   title = {SEU Injection Framework: Fault Tolerance Analysis for Neural Networks},
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
-  version = {1.0.0},
+  version = {1.1.0},
   note = {Production-ready framework for Single Event Upset injection in neural networks}
 }
 ```

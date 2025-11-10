@@ -67,7 +67,29 @@ from typing import Optional, Union
 
 import numpy as np
 import torch
-from sklearn.metrics import accuracy_score
+
+# Attempt to import sklearn's accuracy_score; provide a lightweight fallback if unavailable.
+# This allows the core package installation to avoid pulling in scikit-learn while still
+# supporting accuracy computations. For production / research parity, install the
+# 'analysis' or 'dev' extra to use the official sklearn implementation.
+try:  # pragma: no cover - import guard
+    from sklearn.metrics import accuracy_score  # type: ignore
+except Exception:  # pragma: no cover - fallback intentionally simple
+    def accuracy_score(y_true, y_pred):  # type: ignore
+        """Fallback accuracy_score implementation.
+
+        Provides basic classification accuracy if scikit-learn is not installed.
+        Matches sklearn.metrics.accuracy_score behavior for simple cases.
+        Intended for minimal installs; for full functionality install 'analysis' extra.
+        """
+        y_true_arr = np.asarray(y_true)
+        y_pred_arr = np.asarray(y_pred)
+        if y_true_arr.shape != y_pred_arr.shape:
+            raise ValueError(
+                "Shape mismatch in fallback accuracy_score: "
+                f"y_true {y_true_arr.shape} vs y_pred {y_pred_arr.shape}"
+            )
+        return float(np.mean(y_true_arr == y_pred_arr))
 
 
 def classification_accuracy_loader(

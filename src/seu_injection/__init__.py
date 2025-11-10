@@ -32,7 +32,11 @@ For detailed examples, see the documentation at:
 https://seu-injection-framework.readthedocs.io
 """
 
-__version__ = "1.0.0"
+try:  # Prefer dynamic version from installed metadata
+    from importlib.metadata import version as _pkg_version
+    __version__ = _pkg_version("seu-injection-framework")
+except Exception:  # Fallback for editable/source checkouts prior to build
+    __version__ = "1.0.0"
 __author__ = "William Dennis"
 __email__ = "william.dennis@bristol.ac.uk"
 

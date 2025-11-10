@@ -7,7 +7,7 @@ packages = ["src/seu_injection"]
 
 [project]
 name = "seu-injection-framework"
-version = "1.0.0"
+version = "1.1.0"
 description = "Framework for Single Event Upset (SEU) injection in neural networks for harsh environment applications"
 authors = [
     {name = "William Dennis", email = "wd7512@bristol.ac.uk"}
@@ -35,50 +35,70 @@ classifiers = [
     "Topic :: Software Development :: Testing",
     "Environment :: GPU :: NVIDIA CUDA",
     "Natural Language :: English",
+    "Typing :: Typed",
 ]
 requires-python = ">=3.9"
 
-# Core dependencies for SEU injection framework
+# Core dependencies (intentionally slimmed; heavier analysis libs moved to extras)
 dependencies = [
     "torch>=2.0.0",
-    "torchvision>=0.15.0", 
     "numpy>=1.21.0,<2.0.0",
-    "scikit-learn>=1.1.0",
-    "pandas>=1.4.0",
-    "tqdm>=4.60.0",
-    "matplotlib>=3.5.0",
     "scipy>=1.8.0",
+    "tqdm>=4.60.0",
 ]
 
 [project.optional-dependencies]
-# Development and testing dependencies
+# Development & testing (includes analysis libs to keep tests stable)
 dev = [
     "pytest>=7.0.0",
-    "pytest-cov>=4.0.0", 
+    "pytest-cov>=4.0.0",
     "ruff>=0.1.0",
     "mypy>=1.0.0",
     "bandit>=1.7.0",
     "psutil>=7.1.3",
-]
-
-# Jupyter notebook support for research
-notebooks = [
-    "jupyter>=1.0.0",
-    "jupyterlab>=3.0.0",
-    "ipywidgets>=7.0.0",
+    "scikit-learn>=1.1.0",
+    "pandas>=1.4.0",
+    "matplotlib>=3.5.0",
     "seaborn>=0.11.0",
+    "scikit-image>=0.19.0",
+    "statsmodels>=0.13.0",
+    "joblib>=1.1.0",
+    "torchvision>=0.15.0",
 ]
 
-# Additional data science tools
-extras = [
+# Analysis & extended research stack
+analysis = [
+    "scikit-learn>=1.1.0",
+    "pandas>=1.4.0",
+    "matplotlib>=3.5.0",
+    "seaborn>=0.11.0",
     "scikit-image>=0.19.0",
     "statsmodels>=0.13.0",
     "joblib>=1.1.0",
 ]
 
-# Complete development environment
+# Vision / model zoo extras
+vision = [
+    "torchvision>=0.15.0",
+]
+
+# Notebook / interactive usage
+notebooks = [
+    "jupyter>=1.0.0",
+    "jupyterlab>=3.0.0",
+    "ipywidgets>=7.0.0",
+]
+
+# Documentation toolchain (optional)
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings[python]>=0.24.0",
+]
+
+# Aggregate convenience extra
 all = [
-    "seu-injection-framework[dev,notebooks,extras]"
+    "seu-injection-framework[dev,analysis,vision,notebooks,docs]"
 ]
 
 [project.urls]

@@ -139,3 +139,41 @@ MIT License - see LICENSE file for details.
 ---
 
 *This release represents the culmination of comprehensive development phases focused on performance, quality, and research community adoption.*
+
+## [1.1.0] - 2025-11-10
+
+### Changed
+- Slimmed core runtime dependencies to only essential libraries (torch, numpy, scipy, tqdm) for faster, lighter installs.
+- Moved heavier data/analysis libs (pandas, scikit-learn, matplotlib, seaborn, statsmodels, scikit-image, joblib, torchvision) into categorized optional extras (`analysis`, `vision`, `notebooks`, `dev`, `docs`, `all`).
+- Dynamic version retrieval in `__init__.py` via `importlib.metadata` to prevent drift and simplify release management.
+- README installation section refactored for PyPI-first workflow; separated development setup.
+
+### Added
+- `py.typed` marker enabling type information distribution and added `Typing :: Typed` Trove classifier.
+- Fallback internal `accuracy_score` implementation allowing minimal install without scikit-learn while preserving behavior when analysis extras installed.
+- GitHub Actions CI workflow (`ci.yml`) for multi-Python tests, lint (ruff), type checks (mypy), and security scan (bandit).
+- GitHub Actions release workflow (`release.yml`) for tag-triggered build & publish using PyPI Trusted Publishing.
+
+### Internal / Maintenance
+- Confirmed sdist/wheel build via `uv build` and validated dynamic import of version.
+- Updated packaging metadata and extras grouping for clearer user ergonomics.
+
+### Notes
+- If upgrading from 1.0.0 and you rely on scikit-learn/pandas/matplotlib functionality, install with an appropriate extra, e.g.:
+  ```bash
+  pip install "seu-injection-framework[analysis]"
+  ```
+- Core API surface remains backward compatible; no breaking changes introduced.
+
+### Citation Update
+```bibtex
+@software{seu_injection_framework,
+  author = {William Dennis},
+  title = {SEU Injection Framework: Fault Tolerance Analysis for Neural Networks},
+  year = {2025},
+  url = {https://github.com/wd7512/seu-injection-framework},
+  version = {1.1.0}
+}
+```
+
+---
