@@ -123,122 +123,80 @@ uv sync --all-extras
 
 ```python
 import torch
-from seu_injection import SEUInjector, classification_accuracy
+from seu_injection import SEUInjector
+from seu_injection.metrics import classification_accuracy
 
 # Create a simple model and test data
 model = torch.nn.Sequential(
-    torch.nn.Linear(784, 128),
-    torch.nn.ReLU(),
-    torch.nn.Linear(128, 10)
+    torch.nn.Linear(10, 64),
+    torch.nn.ReLU(), 
+    torch.nn.Linear(64, 2)
 )
-test_data = torch.randn(100, 784)
-test_labels = torch.randint(0, 10, (100,))
+x_test = torch.randn(100, 10)
+y_test = torch.randint(0, 2, (100,))
 
 # Initialize SEU injector
-injector = SEUInjector(model)
-
-# Run deterministic SEU injection
-results = injector.run_seu(
-    data=test_data,
-    targets=test_labels, 
-    criterion=classification_accuracy,
-    bit_position=15,  # Target mantissa bit
-    target_layers=['0.weight']  # Target first layer weights
+injector = SEUInjector(
+    trained_model=model,
+    criterion=classification_accuracy, 
+    x=x_test,
+    y=y_test
 )
 
-print(f"Baseline accuracy: {results['baseline_accuracy']:.3f}")
-print(f"Post-SEU accuracy: {results['corrupted_accuracy']:.3f}")
-print(f"Accuracy drop: {results['accuracy_drop']:.3f}")
+# Check baseline performance
+print(f"Baseline accuracy: {injector.baseline_score:.2%}")
 
-# Run stochastic SEU analysis
-stochastic_results = injector.run_stochastic_seu(
-    data=test_data,
-    targets=test_labels,
-    criterion=classification_accuracy,
-    num_trials=100,
-    injection_probability=0.01  # 1% of weights affected
-)
+# Inject bit flips into sign bits (bit position 0)
+results = injector.run_seu(bit_i=0)
+print(f"Performed {len(results['criterion_score'])} injections")
 
-print(f"Mean accuracy: {stochastic_results['mean_accuracy']:.3f}")
-print(f"Std deviation: {stochastic_results['std_accuracy']:.3f}")
+# Sample some results
+fault_impacts = [injector.baseline_score - score for score in results['criterion_score']]
+print(f"Average accuracy drop: {sum(fault_impacts)/len(fault_impacts):.1%}")
 ```
+
+> **💡 Need a full tutorial?** See [`docs/quickstart.md`](docs/quickstart.md) for a complete 10-minute walkthrough.
 
 ### 📚 Complete Examples
 
 - **Basic CNN Robustness**: [`examples/basic_cnn_robustness.py`](examples/basic_cnn_robustness.py)
-- **Space Mission Simulation**: [`examples/space_mission_simulation.py`](examples/space_mission_simulation.py)
-- **Architecture Comparison**: [`examples/architecture_comparison.py`](examples/architecture_comparison.py)
-- **Research Notebooks**: [`examples/notebooks/`](examples/notebooks/)
+- **Architecture Comparison**: [`examples/architecture_comparison.py`](examples/architecture_comparison.py)  
+- **Interactive Tutorial**: [`examples/Example_Attack_Notebook.ipynb`](examples/Example_Attack_Notebook.ipynb)
 
-For comprehensive documentation, visit the [`docs/`](docs/) directory.
+For comprehensive documentation and guides, visit the [`docs/`](docs/) directory.
 
 ## ✨ Key Features
 
-### 🔧 **Core Capabilities**
-- **🚀 High-Performance SEU Injection**: 10-100x optimized bitflip operations via direct bit manipulation
-- **🎯 Multiple Injection Strategies**: Deterministic and stochastic sampling with configurable parameters
-- **⚡ GPU Acceleration**: Full CUDA support for large-scale robustness studies
-- **🔍 Layer-Specific Targeting**: Precise control over which model components to analyze
-- **📊 Comprehensive Metrics**: Built-in accuracy evaluation with extensible metric system
-
-### 🏗️ **Production Quality**
-- **🧪 Extensive Testing**: 109 comprehensive tests with 94% code coverage
-- **🏛️ Architecture Support**: Compatible with NN, CNN, RNN, and Transformer models
-- **🔄 CI/CD Pipeline**: Automated testing across Windows, macOS, and Linux platforms  
-- **⚙️ Enterprise-Grade**: Zero linting violations, automated quality enforcement, professional documentation
-
-### 🌐 **Cross-Platform & Integration**
-- **🐍 Python 3.9-3.12**: Full support for modern Python versions
-- **🔥 PyTorch Integration**: Native support for PyTorch tensors and models
-- **📦 Easy Installation**: Simple source installation with comprehensive dependency management
-- **🔗 Research Ready**: Reproducible experiments with deterministic random seeds
+- **🚀 High-Performance Bit Manipulation**: Optimized SEU injection with 10-100x speedup
+- **🎯 Flexible Injection Modes**: Systematic exhaustive or stochastic sampling
+- **⚡ GPU Acceleration**: Full CUDA support for large models
+- **🔍 Layer Targeting**: Precise control over which components to test
+- **�️ Production Ready**: 94% test coverage, multi-platform support
+- **🔥 PyTorch Native**: Seamless integration with existing workflows
 
 ## 🔬 Research Applications
 
-### **Space & Aerospace**
-- **🚀 Spacecraft Neural Networks**: Radiation tolerance analysis for deep-space missions
-- **🛰️ Satellite Systems**: Robust AI for autonomous navigation and control
-- **✈️ Aviation Safety**: Fault-tolerant ML for flight-critical systems
+**Space & Aerospace**: Radiation tolerance for spacecraft AI, satellite systems, aviation safety
 
-### **Nuclear & Energy**
-- **⚛️ Nuclear Facility Monitoring**: Radiation-hardened anomaly detection systems
-- **🔋 Power Grid AI**: Robust neural networks for energy management
-- **🏭 Industrial Automation**: Fault-tolerant control systems in harsh environments
+**Nuclear & Energy**: Robust monitoring systems, power grid AI, industrial automation
 
-### **Research & Development**
-- **📊 Architecture Benchmarking**: Systematic comparison of model robustness characteristics
-- **🧠 Fault Propagation Studies**: Understanding how single-bit errors cascade through networks
-- **🔬 Methodology Development**: Novel techniques for neural network reliability assessment
-- **📈 Performance Analysis**: Quantitative evaluation of hardening techniques
+**Research**: Architecture benchmarking, fault propagation studies, reliability assessment
 
-## 📈 Performance & Reliability
+## 📈 Performance & Quality
 
-### **Benchmarks**
-- **⚡ Bitflip Operations**: <1ms per operation for typical neural networks (using optimized functions)
-- **💾 Memory Efficiency**: <2x baseline memory usage during injection campaigns  
-- **🧪 Test Suite**: Complete validation in <15 seconds on modern hardware
-- **📦 Import Time**: Framework loads in <2 seconds for immediate productivity
-
-### **Quality Metrics**
-- **✅ Test Coverage**: 94% with 109 comprehensive tests (107 passed, 2 skipped)
-- **🔍 Code Quality**: Zero critical linting violations, active TODO system for continuous improvement
-- **🛡️ Security**: Clean security scans with no critical vulnerabilities
-- **📚 Documentation**: Professional API docs with comprehensive examples and development guidelines
+- **⚡ Fast**: <1ms per bitflip operation, memory efficient
+- **✅ Tested**: 94% coverage with 109 tests across platforms  
+- **🔍 Clean**: Zero critical linting violations, automated quality checks
+- **📚 Documented**: Complete API documentation with examples
 
 ## 🤝 Community & Support
 
-### **Contributing**
-We welcome contributions from the research community! See [`CONTRIBUTING.md`](CONTRIBUTING.md) for:
-- Development setup and workflow
-- Quality standards and testing requirements  
-- Research contribution guidelines
-- Community standards and code of conduct
+**Contributing**: See [`CONTRIBUTING.md`](CONTRIBUTING.md) for development setup and guidelines
 
-### **Getting Help**
-- **📖 Documentation**: Start with this README and [`docs/`](docs/) directory
-- **🐛 Bug Reports**: Use our [issue templates](https://github.com/wd7512/seu-injection-framework/issues/new/choose)
-- **💡 Feature Requests**: Share your ideas through GitHub issues
-- **🔬 Research Questions**: Join discussions about methodologies and applications
+**Getting Help**: 
+- 📖 Start with [`docs/`](docs/) directory
+- 🐛 Use [issue templates](https://github.com/wd7512/seu-injection-framework/issues/new/choose) for bugs
+- 💡 Share feature requests through GitHub issues
 
 ### **Citation**
 

@@ -24,8 +24,9 @@ This package provides tools for:
 
 Basic Usage:
     >>> from seu_injection import SEUInjector
-    >>> injector = SEUInjector(model)
-    >>> results = injector.run_stochastic_seu(X, y, p=0.01)
+    >>> from seu_injection.metrics import classification_accuracy
+    >>> injector = SEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
+    >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
 
 For detailed examples, see the documentation at:
 https://seu-injection-framework.readthedocs.io

@@ -2,6 +2,13 @@
 """
 Architecture Comparison Study
 
+# TODO EXAMPLES UPDATE: This file uses outdated API and needs complete rewrite
+# ISSUE: Uses non-existent parameters like bit_position=, data=, criterion=
+# CURRENT API: run_seu(bit_i), run_stochastic_seu(bit_i, p)
+# IMPACT: Example will fail to run with current framework version
+# PRIORITY: HIGH - Critical for comparative studies
+# SEE: docs/quickstart.md for correct API usage
+
 Compare robustness of different neural network architectures to SEU injection.
 Demonstrates systematic evaluation methodology for choosing fault-tolerant models.
 

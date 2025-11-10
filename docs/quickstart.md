@@ -152,7 +152,7 @@ Now let's inject Single Event Upsets (bit flips) and measure the impact:
 ```python
 # Initialize SEU injector
 injector = SEUInjector(
-    model=model,
+    trained_model=model,
     x=x_test,
     y=y_test,
     criterion=classification_accuracy,
@@ -169,11 +169,11 @@ Baseline accuracy: 95.33%
 
 ### Inject Sign Bit Flips
 
-The sign bit (bit 31 in float32) controls whether a value is positive or negative:
+The sign bit (bit 0 in our indexing) controls whether a value is positive or negative:
 
 ```python
 # Test sign bit flips across all parameters
-results = injector.run_seu(bit_position=31)
+results = injector.run_seu(bit_i=0)
 
 print(f"\nSign Bit Injection Results:")
 print(f"Total parameters tested: {len(results)}")
@@ -198,8 +198,8 @@ Max accuracy: 95.33%
 Exponent bits (bits 23-30) control the magnitude:
 
 ```python
-# Test exponent bit flips (bit 30)
-results_exp = injector.run_seu(bit_position=30)
+# Test exponent bit flips (bit 1 = most significant exponent bit)
+results_exp = injector.run_seu(bit_i=1)
 
 print(f"\nExponent Bit Injection Results:")
 print(f"Mean accuracy: {results_exp['criterion_score'].mean():.2%}")
@@ -221,11 +221,11 @@ Visualize the robustness profile:
 import matplotlib.pyplot as plt
 
 # Compare different bit positions
-bit_positions = [31, 30, 29, 20, 10, 0]
+bit_positions = [0, 1, 2, 11, 21, 31]  # Sign, exponent, mantissa bits
 mean_accuracies = []
 
 for bit_pos in bit_positions:
-    results = injector.run_seu(bit_position=bit_pos)
+    results = injector.run_seu(bit_i=bit_pos)
     mean_accuracies.append(results['criterion_score'].mean())
 
 # Create visualization
@@ -252,14 +252,14 @@ Target specific layers to understand vulnerability:
 ```python
 # Test only the first layer
 results_layer0 = injector.run_seu(
-    bit_position=31,
-    layer_indices=[0]  # Target only first Linear layer
+    bit_i=0,
+    layer_name="0.weight"  # Target only first Linear layer weights
 )
 
 # Test only the second layer  
 results_layer1 = injector.run_seu(
-    bit_position=31,
-    layer_indices=[2]  # Target only second Linear layer
+    bit_i=0,
+    layer_name="2.weight"  # Target only second Linear layer weights  
 )
 
 print(f"First layer impact: {results_layer0['criterion_score'].mean():.2%}")
@@ -288,14 +288,14 @@ def custom_metric(y_true, y_pred):
 
 # Re-initialize with custom criterion
 injector_custom = SEUInjector(
-    model=model,
+    trained_model=model,
     x=x_test,
     y=y_test,
     criterion=custom_metric,
     device='cpu'
 )
 
-results_f1 = injector_custom.run_seu(bit_position=31)
+results_f1 = injector_custom.run_seu(bit_i=0)
 print(f"Mean F1 Score after SEU: {results_f1['criterion_score'].mean():.3f}")
 ```
 
@@ -352,12 +352,12 @@ for epoch in range(100):
 
 # 4. Run SEU injection
 model.eval()
-injector = SEUInjector(model, x=x_test, y=y_test, 
+injector = SEUInjector(trained_model=model, x=x_test, y=y_test, 
                        criterion=classification_accuracy, device='cpu')
 print(f"Baseline: {injector.baseline_score:.2%}")
 
 # 5. Analyze results
-results = injector.run_seu(bit_position=31)
+results = injector.run_seu(bit_i=0)
 print(f"Mean accuracy after sign bit flips: {results['criterion_score'].mean():.2%}")
 print(f"Accuracy drop: {(injector.baseline_score - results['criterion_score'].mean()):.2%}")
 ```
@@ -397,19 +397,19 @@ Congratulations! 🎉 You've completed the quickstart tutorial. You now know how
 **1. Quick Robustness Check**
 ```python
 # Test all critical bits quickly
-critical_bits = [31, 30, 29]  # Sign + top exponent bits
+critical_bits = [0, 1, 2]  # Sign + top exponent bits
 for bit in critical_bits:
-    results = injector.run_seu(bit_position=bit)
+    results = injector.run_seu(bit_i=bit)
     print(f"Bit {bit}: {results['criterion_score'].mean():.2%}")
 ```
 
 **2. Layer Vulnerability Analysis**
 ```python
-# Identify most vulnerable layer
-for layer_idx in range(len(model.network)):
-    if isinstance(model.network[layer_idx], nn.Linear):
-        results = injector.run_seu(bit_position=31, layer_indices=[layer_idx])
-        print(f"Layer {layer_idx}: {results['criterion_score'].mean():.2%}")
+# Identify most vulnerable layer - check layer names first
+for layer_name, _ in model.named_parameters():
+    if 'weight' in layer_name:
+        results = injector.run_seu(bit_i=0, layer_name=layer_name)
+        print(f"Layer {layer_name}: {results['criterion_score'].mean():.2%}")
 ```
 
 **3. Comprehensive Robustness Profile**
@@ -417,7 +417,7 @@ for layer_idx in range(len(model.network)):
 # Test all bits (warning: time-consuming for large models)
 all_results = []
 for bit in range(32):
-    results = injector.run_seu(bit_position=bit)
+    results = injector.run_seu(bit_i=bit)
     all_results.append(results['criterion_score'].mean())
     
 # Find most vulnerable bits
