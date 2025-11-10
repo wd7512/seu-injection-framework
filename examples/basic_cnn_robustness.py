@@ -51,7 +51,7 @@ def create_simple_cnn():
 
 def prepare_data():
     """Prepare training and test data."""
-    print("🔄 Preparing dataset...")
+    print("Preparing dataset...")
 
     # Generate moon-shaped data for binary classification
     X, y = make_moons(n_samples=2000, noise=0.3, random_state=42)
@@ -71,13 +71,13 @@ def prepare_data():
     y_train = torch.tensor(y_train, dtype=torch.float32).unsqueeze(1)
     y_test = torch.tensor(y_test, dtype=torch.float32).unsqueeze(1)
 
-    print(f"✅ Dataset ready: {len(X_train)} train, {len(X_test)} test samples")
+    print(f"Dataset ready: {len(X_train)} train, {len(X_test)} test samples")
     return X_train, X_test, y_train, y_test
 
 
 def train_model(model, x_train, y_train, epochs=100):
     """Train the CNN model."""
-    print("🔄 Training model...")
+    print("Training model...")
 
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
@@ -94,13 +94,13 @@ def train_model(model, x_train, y_train, epochs=100):
             print(f"  Epoch {epoch + 1}/{epochs}, Loss: {loss.item():.4f}")
 
     model.eval()
-    print("✅ Training complete")
+    print("Training complete")
     return model
 
 
 def run_baseline_analysis(model, x_test, y_test):
     """Run baseline analysis without SEU injection."""
-    print("\n📊 BASELINE ANALYSIS")
+    print("\nBASELINE ANALYSIS")
     print("=" * 50)
 
     # Initialize SEU injector - CORRECT API
@@ -116,7 +116,7 @@ def run_baseline_analysis(model, x_test, y_test):
 
 def analyze_sign_bit_vulnerability(injector):
     """Analyze vulnerability to sign bit flips."""
-    print("\n🎯 SIGN BIT ANALYSIS")
+    print("\nSIGN BIT ANALYSIS")
     print("=" * 50)
 
     # Test sign bit flips (bit 0) - CORRECT API
@@ -141,7 +141,7 @@ def analyze_sign_bit_vulnerability(injector):
 
 def analyze_layer_vulnerability(injector):
     """Compare vulnerability across different layers."""
-    print("\n🏗️ LAYER VULNERABILITY ANALYSIS")
+    print("\nLAYER VULNERABILITY ANALYSIS")
     print("=" * 50)
 
     # Get layer names from model
@@ -173,7 +173,7 @@ def analyze_layer_vulnerability(injector):
         layer_results.keys(), key=lambda x: layer_results[x]["accuracy_drop"]
     )
 
-    print(f"\n🎯 Most vulnerable layer: {most_vulnerable}")
+    print(f"\nMost vulnerable layer: {most_vulnerable}")
     print(f"   Accuracy drop: {layer_results[most_vulnerable]['accuracy_drop']:.2%}")
 
     return layer_results
@@ -181,7 +181,7 @@ def analyze_layer_vulnerability(injector):
 
 def analyze_bit_position_sensitivity(injector):
     """Analyze sensitivity to different IEEE 754 bit positions."""
-    print("\n🔬 BIT POSITION SENSITIVITY")
+    print("\nBIT POSITION SENSITIVITY")
     print("=" * 50)
 
     # Test representative bit positions
@@ -229,7 +229,7 @@ def analyze_bit_position_sensitivity(injector):
 
 def create_visualizations(baseline_acc, layer_results, bit_results):
     """Create visualization plots."""
-    print("\n📈 CREATING VISUALIZATIONS")
+    print("\nCREATING VISUALIZATIONS")
     print("=" * 50)
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
@@ -268,13 +268,13 @@ def create_visualizations(baseline_acc, layer_results, bit_results):
 
     plt.tight_layout()
     plt.savefig("cnn_robustness_analysis.png", dpi=300, bbox_inches="tight")
-    print("✅ Visualizations saved as 'cnn_robustness_analysis.png'")
+    print("Visualizations saved as 'cnn_robustness_analysis.png'")
     plt.show()
 
 
 def main():
     """Main analysis pipeline."""
-    print("🚀 CNN ROBUSTNESS ANALYSIS - SEU INJECTION FRAMEWORK")
+    print("CNN ROBUSTNESS ANALYSIS - SEU INJECTION FRAMEWORK")
     print("=" * 60)
 
     try:
@@ -297,7 +297,7 @@ def main():
         create_visualizations(baseline_acc, layer_results, bit_results)
 
         # 6. Summary
-        print("\n🎉 ANALYSIS COMPLETE")
+        print("\nANALYSIS COMPLETE")
         print("=" * 60)
         print(f"Baseline accuracy: {baseline_acc:.2%}")
         print(f"Layers analyzed: {len(layer_results)}")
@@ -305,7 +305,7 @@ def main():
         print("Check 'cnn_robustness_analysis.png' for visualizations!")
 
     except Exception as e:
-        print(f"❌ Error during analysis: {str(e)}")
+        print(f"ERROR during analysis: {str(e)}")
         raise
 
 

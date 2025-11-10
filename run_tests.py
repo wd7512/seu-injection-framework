@@ -133,6 +133,36 @@ def run_integration_tests():
     return run_command(cmd, "Integration tests")
 
 
+def run_example_tests():
+    """Run example validation tests."""
+    print("Running example validation tests...")
+
+    # Run the basic CNN robustness example pipeline test
+    pipeline_test = (
+        framework_root
+        / "tests"
+        / "integration"
+        / "test_basic_cnn_robustness_pipeline.py"
+    )
+    if pipeline_test.exists():
+        cmd = ["uv", "run", "python", str(pipeline_test)]
+        success = run_command(cmd, "Basic CNN Robustness Example Pipeline Test")
+        if not success:
+            return False
+
+    # Run example-related pytest tests
+    cmd = [
+        "uv",
+        "run",
+        "pytest",
+        "tests/integration/test_basic_cnn_robustness_example.py",
+        "tests/smoke/test_basic_cnn_robustness_smoke.py",
+        "-v",
+        "--tb=short",
+    ]
+    return run_command(cmd, "Example integration and smoke tests")
+
+
 def run_all_tests():
     """Run all tests with coverage."""
     # TODO PIPELINE FIX: Coverage threshold implementation per PIPELINE_FIX_URGENT.md
@@ -208,7 +238,7 @@ def main():
 
     parser.add_argument(
         "test_type",
-        choices=["smoke", "unit", "integration", "all", "deps"],
+        choices=["smoke", "unit", "integration", "examples", "all", "deps"],
         help="Type of tests to run",
     )
 
@@ -235,6 +265,8 @@ def main():
         success = run_unit_tests()
     elif args.test_type == "integration":
         success = run_integration_tests()
+    elif args.test_type == "examples":
+        success = run_example_tests()
     elif args.test_type == "all":
         success = run_all_tests()
 
