@@ -1,0 +1,196 @@
+name: Research Question
+description: Ask questions about SEU injection methodology, framework usage, or research applications
+title: "[RESEARCH] "
+labels: ["research", "question", "discussion"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Welcome to the SEU Injection Framework research community! 
+        
+        This template is for research-oriented questions about methodology, best practices, 
+        experimental design, or framework usage in your research.
+        
+        **For bug reports**: Use the Bug Report template instead
+        **For feature requests**: Use the Feature Request template instead
+
+  - type: dropdown
+    id: question-type
+    attributes:
+      label: Question Category
+      description: What type of research question is this?
+      options:
+        - Methodology (SEU injection strategies)
+        - Experimental Design
+        - Framework Usage
+        - Performance/Optimization
+        - Statistical Analysis
+        - Model Architecture
+        - Research Domain Application
+        - Reproducibility
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: question
+    attributes:
+      label: Research Question
+      description: Ask your question clearly and provide context
+      placeholder: |
+        State your research question clearly...
+        
+        Include relevant context such as:
+        - Your research domain (space, nuclear, automotive, etc.)
+        - Model architecture you're working with
+        - Specific SEU injection scenario
+        - What you're trying to achieve or understand
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Research Domain
+      description: Which application domain is most relevant?
+      options:
+        - Space/Aerospace
+        - Nuclear Systems
+        - Automotive/Transportation
+        - Defense/Military
+        - Industrial Control
+        - Medical Devices
+        - General Fault Tolerance
+        - Academic Research
+        - Other
+
+  - type: dropdown
+    id: model-type
+    attributes:
+      label: Model Architecture
+      description: What type of neural network are you studying?
+      options:
+        - Convolutional Neural Network (CNN)
+        - Fully Connected/Dense Network
+        - Recurrent Neural Network (RNN/LSTM)
+        - Transformer
+        - ResNet/EfficientNet
+        - Custom Architecture
+        - Multiple Architectures
+        - Not Applicable
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Research Context
+      description: Provide background and what you've tried so far
+      placeholder: |
+        Help us understand your research context:
+        
+        - What is your research goal or hypothesis?
+        - What have you tried already?
+        - What specific challenges are you facing?
+        - Are there specific papers or methodologies you're following?
+
+  - type: textarea
+    id: code-example
+    attributes:
+      label: Code Example (if applicable)
+      description: Share relevant code or experimental setup
+      placeholder: |
+        # Share your current approach or what you're trying to implement
+        from seu_injection import SEUInjector
+        
+        # Your experimental setup...
+      render: python
+
+  - type: textarea
+    id: specific-help
+    attributes:
+      label: Specific Help Needed
+      description: What specific guidance or information would be most helpful?
+      placeholder: |
+        Be specific about what would help you most:
+        - Methodological guidance
+        - Code examples
+        - Literature references
+        - Experimental design suggestions
+        - Statistical analysis approaches
+
+  - type: checkboxes
+    id: areas
+    attributes:
+      label: Related Areas
+      description: Check all relevant areas for your research
+      options:
+        - label: Single Event Upset (SEU) physics
+        - label: Radiation effects in electronics
+        - label: Neural network robustness
+        - label: Fault injection methodologies
+        - label: Statistical significance testing
+        - label: Performance optimization
+        - label: Model comparison studies
+        - label: Reproducible research practices
+
+  - type: textarea
+    id: references
+    attributes:
+      label: Relevant References
+      description: Share any papers, resources, or related work
+      placeholder: |
+        Include any relevant:
+        - Research papers you're following
+        - Methodologies you're implementing
+        - Related frameworks or tools
+        - Existing studies in your domain
+
+  - type: dropdown
+    id: urgency
+    attributes:
+      label: Timeline
+      description: What's your timeline for this research?
+      options:
+        - Immediate (within days)
+        - Short-term (within weeks)
+        - Medium-term (within months)
+        - Long-term (exploratory)
+        - No specific timeline
+
+  - type: textarea
+    id: contribution
+    attributes:
+      label: Potential Contribution
+      description: How might your research contribute back to the community?
+      placeholder: |
+        Consider sharing:
+        - Novel methodologies or findings
+        - Benchmark results in new domains
+        - Validation studies
+        - Performance optimizations
+        - Documentation improvements
+
+  - type: checkboxes
+    id: collaboration
+    attributes:
+      label: Collaboration Interest
+      description: Are you interested in collaboration opportunities?
+      options:
+        - label: I'm interested in collaborating with other researchers
+        - label: I'm open to co-authoring publications
+        - label: I would like to contribute results back to the framework
+        - label: I'm interested in reviewing related research
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm you have completed these steps
+      options:
+        - label: I have searched existing issues and discussions
+          required: true
+        - label: This is a research question (not a bug report or feature request)
+          required: true
+        - label: I have provided sufficient context about my research
+          required: true
+        - label: I am open to community discussion and feedback
+          required: true

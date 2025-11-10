@@ -63,22 +63,22 @@ class SimpleRNN(nn.Module):
         return self.fc(out)
 
 
-def train_model(model, X_train, y_train, epochs=300, lr=0.01):
+def train_model(model, x_train, y_train, epochs=300, lr=0.01):
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
     model.train()
     for _ in range(epochs):
         optimizer.zero_grad()
-        output = model(X_train)
+        output = model(x_train)
         loss = criterion(output, y_train)
         loss.backward()
         optimizer.step()
 
 
-def evaluate_model(model, X_test, y_test):
+def evaluate_model(model, x_test, y_test):
     model.eval()
     with torch.no_grad():
-        preds = (model(X_test) > 0.5).float()
+        preds = (model(x_test) > 0.5).float()
         accuracy = preds.eq(y_test).sum().item() / len(y_test)
     return accuracy
 

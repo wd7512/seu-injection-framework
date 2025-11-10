@@ -1,8 +1,9 @@
-import torch
-import time
-import platform
 import json
+import platform
+import time
+
 import psutil
+import torch
 import torch.nn as nn
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

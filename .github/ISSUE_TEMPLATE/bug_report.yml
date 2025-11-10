@@ -1,0 +1,134 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in the SEU Injection Framework
+title: "[BUG] "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please provide detailed information to help us reproduce and fix the issue.
+        
+        **Before submitting**: Please check existing issues to avoid duplicates.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe the unexpected behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Provide minimal code to reproduce the issue
+      placeholder: |
+        1. Import seu_injection
+        2. Create SEUInjector with...
+        3. Run injection with...
+        4. Observe error/unexpected behavior
+      render: python
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+      placeholder: Describe what you expected to happen...
+    validations:
+      required: true
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Error Message
+      description: Include full error traceback if applicable
+      placeholder: Paste error message here...
+      render: shell
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: What operating system are you using?
+      options:
+        - Windows
+        - macOS
+        - Linux (Ubuntu/Debian)
+        - Linux (other)
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: python-version
+    attributes:
+      label: Python Version
+      description: Output of `python --version`
+      placeholder: "3.11.8"
+    validations:
+      required: true
+
+  - type: input
+    id: framework-version
+    attributes:
+      label: SEU Injection Framework Version
+      description: Output of `pip show seu-injection-framework` or installed version
+      placeholder: "1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: torch-version
+    attributes:
+      label: PyTorch Version
+      description: Output of `python -c "import torch; print(torch.__version__)"`
+      placeholder: "2.1.0"
+
+  - type: dropdown
+    id: installation
+    attributes:
+      label: Installation Method
+      description: How did you install the framework?
+      options:
+        - Source install (git clone + uv/pip install -e)
+        - Development install (git clone + uv/pip install -e)
+        - Other
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: cuda
+    attributes:
+      label: CUDA/GPU Information
+      description: Check all that apply
+      options:
+        - label: Issue occurs with GPU/CUDA
+        - label: Issue occurs with CPU only
+        - label: Issue is related to device handling
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or relevant information
+      placeholder: Any additional information that might help...
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission Checklist
+      description: Please confirm you have completed these steps
+      options:
+        - label: I have searched existing issues for duplicates
+          required: true
+        - label: I have provided a minimal reproducible example
+          required: true
+        - label: I have included all relevant version information
+          required: true
+        - label: I have tested with the latest version
+          required: true

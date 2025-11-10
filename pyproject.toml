@@ -1,1 +1,197 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/seu_injection"]
+
+[project]
+name = "seu-injection-framework"
+version = "1.0.0"
+description = "Framework for Single Event Upset (SEU) injection in neural networks for harsh environment applications"
+authors = [
+    {name = "William Dennis", email = "wd7512@bristol.ac.uk"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+homepage = "https://github.com/wd7512/seu-injection-framework"
+repository = "https://github.com/wd7512/seu-injection-framework"
+keywords = ["machine-learning", "robustness", "fault-tolerance", "seu", "radiation", "neural-networks"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: Testing",
+    "Environment :: GPU :: NVIDIA CUDA",
+    "Natural Language :: English",
+]
+requires-python = ">=3.9"
+
+# Core dependencies for SEU injection framework
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0", 
+    "numpy>=1.21.0,<2.0.0",
+    "scikit-learn>=1.1.0",
+    "pandas>=1.4.0",
+    "tqdm>=4.60.0",
+    "matplotlib>=3.5.0",
+    "scipy>=1.8.0",
+]
+
+[project.optional-dependencies]
+# Development and testing dependencies
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0", 
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "bandit>=1.7.0",
+    "psutil>=7.1.3",
+]
+
+# Jupyter notebook support for research
+notebooks = [
+    "jupyter>=1.0.0",
+    "jupyterlab>=3.0.0",
+    "ipywidgets>=7.0.0",
+    "seaborn>=0.11.0",
+]
+
+# Additional data science tools
+extras = [
+    "scikit-image>=0.19.0",
+    "statsmodels>=0.13.0",
+    "joblib>=1.1.0",
+]
+
+# Complete development environment
+all = [
+    "seu-injection-framework[dev,notebooks,extras]"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/wd7512/seu-injection-framework"
+"Documentation" = "https://github.com/wd7512/seu-injection-framework/blob/main/README.md"
+"Repository" = "https://github.com/wd7512/seu-injection-framework"
+"Bug Tracker" = "https://github.com/wd7512/seu-injection-framework/issues"
+"Changelog" = "https://github.com/wd7512/seu-injection-framework/blob/main/CHANGELOG.md"
+"Research Paper" = "https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars"
+"Download" = "https://pypi.org/project/seu-injection-framework/"
+
+
+
+# Tool configurations for code quality
+# TODO PIPELINE FIX: Coverage configuration addressed per PIPELINE_FIX_URGENT.md
+# ISSUE: Global --cov-fail-under=50 in pytest addopts breaks isolated test runs (benchmarks get 23% coverage)
+# SOLUTION IMPLEMENTED: Removed global threshold, now enforced only in CI/CD for full test suite
+# CURRENT STATUS: Full test suite achieves 94% coverage (well above 50% minimum requirement)
+# ENFORCEMENT: CI/CD pipeline enforces --cov-fail-under=50 on complete test runs only
+# BENEFIT: Allows individual test files and benchmark tests to run without coverage failures
+# REFERENCE: See .github/workflows/python-tests.yml for CI/CD enforcement implementation
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "--cov=src/seu_injection", 
+    "--cov-report=term-missing",
+    "--cov-report=html:htmlcov",
+    # TODO: --cov-fail-under=50 REMOVED from global config per pipeline fix
+    # REASON: Benchmark tests achieve 23% coverage when run isolated, failing 50% threshold
+    # CURRENT: Coverage threshold enforced in CI/CD for full suite only (94% > 50%)
+    # Note: Coverage threshold removed from default addopts to allow individual test file runs
+    # Use --cov-fail-under=50 when running full test suite if desired
+    "-v",
+    "--tb=short",
+    "--strict-markers"
+]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "smoke: marks tests as smoke tests for quick validation",
+    "gpu: marks tests that require GPU/CUDA",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["src/seu_injection"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
+    "*/conftest.py",
+    "*/utils/device.py",
+    "*/utils/__init__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+# Ruff configuration for linting and formatting
+[tool.ruff]
+line-length = 88
+target-version = "py39"
+src = ["src", "tests"]
+extend-exclude = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings  
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "A",   # flake8-builtins
+    "C4",  # flake8-comprehensions
+    "T20", # flake8-print
+]
+ignore = [
+    "E501",  # Line too long (handled by formatter)
+    "B008",  # Do not perform function calls in argument defaults
+    "B905",  # zip strict argument
+    "N806",  # Variable name in function should be lowercase (allow ML conventions like X, y)
+    "T201",  # Print found (allow for debugging/standalone scripts)
+    "B011",  # Do not use assert False (pytest uses this pattern)
+    "F401",  # Imported but unused (some imports are for testing availability)
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
