@@ -282,6 +282,9 @@ New contributors should:
 - **pytest**: Testing framework with coverage reporting
 - **MyPy**: Static type checking for Python
 
+### AI Agent Development
+- **AI Agent Guide**: [`AI_AGENT_GUIDE.md`](AI_AGENT_GUIDE.md) - Comprehensive guidance for AI agents working on this codebase (includes critical restrictions and mandatory workflows)
+
 ## 📞 Support & Questions
 
 ### Getting Help

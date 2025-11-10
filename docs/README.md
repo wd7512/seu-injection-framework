@@ -16,8 +16,10 @@
 
 ### **🔧 Development & Contributing**
 - **Contributing Guide**: [`../CONTRIBUTING.md`](../CONTRIBUTING.md) - Development workflow and community guidelines
-- **Development Archive**: [`DEVELOPMENT_ARCHIVE.md`](DEVELOPMENT_ARCHIVE.md) - Historical development phases and achievements
 - **Known Issues**: [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) - Non-critical issue tracking
+
+### **📚 Archive & History**
+- **Development Archive**: [`archive/DEVELOPMENT_ARCHIVE.md`](archive/DEVELOPMENT_ARCHIVE.md) - Historical development phases and achievements
 
 ## 🎯 Current Status (November 2025)
 
