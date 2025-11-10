@@ -36,8 +36,13 @@ jobs:
         run: uv build
       - name: Verify wheel import
         run: |
-          python -m pip install dist/*.whl
+          # Install the built wheel WITHOUT re-resolving deps to avoid second massive Torch + CUDA download
+          python -m pip install --no-deps --no-cache-dir dist/*.whl
           python -c "import seu_injection; print('Imported version:', seu_injection.__version__)"
+      - name: (Optional) Free pip cache space
+        if: always()
+        run: |
+          python -m pip cache purge || true
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
