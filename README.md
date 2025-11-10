@@ -5,9 +5,11 @@
 [![Tests](https://img.shields.io/badge/tests-109%20passed-green)](https://github.com/wd7512/seu-injection-framework)
 [![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](https://github.com/wd7512/seu-injection-framework)
 
-A production-ready Python framework for **Single Event Upset (SEU) injection** in neural networks, designed for systematic robustness analysis in harsh environments including space missions, nuclear facilities, and radiation-prone applications.
+A Python framework for **Single Event Upset (SEU) injection** in neural networks, designed for systematic robustness analysis in harsh environments including space missions, nuclear facilities, and radiation-prone applications.
 
 **🔬 Research Paper:** [*A Framework for Developing Robust Machine Learning Models in Harsh Environments*](https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars)
+
+Please reach out to me if you find this interesting!
 
 ## 🚀 Quick Start
 
@@ -227,13 +229,6 @@ If you use this framework in your research, please cite:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🚀 Development Status
-
-**v1.0.0 - Production Ready** ✅
-- Professional packaging ready for PyPI distribution (planned)
-- Comprehensive documentation and examples  
-- Community infrastructure and contribution guidelines
-- Enterprise-grade quality standards maintained
 
 ---
 
