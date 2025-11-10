@@ -22,9 +22,15 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           version: latest
-      - name: Sync dependencies (build only)
+      - name: Sync core dependencies
         run: uv sync --frozen
-      - name: Run smoke tests
+      - name: Install dev & analysis extras (pytest, coverage, ruff, mypy, etc.)
+        run: uv sync --extra dev --extra analysis --frozen
+      - name: Lint (ruff)
+        run: uv run ruff check src tests
+      - name: Type check (mypy)
+        run: uv run mypy src/seu_injection --ignore-missing-imports
+      - name: Smoke tests
         run: uv run python run_tests.py smoke
       - name: Build distributions
         run: uv build

@@ -140,6 +140,21 @@ MIT License - see LICENSE file for details.
 
 *This release represents the culmination of comprehensive development phases focused on performance, quality, and research community adoption.*
 
+## [1.1.3] - 2025-11-10
+
+### Fixed
+- Release workflow corrected to install dev & analysis extras before running smoke tests (previous failure: missing `pytest`).
+- Added lint (ruff) and type (mypy) steps to release pipeline for stronger gatekeeping.
+
+### Verification
+- Full local build and import version check will precede tagging.
+- Workflow now uses `uv sync --extra dev --extra analysis --frozen` ensuring test dependencies present.
+
+### Advisory
+This patch is workflow/packaging automation oriented; no library API or behavior changes versus 1.1.1.
+
+---
+
 ## [1.1.1] - 2025-11-10
 
 ### Fixed / Maintenance
