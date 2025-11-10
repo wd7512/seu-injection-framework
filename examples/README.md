@@ -1,4 +1,4 @@
-# Research Examples# Research Examples# Research Examples# Examples
+# Research Examples
 
 
 
