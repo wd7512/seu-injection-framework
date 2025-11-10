@@ -95,6 +95,8 @@ uv run pytest tests/test_injector.py --no-cov
 # Or run the full test suite which meets coverage requirements
 uv run pytest tests/
 ```
+
+**Note**: The framework uses an embedded TODO system throughout the codebase to track improvements and optimizations. These are normal and indicate active development priorities rather than bugs.
 </details>
 
 <details>
@@ -212,16 +214,16 @@ For comprehensive documentation, visit the [`docs/`](docs/) directory.
 ## 📈 Performance & Reliability
 
 ### **Benchmarks**
-- **⚡ Bitflip Operations**: <1ms per operation for typical neural networks
+- **⚡ Bitflip Operations**: <1ms per operation for typical neural networks (using optimized functions)
 - **💾 Memory Efficiency**: <2x baseline memory usage during injection campaigns  
 - **🧪 Test Suite**: Complete validation in <15 seconds on modern hardware
 - **📦 Import Time**: Framework loads in <2 seconds for immediate productivity
 
 ### **Quality Metrics**
 - **✅ Test Coverage**: 94% with 109 comprehensive tests (107 passed, 2 skipped)
-- **🔍 Code Quality**: Zero linting violations with automated enforcement
+- **🔍 Code Quality**: Zero critical linting violations, active TODO system for continuous improvement
 - **🛡️ Security**: Clean security scans with no critical vulnerabilities
-- **📚 Documentation**: Professional API docs with comprehensive examples
+- **📚 Documentation**: Professional API docs with comprehensive examples and development guidelines
 
 ## 🤝 Community & Support
 

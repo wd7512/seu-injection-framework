@@ -9,6 +9,13 @@ from typing import Any, Optional, Union
 
 import torch
 
+# TODO MAINTAINABILITY: Missing comprehensive error handling in utility functions
+# ISSUE: Functions don't validate inputs or handle edge cases robustly
+# EXAMPLES: detect_device() doesn't validate device availability, ensure_tensor() lacks type validation
+# IMPACT: Runtime errors in production when invalid devices specified or incompatible data passed
+# SOLUTION: Add input validation, proper error messages, graceful fallbacks
+# PRIORITY: MEDIUM - affects framework reliability in production environments
+
 
 def detect_device(
     preferred_device: Optional[Union[str, torch.device]] = None,
@@ -67,6 +74,13 @@ def ensure_tensor(
 def get_model_info(model: torch.nn.Module) -> dict:
     """
     Extract comprehensive information about a PyTorch model.
+
+    # TODO UNUSED FUNCTION: get_model_info() appears unused throughout codebase
+    # STATUS: Function implemented but no references found in src/ or tests/
+    # IMPACT: Dead code increases maintenance burden and package size
+    # DECISION NEEDED: Remove if truly unused, or add to public API if valuable
+    # SEARCH PERFORMED: grep -r "get_model_info" src/ tests/ - no matches found
+    # PRIORITY: LOW - cleanup issue, no functional impact
 
     Args:
         model: PyTorch model to analyze

@@ -292,6 +292,13 @@ Based on 6 critical bugs found and fixed during development:
 - **Documentation debt**: Separate planning files become stale quickly
 - **Performance bottlenecks**: String operations in hot paths are major issue
 
+**Code Quality Patterns:**
+- **Embedded TODO system**: Living documentation in code reduces maintenance vs separate files
+- **Error handling inconsistency**: Mixed exception types (ValueError, RuntimeError) need standardization
+- **Import optimization**: Global imports for function-specific modules create unnecessary overhead
+- **Test quality**: Weak assertions reduce test value and coverage meaningfulness
+- **Dead code**: Unused functions (get_model_info) increase maintenance burden
+
 ---
 
 ## 🎯 **Development Priorities & Next Steps**

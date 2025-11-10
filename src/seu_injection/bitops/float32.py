@@ -63,6 +63,12 @@ from typing import Union
 
 import numpy as np
 
+# TODO CODE QUALITY: Import optimization needed - numpy imported but struct only used in specific functions
+# ISSUE: struct module imported globally but only used in 2 specific functions
+# IMPACT: Unnecessary global namespace pollution and import overhead
+# SOLUTION: Move struct imports to function level where needed
+# PRIORITY: LOW - cosmetic improvement, no functional impact
+
 
 def bitflip_float32(
     x: Union[float, np.ndarray], bit_i: int = None

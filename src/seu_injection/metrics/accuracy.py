@@ -371,6 +371,12 @@ def classification_accuracy(
     if hasattr(x_tensor, "__iter__") and hasattr(x_tensor, "dataset"):
         # It's a DataLoader, use the loader function
         if y_true is not None:
+            # TODO ERROR HANDLING: Inconsistent exception types across framework
+            # ISSUE: Mixed use of ValueError, RuntimeError, TypeError without clear patterns
+            # CURRENT: ValueError for user input errors, but RuntimeError for device issues
+            # IMPROVEMENT: Define custom exception hierarchy with clear usage guidelines
+            # EXAMPLES: SEUInputError, SEUDeviceError, SEUComputationError
+            # PRIORITY: MEDIUM - affects user experience and debugging efficiency
             raise ValueError(
                 "When using DataLoader, do not specify y_true separately. "
                 "Labels should be included in the DataLoader."

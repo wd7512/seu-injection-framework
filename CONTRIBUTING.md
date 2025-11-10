@@ -107,7 +107,35 @@ uv run mypy src/seu_injection --ignore-missing-imports
 uv run bandit -r src/seu_injection -f txt
 ```
 
-## 🔄 Development Workflow
+## � Code Quality & TODO System
+
+The framework uses an embedded TODO system throughout the codebase to track improvements:
+
+### TODO Format Standards
+```python
+# TODO CATEGORY: Brief description of issue
+# ISSUE: Detailed explanation of problem
+# IMPACT: Effect on users or performance
+# SOLUTION: Proposed fix or improvement
+# PRIORITY: HIGH/MEDIUM/LOW - indicates urgency
+```
+
+### TODO Categories
+- **PERFORMANCE**: Critical path optimizations and bottlenecks (highest priority)
+- **CODE QUALITY**: Import optimization, dead code, refactoring needs
+- **ERROR HANDLING**: Exception consistency and input validation improvements
+- **TEST QUALITY**: Test improvements and coverage enhancements
+- **MAINTAINABILITY**: Code organization and documentation improvements
+
+### Working with TODOs
+- **Before Changes**: Review relevant TODOs in files you're modifying
+- **During Development**: Add TODOs for issues you discover but can't fix immediately
+- **After Changes**: Update or remove TODOs that your changes address
+- **Code Review**: TODOs are normal and expected - they indicate active development priorities
+
+**Note**: TODOs are part of our living documentation system and are not considered technical debt unless marked with HIGH priority.
+
+## �🔄 Development Workflow
 
 ### Branching Strategy
 - **`main`**: Stable, production-ready code

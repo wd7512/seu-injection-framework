@@ -22,6 +22,13 @@ class TestUtilsModule:
         """Test utils module structure."""
         import src.seu_injection.utils as utils_module
 
+        # TODO TEST QUALITY: Weak assertion patterns reduce test value
+        # ISSUE: Tests use trivial assertions that don't validate functionality
+        # CURRENT: assert utils_module is not None, assert hasattr(utils_module, "__name__")
+        # PROBLEM: These assertions would be true for any Python module
+        # IMPROVEMENT: Test actual utils functionality, expected exports, API contracts
+        # PRIORITY: MEDIUM - affects test suite quality and coverage meaningfulness
+
         # Module should exist
         assert utils_module is not None
 
