@@ -243,7 +243,7 @@ def analyze_model_complexity(architectures):
 def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
     """
     Fast robustness analysis across all architectures using stochastic SEU injection.
-    
+
     Optimizations:
     - Use stochastic sampling instead of exhaustive injection
     - Focus on most critical bit positions (sign, exponent MSB, mantissa)
@@ -267,20 +267,20 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
 
         # Find one representative layer to test (final classifier or last conv layer)
         target_layer = None
-        for name, param in model.named_parameters():
-            if 'fc' in name and 'weight' in name:  # Final fully connected layer
+        for name, _param in model.named_parameters():
+            if "fc" in name and "weight" in name:  # Final fully connected layer
                 target_layer = name
                 break
-            elif 'conv' in name and 'weight' in name:  # Last conv layer as backup
+            elif "conv" in name and "weight" in name:  # Last conv layer as backup
                 target_layer = name
 
         print(f"   Target layer: {target_layer}")
 
         injector = SEUInjector(
-            trained_model=model, 
+            trained_model=model,
             criterion=classification_accuracy,
             data_loader=test_loader,
-            device=device
+            device=device,
         )
 
         # Get baseline accuracy
@@ -296,8 +296,10 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
         for bit_pos in bit_positions:
             try:
                 # Target only one specific layer for speed
-                result = injector.run_stochastic_seu(bit_i=bit_pos, p=0.001, layer_name=target_layer)
-                
+                result = injector.run_stochastic_seu(
+                    bit_i=bit_pos, p=0.001, layer_name=target_layer
+                )
+
                 if result["criterion_score"]:
                     baseline_acc = injector.baseline_score
                     mean_corrupted_acc = np.mean(result["criterion_score"])
@@ -319,8 +321,10 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
         for prob in injection_probabilities:
             try:
                 # Test mantissa bits with varying probabilities, target layer only
-                result = injector.run_stochastic_seu(bit_i=15, p=prob, layer_name=target_layer)
-                
+                result = injector.run_stochastic_seu(
+                    bit_i=15, p=prob, layer_name=target_layer
+                )
+
                 if result["criterion_score"]:
                     baseline_acc = injector.baseline_score
                     mean_corrupted_acc = np.mean(result["criterion_score"])
@@ -334,7 +338,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
                 stochastic_results[prob] = 0.0
 
         results[arch_name]["stochastic_robustness"] = stochastic_results
-        
+
         # Skip detailed layer analysis for speed - focus on overall robustness
         results[arch_name]["layer_vulnerability"] = {}  # Empty for now
 
@@ -676,38 +680,38 @@ def generate_test_data(num_samples=1000, image_size=28):
 
 def quick_train_model(model, train_loader, device, epochs=5):
     """Quickly train model to convergence for meaningful robustness comparison."""
-    
+
     print(f"   🎯 Quick training ({epochs} epochs)...")
-    
+
     model.to(device)
     model.train()
-    
+
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
     criterion = nn.CrossEntropyLoss()
-    
+
     for epoch in range(epochs):
         total_loss = 0
         correct = 0
         total = 0
-        
+
         for batch_x, batch_y in train_loader:
             batch_x, batch_y = batch_x.to(device), batch_y.to(device)
-            
+
             optimizer.zero_grad()
             outputs = model(batch_x)
             loss = criterion(outputs, batch_y)
             loss.backward()
             optimizer.step()
-            
+
             total_loss += loss.item()
             _, predicted = torch.max(outputs.data, 1)
             total += batch_y.size(0)
             correct += (predicted == batch_y).sum().item()
-        
+
         if epoch == epochs - 1:  # Print final accuracy
             acc = 100 * correct / total
             print(f"      Final training accuracy: {acc:.1f}%")
-    
+
     model.eval()
     return model
 
@@ -715,10 +719,10 @@ def quick_train_model(model, train_loader, device, epochs=5):
 def main():
     """
     Main pipeline for fast architecture comparison study.
-    
+
     Optimizations for speed:
     - Smaller datasets (200 train, 100 test)
-    - Quick training (5 epochs)  
+    - Quick training (5 epochs)
     - Stochastic SEU injection only
     - Focus on most critical bit positions
     """
@@ -741,19 +745,21 @@ def main():
     # Generate ultra-small datasets for maximum speed
     print("\n📊 Generating datasets (ultra-optimized size)...")
     X_train, y_train = generate_test_data(num_samples=100)  # Ultra-small training set
-    X_test, y_test = generate_test_data(num_samples=50)     # Ultra-small test set
-    
+    X_test, y_test = generate_test_data(num_samples=50)  # Ultra-small test set
+
     train_dataset = TensorDataset(X_train, y_train)
     test_dataset = TensorDataset(X_test, y_test)
     train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
     test_loader = DataLoader(test_dataset, batch_size=32, shuffle=False)
 
-    print(f"✅ Setup complete: {len(architectures)} architectures, {len(train_dataset)} train + {len(test_dataset)} test samples")
+    print(
+        f"✅ Setup complete: {len(architectures)} architectures, {len(train_dataset)} train + {len(test_dataset)} test samples"
+    )
 
     # Quick training phase
     print("\n🎯 Quick Training Phase")
     print("-" * 40)
-    
+
     trained_architectures = {}
     for arch_name, model in architectures.items():
         print(f"Training {arch_name}...")
@@ -763,7 +769,9 @@ def main():
     try:
         # Fast robustness analysis
         print("\n" + "=" * 80)
-        results = comprehensive_robustness_analysis(trained_architectures, test_loader, device)
+        results = comprehensive_robustness_analysis(
+            trained_architectures, test_loader, device
+        )
 
         # Create visualizations
         print("\n📊 Creating comparison visualizations...")

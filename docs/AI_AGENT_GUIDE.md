@@ -40,11 +40,13 @@ This document provides essential context, workflows, and critical restrictions f
 - **⚠️  CAREFUL with `pyproject.toml`** (dependency changes require human review)
 - **✅ SAFE to modify**: Source code, tests, documentation, configuration
 
-### **🧪 TESTING REQUIREMENTS**
+### **🧪 TESTING & CODE QUALITY REQUIREMENTS**
 - **✅ ALWAYS run tests after ANY code changes**
-- **✅ MANDATORY workflow**: `uv run python run_tests.py smoke` → make changes → `uv run python run_tests.py all`
-- **❌ NEVER skip test validation** before suggesting changes
+- **🚨 MANDATORY: Always run `uv run ruff check` after ANY file modification**
+- **✅ MANDATORY workflow**: `uv run python run_tests.py smoke` → make changes → `uv run ruff check` → `uv run python run_tests.py all`
+- **❌ NEVER skip test validation OR ruff check** before suggesting changes
 - **✅ REQUIRED**: 94% coverage must be maintained (currently 109 tests)
+- **✅ REQUIRED**: Zero ruff violations ("All checks passed!")
 
 ---
 
@@ -144,9 +146,15 @@ uv run python run_tests.py smoke  # Quick validation (30s)
 # ... implement changes in small increments ...
 uv run python run_tests.py unit   # Unit tests (1-2min)  
 # ... continue changes ...
-uv run python run_tests.py all    # Full validation before completion (3-5min)
 
-# 4. Ensure coverage standards maintained
+# 4. 🚨 CRITICAL: ALWAYS run ruff check after ANY file modifications
+uv run ruff check                  # MANDATORY - must show "All checks passed!"
+# Fix any violations before proceeding - this step is frequently forgotten!
+
+# 5. Full validation before completion
+uv run python run_tests.py all    # Full test suite (3-5min)
+
+# 6. Ensure coverage standards maintained
 uv run pytest --cov=src/seu_injection --cov-fail-under=80
 # Must maintain 94% coverage (well above 50% minimum)
 ```
@@ -341,9 +349,9 @@ Based on 6 critical bugs found and fixed during development:
 ### **Completion Validation Commands**
 ```bash
 # Required before any agent handoff:
-uv run python run_tests.py all                    # Must: 107 passed, 2 skipped
+uv run ruff check                                 # 🚨 CRITICAL FIRST - Must: "All checks passed!"
+uv run python run_tests.py all                   # Must: 107 passed, 2 skipped
 uv run pytest --cov=src/seu_injection --cov-fail-under=90  # Must: >94% coverage
-uv run ruff check src tests                       # Must: Zero violations
 uv run python -c "from seu_injection import SEUInjector; print('✅ API functional')"
 ```
 
@@ -394,9 +402,9 @@ When unable to resolve issues:
 ### **Repository State Verification**
 Before ending any session, agents must verify:
 ```bash
-# Repository health check:
+# Repository health check (MANDATORY ORDER):
+uv run ruff check                  # 🚨 FIRST - Must: "All checks passed!"
 uv run python run_tests.py all    # ✅ 107 passed, 2 skipped
-uv run ruff check src tests       # ✅ All clear
 git status                        # 📋 Document any uncommitted changes
 ```
 
@@ -445,6 +453,28 @@ This context helps agents understand the scientific importance and technical req
 - **Quality-first approach**: Comprehensive testing and documentation prevent regression
 - **Community preparation**: Contributing guidelines and professional documentation ready
 - **Agent-assisted development**: AI agents effectively enhance code quality when properly guided
+
+---
+
+---
+
+## 🚨 **CRITICAL REMINDER: RUFF CHECK**
+
+### **⚠️ MOST COMMON AGENT MISTAKE**
+**Forgetting to run `uv run ruff check` after file modifications!**
+
+**This happens because:**
+- Agents focus on functionality and forget code quality
+- Ruff violations break the zero-violation policy
+- Quality gates are bypassed when this step is skipped
+
+**MANDATORY PROCEDURE:**
+1. Make any file change
+2. **IMMEDIATELY run `uv run ruff check`**
+3. Fix any violations before continuing
+4. Only then proceed with testing
+
+**Remember**: Ruff check is NOT optional - it's a critical quality gate!
 
 ---
 
