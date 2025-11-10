@@ -140,6 +140,22 @@ MIT License - see LICENSE file for details.
 
 *This release represents the culmination of comprehensive development phases focused on performance, quality, and research community adoption.*
 
+## [1.1.1] - 2025-11-10
+
+### Fixed / Maintenance
+- Re-run release with corrected GitHub workflow sequencing after tagging before Trusted Publishing configuration.
+- Clarified release workflow filename usage for PyPI Trusted Publishing (requires `release.yml`).
+- No functional code changes; package contents identical to 1.1.0 besides version metadata.
+
+### Integrity Verification
+- Rebuilt sdist and wheel (`uv build`) for 1.1.1 and validated import version.
+- Lint & type checks re-confirmed clean prior to publish.
+
+### Advisory
+If you successfully installed 1.1.0 from a local build, upgrading to 1.1.1 is optional; this is a metadata/publishing correction release.
+
+---
+
 ## [1.1.0] - 2025-11-10
 
 ### Changed

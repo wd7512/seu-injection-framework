@@ -210,7 +210,7 @@ If you use this framework in your research, please cite:
   title = {SEU Injection Framework: Fault Tolerance Analysis for Neural Networks},
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
-  version = {1.1.0},
+  version = {1.1.1},
   note = {Production-ready framework for Single Event Upset injection in neural networks}
 }
 ```
@@ -233,3 +233,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 *Built with ❤️ for the research community studying neural network robustness in harsh environments.* 
+
+## Release History
+
+- **1.1.1 (2025-11-10)**: Maintenance re-publish after initial tag sequencing; no functional changes vs 1.1.0.
+- **1.1.0 (2025-11-10)**: Slimmed core dependencies; added optional extras (`analysis`, `vision`, `notebooks`, `docs`, `dev`, `all`); dynamic version loading; typing marker; CI + release workflows; fallback accuracy without scikit-learn.
+- **1.0.0 (2025-11-09)**: Initial public stable release.

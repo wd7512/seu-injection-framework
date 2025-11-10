@@ -482,4 +482,4 @@ uv run pytest tests/test_injector.py --no-cov
 **Last Updated:** November 2025  
 **Estimated Time:** 10-15 minutes  
 **Difficulty:** Beginner  
-**Version:** 1.0.0 (Phase 3 Complete)
+**Version:** 1.1.1 (Distribution & packaging enhancements applied)

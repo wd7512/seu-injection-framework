@@ -37,4 +37,4 @@
 
 **Note**: The framework uses an embedded TODO system to track improvements. This is normal development practice and indicates active maintenance, not technical debt.
 
-This file tracks non-critical issues that don't block the v1.0.0 PyPI release.
+This file tracks non-critical issues that don't block the v1.1.1 PyPI release.

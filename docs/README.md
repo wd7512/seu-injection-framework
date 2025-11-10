@@ -1,6 +1,6 @@
 # SEU Injection Framework Documentation
 
-**Navigation Hub**: This directory contains comprehensive documentation for the SEU Injection Framework v1.0.0.
+**Navigation Hub**: This directory contains comprehensive documentation for the SEU Injection Framework (current version: 1.1.1).
 
 ## 📚 Documentation Quick Access
 
@@ -25,7 +25,7 @@
 
 ✅ **Phase 4 Complete**: Production-ready framework with 94% test coverage  
 🚀 **Phase 5 Ready**: PyPI release and community launch prepared  
-📦 **Distribution**: Source installation ready, PyPI distribution planned for future release  
+📦 **Distribution**: PyPI distribution prepared (extras available: `analysis`, `vision`, `notebooks`, `docs`, `dev`, `all`)  
 🏛️ **Quality**: Enterprise-grade with comprehensive testing and documentation  
 
 ## 📋 Documentation Standards

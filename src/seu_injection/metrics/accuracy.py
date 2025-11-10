@@ -75,6 +75,7 @@ import torch
 try:  # pragma: no cover - import guard
     from sklearn.metrics import accuracy_score  # type: ignore
 except Exception:  # pragma: no cover - fallback intentionally simple
+
     def accuracy_score(y_true, y_pred):  # type: ignore
         """Fallback accuracy_score implementation.
 

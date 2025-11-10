@@ -7,7 +7,7 @@ packages = ["src/seu_injection"]
 
 [project]
 name = "seu-injection-framework"
-version = "1.1.0"
+version = "1.1.1"
 description = "Framework for Single Event Upset (SEU) injection in neural networks for harsh environment applications"
 authors = [
     {name = "William Dennis", email = "wd7512@bristol.ac.uk"}
