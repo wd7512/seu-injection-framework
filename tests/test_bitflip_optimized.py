@@ -154,8 +154,8 @@ class TestOptimizedBitflipOperations:
         # Should be significantly faster (at least 5x, target 32x)
         # Note: Scalar operations may not show dramatic speedup due to overhead
         # The real performance gains are in array operations (vectorization)
-        assert speedup >= 0.8, (  # <-- TOO LENIENT: Allows slower performance!
-            f"Performance should not degrade significantly, got {speedup:.1f}x"
+        assert speedup >= 1.5, (
+            f"Optimized implementation should be at least 1.5x faster, got {speedup:.1f}x"
         )
 
     def test_performance_improvement_array(self):
