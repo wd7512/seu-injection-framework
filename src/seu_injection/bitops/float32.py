@@ -59,7 +59,7 @@ See Also:
 """
 
 import struct
-from typing import Union
+from typing import Optional, Union
 
 import numpy as np
 
@@ -71,7 +71,7 @@ import numpy as np
 
 
 def bitflip_float32(
-    x: Union[float, np.ndarray], bit_i: int = None
+    x: Union[float, np.ndarray], bit_i: Optional[int] = None
 ) -> Union[float, np.ndarray]:
     """
     Flip a specific bit in IEEE 754 float32 values using string-based manipulation.
@@ -258,7 +258,8 @@ def binary_to_float32(binary_str: str) -> float:
     # Convert binary string to a 32-bit integer
     bits = int(binary_str, 2)
     # Pack the integer into bytes, then unpack as a float
-    return struct.unpack("!f", struct.pack("!I", bits))[0]
+    # struct.unpack returns a tuple[Any, ...]; make the float explicit for mypy
+    return float(struct.unpack("!f", struct.pack("!I", bits))[0])
 
 
 # TODO ARCHITECTURE: Multiple bitflip implementations create code duplication and maintenance burden
@@ -410,8 +411,7 @@ def bitflip_float32_optimized(
 
         # Convert back to float32
         bytes_flipped = struct.pack("I", flipped_uint32)
-        result = struct.unpack("f", bytes_flipped)[0]
-
+        result = float(struct.unpack("f", bytes_flipped)[0])
         return result
 
     # Handle array values
@@ -465,7 +465,7 @@ def _bitflip_array_optimized(
 
 
 def bitflip_float32_fast(
-    x: Union[float, np.ndarray], bit_i: int = None
+    x: Union[float, np.ndarray], bit_i: Optional[int] = None
 ) -> Union[float, np.ndarray]:
     """
     Intelligent bit flipping with automatic performance optimization and fallback handling.
@@ -613,7 +613,7 @@ def _bitflip_original_scalar(x: float, bit_i: int) -> float:
     """Original string-based scalar bitflip for compatibility fallback."""
     string = list(float32_to_binary(x))
     string[bit_i] = "0" if string[bit_i] == "1" else "1"
-    return binary_to_float32("".join(string))
+    return float(binary_to_float32("".join(string)))
 
 
 def _bitflip_original_array(x, bit_i: int) -> np.ndarray:

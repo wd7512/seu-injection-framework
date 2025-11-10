@@ -1,6 +1,6 @@
 # SEU Injection Framework Documentation
 
-**Navigation Hub**: This directory contains comprehensive documentation for the SEU Injection Framework (current version: 1.1.1).
+**Navigation Hub**: This directory contains comprehensive documentation for the SEU Injection Framework (current version: 1.1.4).
 
 ## 📚 Documentation Quick Access
 

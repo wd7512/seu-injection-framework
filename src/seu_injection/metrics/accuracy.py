@@ -63,6 +63,7 @@ See Also:
     torch.utils.data.DataLoader: Batch data loading for large datasets
 """
 
+from collections.abc import Iterable
 from typing import Optional, Union
 
 import numpy as np
@@ -95,7 +96,7 @@ except Exception:  # pragma: no cover - fallback intentionally simple
 
 def classification_accuracy_loader(
     model: torch.nn.Module,
-    data_loader: torch.utils.data.DataLoader,
+    data_loader: "torch.utils.data.DataLoader",  # keep runtime type but avoid union confusion
     device: Optional[Union[str, torch.device]] = None,
 ) -> float:
     """
@@ -252,7 +253,7 @@ def classification_accuracy_loader(
 
 def classification_accuracy(
     model: torch.nn.Module,
-    x_tensor: Union[torch.Tensor, torch.utils.data.DataLoader],
+    x_tensor: Union[torch.Tensor, "torch.utils.data.DataLoader"],
     y_true: Optional[torch.Tensor] = None,
     device: Optional[Union[str, torch.device]] = None,
     batch_size: int = 64,
@@ -391,7 +392,8 @@ def classification_accuracy(
         sklearn.metrics.accuracy_score: Underlying accuracy computation standard
     """
     # Check if x_tensor is actually a DataLoader
-    if hasattr(x_tensor, "__iter__") and hasattr(x_tensor, "dataset"):
+    # DataLoader detection: Torch DataLoader has 'dataset' attribute; exclude plain tensors
+    if not isinstance(x_tensor, torch.Tensor) and hasattr(x_tensor, "dataset"):
         # It's a DataLoader, use the loader function
         if y_true is not None:
             # TODO ERROR HANDLING: Inconsistent exception types across framework
@@ -409,7 +411,8 @@ def classification_accuracy(
     # Handle tensor inputs
     if device:
         model = model.to(device)
-        x_tensor = x_tensor.to(device)
+        if isinstance(x_tensor, torch.Tensor):
+            x_tensor = x_tensor.to(device)
         if y_true is not None:
             y_true = y_true.to(device)
 
@@ -418,10 +421,15 @@ def classification_accuracy(
     y_true_list = []
 
     if batch_size is None:
-        batch_size = len(x_tensor)
+        batch_size = int(len(x_tensor))  # ensure int for mypy
+
+    if not isinstance(x_tensor, torch.Tensor):
+        raise TypeError("x_tensor must be a torch.Tensor when not using a DataLoader")
+    if y_true is None:
+        raise ValueError("y_true must be provided when using tensor inputs")
 
     with torch.no_grad():
-        for start in range(0, len(x_tensor), batch_size):
+        for start in range(0, x_tensor.shape[0], batch_size):
             end = start + batch_size
             batch_X = x_tensor[start:end]
             batch_y = y_true[start:end]
@@ -563,4 +571,4 @@ def multiclass_classification_accuracy(
         # Multiclass classification case
         y_pred = np.argmax(model_output, axis=1)
 
-    return accuracy_score(y_true=y_true, y_pred=y_pred)
+    return float(accuracy_score(y_true=y_true, y_pred=y_pred))

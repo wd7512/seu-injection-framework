@@ -23,7 +23,7 @@ in PyTorch neural networks to study robustness in harsh environments.
 # PRIORITY: HIGH - Core user-facing API needs enhancement for v1.0 release
 """
 
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union
 
 import numpy as np
 import torch
@@ -98,7 +98,7 @@ class SEUInjector:
     def __init__(
         self,
         trained_model: torch.nn.Module,
-        criterion: callable,
+        criterion: Callable[..., float],
         device: Optional[Union[str, torch.device]] = None,
         x: Optional[Union[torch.Tensor, np.ndarray]] = None,
         y: Optional[Union[torch.Tensor, np.ndarray]] = None,
@@ -139,8 +139,6 @@ class SEUInjector:
             y (Optional[Union[torch.Tensor, np.ndarray]]): Target labels tensor for
                 supervised evaluation. Must have same batch size as x. Mutually
                 exclusive with data_loader parameter. Will be moved to target device.
-            data_loader (Optional[torch.utils.data.DataLoader]): PyTorch DataLoader
-                providing (x, y) batches for evaluation. Mutually exclusive with
                 x and y parameters. Useful for large datasets that don't fit in memory.
 
         Raises:
@@ -174,17 +172,18 @@ class SEUInjector:
         """
         # Device detection and setup
         if device is None:
-            if torch.cuda.is_available():
-                self.device = torch.device("cuda")
-            else:
-                self.device = torch.device("cpu")
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = torch.device(device)
 
         # Model setup
-        self.criterion = criterion
+        self.criterion = criterion  # type: ignore[assignment]
         self.model = trained_model.to(self.device)
         self.model.eval()
+
+        # Initialize optional data attributes for type checking
+        self.X: Optional[torch.Tensor] = None
+        self.y: Optional[torch.Tensor] = None
 
         # Data setup - validate mutually exclusive options
         self.use_data_loader = False
@@ -206,6 +205,7 @@ class SEUInjector:
 
         else:
             # Handle tensor conversion with proper validation
+            # Predeclare attributes for mypy (Optional tensors)
             if x is not None:
                 if isinstance(x, torch.Tensor):
                     self.X = (
@@ -213,9 +213,6 @@ class SEUInjector:
                     )
                 else:
                     self.X = torch.tensor(x, dtype=torch.float32, device=self.device)
-            else:
-                self.X = None
-
             if y is not None:
                 if isinstance(y, torch.Tensor):
                     self.y = (
@@ -223,8 +220,6 @@ class SEUInjector:
                     )
                 else:
                     self.y = torch.tensor(y, dtype=torch.float32, device=self.device)
-            else:
-                self.y = None
 
             # Validate that we have valid data
             if self.X is None and self.y is None:
@@ -295,9 +290,11 @@ class SEUInjector:
             run_stochastic_seu: Statistical injection with automatic evaluation
         """
         if self.use_data_loader:
-            return self.criterion(self.model, self.data_loader, device=self.device)
+            return float(
+                self.criterion(self.model, self.data_loader, device=self.device)
+            )
         else:
-            return self.criterion(self.model, self.X, self.y, device=self.device)
+            return float(self.criterion(self.model, self.X, self.y, device=self.device))
 
     def run_seu(
         self, bit_i: int, layer_name: Optional[str] = None
@@ -385,7 +382,7 @@ class SEUInjector:
 
         self.model.eval()
 
-        results = {
+        results: dict[str, list[Any]] = {
             "tensor_location": [],
             "criterion_score": [],
             "layer_name": [],
@@ -551,7 +548,7 @@ class SEUInjector:
 
         self.model.eval()
 
-        results = {
+        results: dict[str, list[Any]] = {
             "tensor_location": [],
             "criterion_score": [],
             "layer_name": [],

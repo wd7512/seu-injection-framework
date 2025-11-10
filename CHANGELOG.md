@@ -140,6 +140,25 @@ MIT License - see LICENSE file for details.
 
 *This release represents the culmination of comprehensive development phases focused on performance, quality, and research community adoption.*
 
+## [1.1.4] - 2025-11-10
+
+### Internal / Maintenance
+- Completed type hint revisions across `bitops/float32.py`, `metrics/accuracy.py`, and `core/injector.py` (mypy: 0 issues).
+- Replaced deprecated `typing.Dict`/`List` generics with native `dict`/`list`.
+- Resolved ruff import ordering and formatting warnings (all checks pass).
+- Minor refactor in `SEUInjector` to initialize optional attributes explicitly and fix indentation errors.
+- No public API changes; behavior remains identical to 1.1.3.
+
+### Verification
+- Lint: `ruff check` reports no issues.
+- Types: `mypy src/seu_injection` returns success.
+- Build: Wheel & sdist generated successfully.
+
+### Advisory
+Safe upgrade; purely code quality improvements.
+
+---
+
 ## [1.1.3] - 2025-11-10
 
 ### Fixed
