@@ -4,7 +4,24 @@ This guide provides comprehensive instructions for installing the SEU Injection 
 
 ## Quick Install (Recommended)
 
-The fastest way to get started is using UV package manager:
+**Method 1: Install from PyPI (Easiest)**
+
+The fastest way to get started for end users:
+
+```bash
+# Install the latest stable release (v1.1.7)
+pip install seu-injection-framework
+
+# Or with analysis tools
+pip install "seu-injection-framework[analysis]"
+
+# Verify installation
+python -c "from seu_injection import SEUInjector; print('✅ Installation successful!')"
+```
+
+**Method 2: Development Setup with UV**
+
+For contributors and advanced users:
 
 ```bash
 # Install UV (if not already installed)
@@ -15,7 +32,6 @@ powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
 # Clone the repository
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
-git checkout ai_refactor  # Use the latest development branch
 
 # Install all dependencies (IMPORTANT: Use --all-extras for full functionality)
 uv sync --all-extras
@@ -62,9 +78,30 @@ uv sync --all-extras
 uv sync
 ```
 
-### Method 2: pip (Traditional)
+### Method 2: pip from PyPI (Production Use)
 
-Standard Python package installation using pip.
+Install the stable release from PyPI:
+
+```bash
+# Create virtual environment (recommended)
+python -m venv .venv
+
+# Activate virtual environment
+# Windows
+.venv\Scripts\activate
+# Unix/macOS
+source .venv/bin/activate
+
+# Install from PyPI
+pip install seu-injection-framework
+
+# Or with extras
+pip install "seu-injection-framework[all]"
+```
+
+### Method 3: pip from Source (Development)
+
+Install from the repository source:
 
 ```bash
 # Clone repository
@@ -80,14 +117,11 @@ python -m venv .venv
 # Unix/macOS
 source .venv/bin/activate
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Or install from pyproject.toml (once published)
-pip install -e ".[dev,notebooks,extras]"
+# Install in editable mode
+pip install -e ".[all]"
 ```
 
-### Method 3: Docker (Coming Soon)
+### Method 4: Docker (Coming Soon)
 
 Docker containers for reproducible research environments will be available in future releases.
 

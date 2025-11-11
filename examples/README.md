@@ -1,83 +1,164 @@
-# Research Examples
+# Research Examples# Research Examples
 
 
 
-This directory contains validated research examples demonstrating systematic fault injection methodologies for neural network robustness analysis in harsh environments.
+Ready-to-run examples demonstrating fault injection methodologies for neural network robustness analysis.
 
 
 
-## Getting StartedThis directory contains validated research examples demonstrating systematic fault injection methodologies for neural network robustness analysis in harsh environments.
+## Quick StartThis directory contains validated research examples demonstrating systematic fault injection methodologies for neural network robustness analysis in harsh environments.
 
 
 
 ```bash
 
-git clone https://github.com/wd7512/seu-injection-framework.git
+# From PyPI installation
 
-cd seu-injection-framework## Getting StartedThis directory contains validated research examples demonstrating systematic fault injection methodologies for neural network robustness analysis in harsh environments.Ready-to-run examples showing how to use the SEU injection framework.
+pip install seu-injection-framework## Getting StartedThis directory contains validated research examples demonstrating systematic fault injection methodologies for neural network robustness analysis in harsh environments.
 
-uv sync --all-extras  # or pip install -e ".[dev,notebooks,extras]"
+python basic_cnn_robustness.py
+
+
+
+# From source
+
+git clone https://github.com/wd7512/seu-injection-framework.git```bash
+
+cd seu-injection-framework
+
+uv sync --all-extrasgit clone https://github.com/wd7512/seu-injection-framework.git
 
 uv run python examples/basic_cnn_robustness.py
 
+```cd seu-injection-framework## Getting StartedThis directory contains validated research examples demonstrating systematic fault injection methodologies for neural network robustness analysis in harsh environments.Ready-to-run examples showing how to use the SEU injection framework.
+
+
+
+## Available Examplesuv sync --all-extras  # or pip install -e ".[dev,notebooks,extras]"
+
+
+
+### [Example_Attack_Notebook.ipynb](Example_Attack_Notebook.ipynb)uv run python examples/basic_cnn_robustness.py
+
+Interactive research notebook with comprehensive fault injection analysis and visualization tools.
+
 ```
 
-```bash
+### [basic_cnn_robustness.py](basic_cnn_robustness.py)
 
-## Available Studies
-
-uv add seu-injection-framework
-
-### [Example_Attack_Notebook.ipynb](Example_Attack_Notebook.ipynb)
-
-Interactive research notebook with comprehensive fault injection analysis and visualization tools.uv run python basic_cnn_robustness.py## Getting Started## Quick Start
-
-
-
-### basic_cnn_robustness.py```
-
-**Objective**: Single-architecture vulnerability analysis  
+**Objective**: Single-architecture vulnerability analysis  ```bash
 
 **Method**: Systematic bit-flip injection across network layers  
 
-**Application**: Space mission deployment assessment  
-
-## Available Studies
-
-### architecture_comparison.py  
-
-**Objective**: Comparative robustness evaluation  ```bash```bash
-
-**Method**: Standardized fault injection protocol across multiple architectures  
-
-**Application**: Architecture selection for critical systems  ### [Example_Attack_Notebook.ipynb](Example_Attack_Notebook.ipynb)
+**Application**: Space mission deployment assessment  ## Available Studies
 
 
 
-## Experimental ProtocolInteractive research notebook with comprehensive fault injection analysis and visualization tools.pip install seu-injection-frameworkpip install seu-injection-framework
+### [architecture_comparison.py](architecture_comparison.py)uv add seu-injection-framework
+
+**Objective**: Comparative robustness evaluation  
+
+**Method**: Standardized fault injection protocol across multiple architectures  ### [Example_Attack_Notebook.ipynb](Example_Attack_Notebook.ipynb)
+
+**Application**: Architecture selection for critical systems  
+
+Interactive research notebook with comprehensive fault injection analysis and visualization tools.uv run python basic_cnn_robustness.py## Getting Started## Quick Start
+
+## Experimental Protocol
 
 
 
-Both studies implement the IEEE 754-compliant fault injection methodology described in our research paper. Key experimental parameters:
+Both studies implement IEEE 754-compliant fault injection methodology:
 
+- **Fault Model**: Single Event Upset (SEU) via targeted bit manipulation### basic_cnn_robustness.py```
 
-
-- **Fault Model**: Single Event Upset (SEU) via targeted bit manipulation### basic_cnn_robustness.pypython basic_cnn_robustness.pypython basic_cnn_robustness.py
-
-- **Coverage**: Exhaustive layer-wise vulnerability mapping  
+- **Coverage**: Exhaustive layer-wise vulnerability mapping
 
 - **Statistics**: Multiple-trial averaging with confidence intervals**Objective**: Single-architecture vulnerability analysis  
 
 - **Validation**: Baseline accuracy verification and repeatability testing
 
-**Method**: Systematic bit-flip injection across network layers  ``````
+**Method**: Systematic bit-flip injection across network layers  
 
-## Research Applications
+## Customization
 
 **Application**: Space mission deployment assessment  
 
-### Adapting for New Studies
+Easy to adapt for your own models and data:
 
+## Available Studies
+
+```python
+
+from seu_injection import SEUInjector### architecture_comparison.py  
+
+from seu_injection.metrics import classification_accuracy
+
+**Objective**: Comparative robustness evaluation  ```bash```bash
+
+# Use your own model and data
+
+injector = SEUInjector(**Method**: Standardized fault injection protocol across multiple architectures  
+
+    trained_model=your_model,
+
+    criterion=classification_accuracy,**Application**: Architecture selection for critical systems  ### [Example_Attack_Notebook.ipynb](Example_Attack_Notebook.ipynb)
+
+    x=your_test_data,
+
+    y=your_labels
+
+)
+
+## Experimental ProtocolInteractive research notebook with comprehensive fault injection analysis and visualization tools.pip install seu-injection-frameworkpip install seu-injection-framework
+
+# Run analysis
+
+results = injector.run_seu(bit_i=0)
+
+```
+
+Both studies implement the IEEE 754-compliant fault injection methodology described in our research paper. Key experimental parameters:
+
+## Results
+
+
+
+Each script generates detailed reports showing:
+
+- Which layers are most vulnerable to bit flips- **Fault Model**: Single Event Upset (SEU) via targeted bit manipulation### basic_cnn_robustness.pypython basic_cnn_robustness.pypython basic_cnn_robustness.py
+
+- How different bit positions affect accuracy
+
+- Robustness comparison across architectures- **Coverage**: Exhaustive layer-wise vulnerability mapping  
+
+
+
+## Citation- **Statistics**: Multiple-trial averaging with confidence intervals**Objective**: Single-architecture vulnerability analysis  
+
+
+
+```bibtex- **Validation**: Baseline accuracy verification and repeatability testing
+
+@software{seu_injection_framework,
+
+  author = {William Dennis},**Method**: Systematic bit-flip injection across network layers  ``````
+
+  title = {SEU Injection Framework},
+
+  year = {2025},## Research Applications
+
+  url = {https://github.com/wd7512/seu-injection-framework},
+
+  version = {1.1.7}**Application**: Space mission deployment assessment  
+
+}
+
+```### Adapting for New Studies
+
+
+
+For methodology details, see the main [repository documentation](../docs/).
 
 
 ```python

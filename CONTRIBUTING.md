@@ -263,7 +263,7 @@ All performance-related contributions must include:
 ### Reporting Security Issues
 For security vulnerabilities:
 1. **Do not** create public GitHub issues
-2. **Email directly**: wd7512@bristol.ac.uk
+2. **Email directly**: wwdennis.home@gmail.com
 3. **Include**: Detailed description and reproduction steps
 4. **Response**: We aim to respond within 48 hours
 
@@ -319,7 +319,7 @@ New contributors should:
 - **Documentation**: Check README.md and docs/ first
 - **Issues**: Create GitHub issue with detailed description
 - **Research Questions**: Use research question issue template
-- **Email**: wd7512@bristol.ac.uk for direct communication
+- **Email**: wwdennis.home@gmail.com for direct communication
 
 ### Response Times
 - **Bug reports**: Within 48 hours for initial response

@@ -10,7 +10,7 @@ name = "seu-injection-framework"
 version = "1.1.7"
 description = "Framework for Single Event Upset (SEU) injection in neural networks for harsh environment applications"
 authors = [
-    {name = "William Dennis", email = "wd7512@bristol.ac.uk"}
+    {name = "William Dennis", email = "wwdennis.home@gmail.com"}
 ]
 readme = "README.md"
 license = {text = "MIT"}

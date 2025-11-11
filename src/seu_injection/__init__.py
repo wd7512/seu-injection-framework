@@ -29,7 +29,7 @@ Basic Usage:
     >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
 
 For detailed examples, see the documentation at:
-https://seu-injection-framework.readthedocs.io
+https://github.com/wd7512/seu-injection-framework/blob/main/README.md
 """
 
 try:  # Prefer dynamic version from installed metadata
@@ -37,9 +37,9 @@ try:  # Prefer dynamic version from installed metadata
 
     __version__ = _pkg_version("seu-injection-framework")
 except Exception:  # Fallback for editable/source checkouts prior to build
-    __version__ = "1.1.7"
+    __version__ = "1.1.7"  # First stable PyPI release with working build pipeline
 __author__ = "William Dennis"
-__email__ = "william.dennis@bristol.ac.uk"
+__email__ = "wwdennis.home@gmail.com"
 
 # Core public API
 from .bitops.float32 import bitflip_float32
