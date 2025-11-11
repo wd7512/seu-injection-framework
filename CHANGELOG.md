@@ -5,6 +5,29 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.7] - 2025-11-11
+
+### Fixed
+- **Release Workflow**: Optimized wheel verification to use CPU-only PyTorch
+- **Disk Space**: Added cleanup steps to prevent out-of-space errors during builds
+- **Version Consistency**: Ensured all version numbers are synchronized across files
+
+### Changed
+- **CI/CD**: Improved release workflow with best practices from popular PyTorch packages
+- **Verification**: Streamlined wheel verification process for faster builds
+
+## [1.1.6] - 2025-11-11
+
+### Fixed
+- **Release Workflow**: Added disk space cleanup before wheel verification
+- Prevented "No space left on device" errors during GitHub Actions builds
+
+## [1.1.5] - 2025-11-11
+
+### Fixed
+- **Dependencies**: Updated dependency specifications for better compatibility
+- **Build Process**: Minor improvements to build configuration
+
 ## [1.0.0] - 2025-11-09
 
 ### 🎉 **Initial Public Release**
@@ -139,6 +162,33 @@ MIT License - see LICENSE file for details.
 ---
 
 *This release represents the culmination of comprehensive development phases focused on performance, quality, and research community adoption.*
+
+## [1.1.6] - 2025-11-10
+
+### Fixed
+- Added disk space cleanup step in release workflow to prevent "No space left on device" errors during wheel verification
+- Removed unnecessary CUDA packages from test installations by using CPU-only PyTorch for wheel verification
+- Improved release workflow reliability for large dependency installations
+
+### Changed
+- Release workflow now frees up ~10-20GB before wheel installation by removing unused system packages
+- Optimized wheel verification step to use `--no-deps` flag with pre-installed dependencies
+
+### Advisory
+This is a CI/CD improvement release; no functional changes to the package itself.
+
+---
+
+## [1.1.5] - 2025-11-10
+
+### Reverted
+- Reverted changes from 1.1.5 due to release workflow issues
+- This version was tagged but not successfully published to PyPI
+
+### Advisory
+Skip this version; use 1.1.6 or 1.1.4 instead.
+
+---
 
 ## [1.1.4] - 2025-11-10
 
