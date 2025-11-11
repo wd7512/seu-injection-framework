@@ -2,15 +2,15 @@ v1.1.XX
 
 Move many md files out of main and into a more development based branch.
 
-This will mean our future workflow stays clean on main and big ai-assited feature development can be performed on that branch. We could name is `ai-dev` as well as having a `dev` branch.
+This will mean our future workflow stays clean on main and  feature development can be performed on that branch. `dev` branch.
 
-Basically, we want a clear workflow and branch strategy. Having `main` and `dev` is good. Then `ai-dev` off of `dev`. And then `experimentation/...` off of `main`/`dev`?
+Basically, we want a clear workflow and branch strategy. Having `main` and `dev` is good. And then `experimentation/...` off of `main`/`dev`?
 
 We need to clean up old branches that may have some value in it. This is currently 
- - [ ] `ai_refactor`
- - [ ] `Research/ViT`
- - [ ] `Research/shipsnet`
- - [ ] `Feature/forward_pass_states`
+- [x] `ai_refactor`
+- [ ] `Research/ViT`
+- [ ] `Research/shipsnet`
+- [ ] `Feature/forward_pass_states`
 
 v1.2.0
 
