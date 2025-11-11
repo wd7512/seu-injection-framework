@@ -9,7 +9,7 @@ This guide provides comprehensive instructions for installing the SEU Injection 
 The fastest way to get started for end users:
 
 ```bash
-# Install the latest stable release (v1.1.7)
+# Install the latest stable release (v1.1.8)
 pip install seu-injection-framework
 
 # Or with analysis tools
