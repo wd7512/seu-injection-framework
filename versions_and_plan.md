@@ -7,10 +7,10 @@ This will mean our future workflow stays clean on main and big ai-assited featur
 Basically, we want a clear workflow and branch strategy. Having `main` and `dev` is good. Then `ai-dev` off of `dev`. And then `experimentation/...` off of `main`/`dev`?
 
 We need to clean up old branches that may have some value in it. This is currently 
-[ ] `ai_refactor`
-[ ] `Research/ViT`
-[ ] `Research/shipsnet`
-[ ] `Feature/forward_pass_states`
+ - [ ] `ai_refactor`
+ - [ ] `Research/ViT`
+ - [ ] `Research/shipsnet`
+ - [ ] `Feature/forward_pass_states`
 
 v1.2.0
 
