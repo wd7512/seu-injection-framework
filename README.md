@@ -1,14 +1,30 @@
 # SEU Injection Framework
 
-[![PyPI version](https://img.shields.io/pypi/v/seu-injection-framework.svg)](https://pypi.org/project/seu-injection-framework/)
-[![Python versions](https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue)](https://github.com/wd7512/seu-injection-framework)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/tests-109%20passed-green)](https://github.com/wd7512/seu-injection-framework)
-[![Coverage](https://img.shields.io/badge/coverage-94%25-brightgreen)](https://github.com/wd7512/seu-injection-framework)
 
-A Python framework for **Single Event Upset (SEU) injection** in neural networks for robustness analysis in harsh environments.
+<div align="center" style="line-height: 1;">
+  <a href="https://pypi.org/project/seu-injection-framework/"><img alt="PyPI"
+    src="https://img.shields.io/pypi/v/seu-injection-framework.svg"/></a>
+  <a href="https://github.com/wd7512/seu-injection-framework"><img alt="Python Versions"
+    src="https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue"/></a>
+  <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT"
+    src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
+  <br>
+  <a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">
+    <b><br>Research Paper<br></b>
+  </a>
+</div>
 
-**📖 [Documentation](docs/)** | **🚀 [Quick Start](docs/quickstart.md)** | **🔬 [Research Paper](https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars)**
+<hr>
+
+<div align="center">
+  <p>
+    A Python framework for <b>Single Event Upset (SEU) injection</b> in neural networks for robustness analysis in harsh environments.
+  </p>
+  <p>
+    <b><a href="docs/">Documentation</a></b> |
+    <b><a href="docs/quickstart.md">Quick Start</a></b>
+  </p>
+</div>
 
 ## Installation
 
