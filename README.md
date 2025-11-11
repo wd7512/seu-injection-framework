@@ -59,31 +59,54 @@ python -c "from seu_injection import SEUInjector; print('✅ Ready')"
 ## Quick Example
 
 ```python
+import torch
 from seu_injection import SEUInjector
 from seu_injection.metrics import classification_accuracy
 
-# Initialize with your model and test data
+# Create a simple model and test data
+model = torch.nn.Sequential(
+    torch.nn.Linear(10, 64),
+    torch.nn.ReLU(), 
+    torch.nn.Linear(64, 2)
+)
+x_test = torch.randn(100, 10)
+y_test = torch.randint(0, 2, (100,))
+
+# Initialize SEU injector
 injector = SEUInjector(
     trained_model=model,
-    criterion=classification_accuracy,
+    criterion=classification_accuracy, 
     x=x_test,
     y=y_test
 )
 
-# Run systematic bit flip injection
-results = injector.run_seu(bit_i=0)  # Test sign bit
-print(f"Baseline: {injector.baseline_score:.2%}")
+# Check baseline performance
+print(f"Baseline accuracy: {injector.baseline_score:.2%}")
+
+# Inject bit flips into sign bits (bit position 0)
+results = injector.run_seu(bit_i=0)
+print(f"Performed {len(results['criterion_score'])} injections")
+
+# Sample some results
+fault_impacts = [injector.baseline_score - score for score in results['criterion_score']]
+print(f"Average accuracy drop: {sum(fault_impacts)/len(fault_impacts):.1%}")
 ```
 
-**More examples:** [`examples/`](examples/) | **📖 Tutorial:** [`docs/quickstart.md`](docs/quickstart.md)
+💡 **Need a full tutorial?** See [`docs/quickstart.md`](docs/quickstart.md) for a complete 10-minute walkthrough.
 
-## ✨ Features
+### 📚 Complete Examples
 
-- **High-Performance**: Optimized bit manipulation (10-100x speedup)
-- **Flexible**: Systematic or stochastic injection modes
-- **GPU Accelerated**: Full CUDA support
-- **Production Ready**: 94% test coverage, multi-platform
-- **Research Focused**: Space, nuclear, and reliability applications
+- **Basic CNN Robustness:** [`examples/basic_cnn_robustness.py`](examples/basic_cnn_robustness.py)
+- **Architecture Comparison:** [`examples/architecture_comparison.py`](examples/architecture_comparison.py)
+- **Interactive Tutorial:** [`examples/Example_Attack_Notebook.ipynb`](examples/Example_Attack_Notebook.ipynb)
+
+## Features
+
+- **Works with Any PyTorch Model**: Drop-in compatibility with standard PyTorch models - no modifications required
+- **Built for Research**: Designed for reliability analysis in space systems, nuclear environments, and harsh conditions
+- **High-Performance**: Optimized bit manipulation operations (10-100x faster than naive implementations)
+- **Multiple Injection Methods**: Systematic bit-by-bit analysis for small models, stochastic sampling for large-scale campaigns
+- **GPU Accelerated**: Full CUDA support for efficient fault injection on neural networks of any size
 
 ## 🤝 Contributing & Support
 
@@ -119,29 +142,7 @@ If you use this framework in your research, please cite both the software and th
 }
 ```
 
-## 🚀 Future Enhancements
-
-Planned improvements for upcoming releases:
-
-### **Documentation**
-- 📚 **ReadTheDocs Site**: Comprehensive online documentation with API reference, tutorials, and research guides
-- 📝 **Advanced Examples**: More complex use cases including custom metrics and multi-architecture comparisons
-- 🎓 **Video Tutorials**: Step-by-step video guides for common workflows
-
-### **Features**
-- 🔄 **Additional Fault Models**: Support for multi-bit upsets, stuck-at faults, and transient errors
-- 📊 **Enhanced Visualization**: Built-in plotting utilities for fault injection results
-- 🎯 **Layer Importance Analysis**: Automatic identification of critical layers
-- 🚀 **Performance Optimizations**: Further speedups for large-scale campaigns
-
-### **Integration**
-- 🐳 **Docker Images**: Pre-configured containers for reproducible experiments
-- ☁️ **Cloud Support**: Integration with cloud platforms for distributed fault injection
-- 🔌 **Framework Extensions**: Support for TensorFlow, JAX, and other ML frameworks
-
-**Want to contribute?** See [CONTRIBUTING.md](CONTRIBUTING.md) or reach out at wwdennis.home@gmail.com
-
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
