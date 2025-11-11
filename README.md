@@ -94,6 +94,8 @@ print(f"Baseline: {injector.baseline_score:.2%}")
 
 ## 📝 Citation
 
+If you use this framework in your research, please cite both the software and the research paper:
+
 ```bibtex
 @software{seu_injection_framework,
   author = {William Dennis},
@@ -101,6 +103,19 @@ print(f"Baseline: {injector.baseline_score:.2%}")
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
   version = {1.1.7}
+}
+
+@conference{icaart25,
+  author = {William Dennis and James Pope},
+  title = {A Framework for Developing Robust Machine Learning Models in Harsh Environments: A Review of CNN Design Choices},
+  booktitle = {Proceedings of the 17th International Conference on Agents and Artificial Intelligence - Volume 2: ICAART},
+  year = {2025},
+  pages = {322-333},
+  publisher = {SciTePress},
+  organization = {INSTICC},
+  doi = {10.5220/0013155000003890},
+  isbn = {978-989-758-737-5},
+  issn = {2184-433X}
 }
 ```
 
