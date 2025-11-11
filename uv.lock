@@ -4568,7 +4568,7 @@ wheels = [
 
 [[package]]
 name = "seu-injection-framework"
-version = "1.1.7"
+version = "1.1.8"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },

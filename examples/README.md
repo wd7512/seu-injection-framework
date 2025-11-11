@@ -150,7 +150,7 @@ Each script generates detailed reports showing:
 
   url = {https://github.com/wd7512/seu-injection-framework},
 
-  version = {1.1.7}**Application**: Space mission deployment assessment  
+  version = {1.1.8}**Application**: Space mission deployment assessment  
 
 }
 
