@@ -449,13 +449,13 @@ After successful installation:
 
 ## Version Compatibility
 
-| Python Version | Status | Notes |
-|---------------|--------|-------|
-| 3.9 | ✅ Supported | Minimum required version |
-| 3.10 | ✅ Supported | Fully tested |
-| 3.11 | ✅ Supported | Recommended |
-| 3.12 | ✅ Supported | Latest features |
-| 3.13+ | ⚠️ Experimental | May work but not officially tested |
+| Python Version | Status          | Notes                              |
+| -------------- | --------------- | ---------------------------------- |
+| 3.9            | ✅ Supported    | Minimum required version           |
+| 3.10           | ✅ Supported    | Fully tested                       |
+| 3.11           | ✅ Supported    | Recommended                        |
+| 3.12           | ✅ Supported    | Latest features                    |
+| 3.13+          | ⚠️ Experimental | May work but not officially tested |
 
 ## Development Setup
 
