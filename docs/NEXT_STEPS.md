@@ -5,13 +5,15 @@ This document outlines planned enhancements and priorities for the SEU Injection
 ## 📚 High Priority: Documentation Infrastructure
 
 ### ReadTheDocs Setup
-**Status:** Not Started  
-**Priority:** HIGH  
+
+**Status:** Not Started\
+**Priority:** HIGH\
 **Estimated Effort:** 1-2 weeks
 
 Create a professional documentation site hosted on ReadTheDocs:
 
 **Requirements:**
+
 - [ ] Set up Sphinx documentation structure
 - [ ] Configure ReadTheDocs integration with GitHub
 - [ ] Convert existing Markdown docs to reStructuredText or use MyST
@@ -20,6 +22,7 @@ Create a professional documentation site hosted on ReadTheDocs:
 - [ ] Configure versioned documentation (stable, latest, v1.1.x)
 
 **Structure:**
+
 ```
 docs/
 ├── index.rst                 # Main landing page
@@ -49,27 +52,31 @@ docs/
 ```
 
 **Resources:**
+
 - ReadTheDocs Tutorial: https://docs.readthedocs.io/en/stable/tutorial/
 - Sphinx Documentation: https://www.sphinx-doc.org/
 - PyTorch Docs as Reference: https://github.com/pytorch/pytorch/tree/main/docs
 
----
+______________________________________________________________________
 
 ## 🎯 High Priority Features
 
 ### 1. Enhanced Error Messages
-**Status:** Partially Complete  
-**Priority:** HIGH  
+
+**Status:** Partially Complete\
+**Priority:** HIGH\
 **Effort:** Small
 
 Current state uses ValueError for validation, but needs:
+
 - Custom exception classes (SEUConfigurationError, LayerNotFoundError, etc.)
 - Helpful error messages with fix suggestions
 - Better input validation with clear requirements
 
 ### 2. Comprehensive Type Hints
-**Status:** In Progress  
-**Priority:** HIGH  
+
+**Status:** In Progress\
+**Priority:** HIGH\
 **Effort:** Medium
 
 - Complete type annotations for all public APIs
@@ -78,8 +85,9 @@ Current state uses ValueError for validation, but needs:
 - Runtime type checking with pydantic (optional)
 
 ### 3. Performance Profiling & Optimization
-**Status:** Baseline Established  
-**Priority:** MEDIUM  
+
+**Status:** Baseline Established\
+**Priority:** MEDIUM\
 **Effort:** Medium
 
 - Detailed profiling of injection campaigns
@@ -87,16 +95,18 @@ Current state uses ValueError for validation, but needs:
 - GPU kernel optimization opportunities
 - Benchmark suite expansion
 
----
+______________________________________________________________________
 
 ## 📊 Medium Priority: Analysis & Visualization
 
 ### 1. Built-in Visualization Tools
-**Status:** Not Started  
-**Priority:** MEDIUM  
+
+**Status:** Not Started\
+**Priority:** MEDIUM\
 **Effort:** Medium
 
 Add convenience plotting functions:
+
 ```python
 from seu_injection.visualization import (
     plot_bit_sensitivity,
@@ -106,8 +116,9 @@ from seu_injection.visualization import (
 ```
 
 ### 2. Statistical Analysis Tools
-**Status:** Not Started  
-**Priority:** MEDIUM  
+
+**Status:** Not Started\
+**Priority:** MEDIUM\
 **Effort:** Medium
 
 - Confidence intervals for robustness metrics
@@ -116,23 +127,26 @@ from seu_injection.visualization import (
 - Automated report generation
 
 ### 3. Layer Importance Analysis
-**Status:** Not Started  
-**Priority:** MEDIUM  
+
+**Status:** Not Started\
+**Priority:** MEDIUM\
 **Effort:** Large
 
 Automatic identification of:
+
 - Most vulnerable layers
 - Critical parameters
 - Fault propagation patterns
 - Layer-wise robustness scores
 
----
+______________________________________________________________________
 
 ## 🔧 Medium Priority: Usability Improvements
 
 ### 1. High-Level Convenience Functions
-**Status:** Planned (see TODOs in code)  
-**Priority:** MEDIUM  
+
+**Status:** Planned (see TODOs in code)\
+**Priority:** MEDIUM\
 **Effort:** Medium
 
 ```python
@@ -154,8 +168,9 @@ space_results = space_mission_simulation(
 ```
 
 ### 2. DataLoader Optimization
-**Status:** Partially Complete  
-**Priority:** MEDIUM  
+
+**Status:** Partially Complete\
+**Priority:** MEDIUM\
 **Effort:** Small
 
 - More efficient batch processing
@@ -164,8 +179,9 @@ space_results = space_mission_simulation(
 - Parallel data loading support
 
 ### 3. Configuration System
-**Status:** Not Started  
-**Priority:** LOW  
+
+**Status:** Not Started\
+**Priority:** LOW\
 **Effort:** Medium
 
 - YAML/JSON configuration file support
@@ -173,16 +189,18 @@ space_results = space_mission_simulation(
 - Reproducibility guarantees
 - Integration with MLflow or Weights & Biases
 
----
+______________________________________________________________________
 
 ## 🚀 Low Priority: Extended Features
 
 ### 1. Additional Fault Models
-**Status:** Not Started  
-**Priority:** LOW  
+
+**Status:** Not Started\
+**Priority:** LOW\
 **Effort:** Large
 
 Beyond single-bit flips:
+
 - Multi-bit upsets (MBU)
 - Stuck-at faults
 - Transient errors with recovery
@@ -190,8 +208,9 @@ Beyond single-bit flips:
 - Voltage/temperature-induced errors
 
 ### 2. Cloud & Distributed Computing
-**Status:** Not Started  
-**Priority:** LOW  
+
+**Status:** Not Started\
+**Priority:** LOW\
 **Effort:** Large
 
 - Ray integration for distributed fault injection
@@ -200,74 +219,82 @@ Beyond single-bit flips:
 - Distributed result aggregation
 
 ### 3. Framework Extensions
-**Status:** Not Started  
-**Priority:** LOW  
+
+**Status:** Not Started\
+**Priority:** LOW\
 **Effort:** Large
 
 Support for additional ML frameworks:
+
 - TensorFlow/Keras
 - JAX/Flax
 - ONNX models
 - Quantized models
 
 ### 4. Docker Images
-**Status:** Not Started  
-**Priority:** LOW  
+
+**Status:** Not Started\
+**Priority:** LOW\
 **Effort:** Small
 
 Pre-configured containers:
+
 ```bash
 docker pull wdennis/seu-injection-framework:latest
 docker run -it --gpus all seu-injection-framework
 ```
 
----
+______________________________________________________________________
 
 ## 📦 Release Schedule
 
 ### v1.2.0 (Q1 2026) - Documentation & Usability
+
 - ✅ ReadTheDocs site live
 - ✅ Enhanced error messages
 - ✅ High-level convenience functions
 - ✅ Comprehensive examples
 
 ### v1.3.0 (Q2 2026) - Visualization & Analysis
+
 - Built-in plotting utilities
 - Statistical analysis tools
 - Layer importance analysis
 - Automated report generation
 
 ### v2.0.0 (Q3 2026) - Extended Features
+
 - Additional fault models
 - Performance optimizations
 - Cloud integration
 - Framework extensions
 
----
+______________________________________________________________________
 
 ## 🤝 How to Contribute
 
 Want to help with any of these items?
 
 1. **Check GitHub Issues**: Look for issues tagged with the relevant milestone
-2. **Discuss First**: Create an issue or email wwdennis.home@gmail.com
-3. **Follow Guidelines**: See [CONTRIBUTING.md](../CONTRIBUTING.md)
-4. **Submit PR**: Include tests and documentation
+1. **Discuss First**: Create an issue or email wwdennis.home@gmail.com
+1. **Follow Guidelines**: See [CONTRIBUTING.md](../CONTRIBUTING.md)
+1. **Submit PR**: Include tests and documentation
 
 **High-impact areas for new contributors:**
+
 - 📚 Documentation improvements
 - 🧪 Additional test cases
 - 📊 Example notebooks
 - 🐛 Bug fixes
 
----
+______________________________________________________________________
 
 ## 📧 Contact
 
-**Project Maintainer:** William Dennis  
-**Email:** wwdennis.home@gmail.com  
+**Project Maintainer:** William Dennis\
+**Email:** wwdennis.home@gmail.com\
 **GitHub:** https://github.com/wd7512/seu-injection-framework
 
----
+______________________________________________________________________
 
 *Last Updated: November 11, 2025*

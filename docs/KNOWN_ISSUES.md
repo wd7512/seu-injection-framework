@@ -6,7 +6,8 @@
 
 **Status**: Non-critical for PyPI release
 
-**Details**: 
+**Details**:
+
 - Running `python basic_cnn_robustness.py` hangs during pandas import
 - Appears to be dependency/environment related
 - Examples code is correct but dependency chain is slow/problematic
@@ -22,7 +23,8 @@
 
 **Status**: Tracked via embedded TODO system throughout codebase
 
-**Details**: 
+**Details**:
+
 - Import optimization opportunities (function-specific imports)
 - Error handling standardization (consistent exception types)
 - Test quality enhancements (stronger assertions)
@@ -33,7 +35,7 @@
 
 **Priority**: Variable by category - see individual TODO priorities in source code
 
----
+______________________________________________________________________
 
 **Note**: The framework uses an embedded TODO system to track improvements. This is normal development practice and indicates active maintenance, not technical debt.
 

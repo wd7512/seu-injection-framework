@@ -1,4 +1,3 @@
-
 # Research Examples
 
 Ready-to-run examples demonstrating fault injection methodologies for neural network robustness analysis in harsh environments.
@@ -8,12 +7,14 @@ Ready-to-run examples demonstrating fault injection methodologies for neural net
 You can run the examples after installing the framework:
 
 ### From PyPI
+
 ```bash
 pip install seu-injection-framework
 python basic_cnn_robustness.py
 ```
 
 ### From Source
+
 ```bash
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
@@ -31,6 +32,7 @@ uv run python examples/basic_cnn_robustness.py
 ## Experimental Protocol
 
 All studies implement IEEE 754-compliant fault injection methodology:
+
 - **Fault Model**: Single Event Upset (SEU) via targeted bit manipulation
 - **Coverage**: Exhaustive layer-wise vulnerability mapping
 - **Statistics**: Multiple-trial averaging with confidence intervals
@@ -39,6 +41,7 @@ All studies implement IEEE 754-compliant fault injection methodology:
 ## Customization
 
 You can easily adapt these examples for your own models and data:
+
 ```python
 from seu_injection import SEUInjector
 from seu_injection.metrics import classification_accuracy
@@ -56,6 +59,7 @@ results = injector.run_seu(bit_i=0)
 ## Results
 
 Each script generates detailed reports showing:
+
 - Which layers are most vulnerable to bit flips
 - How different bit positions affect accuracy
 - Robustness comparison across architectures
@@ -63,6 +67,7 @@ Each script generates detailed reports showing:
 ## Citation
 
 When using these examples in research, please cite:
+
 ```bibtex
 @software{seu_injection_framework,
   author = {William Dennis},

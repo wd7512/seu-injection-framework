@@ -49,6 +49,7 @@ uv run python run_tests.py smoke
 UV provides fast, reliable dependency resolution and virtual environment management.
 
 **Advantages:**
+
 - Fastest dependency resolution (10-100x faster than pip)
 - Reproducible builds with `uv.lock`
 - Automatic virtual environment management
@@ -140,6 +141,7 @@ pip install -e .
 ```
 
 **Includes:**
+
 - PyTorch >= 2.0.0
 - NumPy >= 1.21.0
 - scikit-learn >= 1.1.0
@@ -159,6 +161,7 @@ pip install -e ".[dev]"
 ```
 
 **Additional tools:**
+
 - pytest, pytest-cov (testing)
 - ruff (linting)
 - mypy (type checking)
@@ -177,6 +180,7 @@ pip install -e ".[notebooks]"
 ```
 
 **Includes:**
+
 - JupyterLab
 - ipywidgets
 - seaborn (advanced visualizations)
@@ -198,11 +202,13 @@ pip install -e ".[dev,notebooks,extras]"
 ### Windows
 
 **Prerequisites:**
+
 - Python 3.9 or later
 - Windows 10/11 or Windows Server 2019+
 - PowerShell or Command Prompt
 
 **CUDA Support (Optional):**
+
 ```powershell
 # Install CUDA-enabled PyTorch
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
@@ -211,11 +217,13 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 ### macOS
 
 **Prerequisites:**
+
 - Python 3.9 or later
 - macOS 11 (Big Sur) or later
 - Xcode Command Line Tools: `xcode-select --install`
 
 **Apple Silicon (M1/M2/M3):**
+
 ```bash
 # MPS acceleration supported
 # No additional configuration needed
@@ -224,11 +232,13 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 ### Linux
 
 **Prerequisites:**
+
 - Python 3.9 or later
 - GCC compiler
 - CUDA toolkit (optional, for GPU support)
 
 **CUDA Support:**
+
 ```bash
 # Install CUDA-enabled PyTorch
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
@@ -284,6 +294,7 @@ print(f'MPS available: {torch.backends.mps.is_available()}')
 **Problem:** You ran `uv sync` without `--all-extras`, missing development dependencies
 
 **Solution:**
+
 ```bash
 # Install ALL dependencies including testing tools
 uv sync --all-extras
@@ -298,6 +309,7 @@ uv run python -c "import pytest; print('pytest available')"
 **Problem:** Using an older version of the repository that lacks proper package structure
 
 **Solution:**
+
 ```bash
 # Switch to latest development branch
 git checkout ai_refactor
@@ -315,6 +327,7 @@ uv run python -c "from testing import get_example_network; print('testing module
 **Problem:** Running single test files may fail coverage requirements even though code is correct
 
 **Solutions:**
+
 ```bash
 # Option 1: Run tests without coverage
 uv run pytest tests/test_injector.py --no-cov -v
@@ -337,6 +350,7 @@ uv run python run_tests.py unit
 **Problem:** Python cannot find the seu_injection module
 
 **Solution:**
+
 ```bash
 # Ensure you're in the correct directory
 cd seu-injection-framework
@@ -353,6 +367,7 @@ uv sync --all-extras
 **Problem:** GPU runs out of memory during SEU injection
 
 **Solution:**
+
 - Reduce batch size in your experiments
 - Use CPU mode: `device='cpu'`
 - Use smaller models for testing
@@ -363,6 +378,7 @@ uv sync --all-extras
 **Problem:** Cannot install packages due to permissions
 
 **Solution:**
+
 ```bash
 # Use virtual environment (recommended)
 python -m venv .venv
@@ -378,6 +394,7 @@ pip install --user -e .
 **Problem:** pip takes a long time to resolve dependencies
 
 **Solution:**
+
 - Switch to UV package manager (10-100x faster)
 - Use pre-built wheels
 - Check your internet connection
@@ -388,32 +405,34 @@ pip install --user -e .
 If you encounter issues not covered here:
 
 1. **Check existing issues:** [GitHub Issues](https://github.com/wd7512/seu-injection-framework/issues)
-2. **Run diagnostics:**
+1. **Run diagnostics:**
    ```bash
    python -c "import sys; print(sys.version)"
    python -c "import torch; print(torch.__version__)"
    uv --version
    ```
-3. **Create a new issue:** Include your Python version, OS, and error messages
+1. **Create a new issue:** Include your Python version, OS, and error messages
 
 ## Next Steps
 
 After successful installation:
 
 1. **Quick Start:** Follow the [Quickstart Tutorial](quickstart.md)
-2. **API Documentation:** Review the [API Reference](api/index.md)
-3. **Examples:** Explore [Example Scripts](examples/)
-4. **Research:** Check out [Research Notebooks](examples/notebooks/)
+1. **API Documentation:** Review the [API Reference](api/index.md)
+1. **Examples:** Explore [Example Scripts](examples/)
+1. **Research:** Check out [Research Notebooks](examples/notebooks/)
 
 ## System Requirements
 
 ### Minimum Requirements
+
 - Python 3.9+
 - 4 GB RAM
 - 1 GB free disk space
 - CPU with SSE4.2 support
 
 ### Recommended Requirements
+
 - Python 3.11+
 - 8 GB RAM
 - 5 GB free disk space
@@ -421,6 +440,7 @@ After successful installation:
 - CUDA 11.8 or later
 
 ### Tested Platforms
+
 - ✅ Windows 10/11 (x64)
 - ✅ macOS 11+ (Intel & Apple Silicon)
 - ✅ Ubuntu 20.04/22.04 LTS
@@ -476,7 +496,7 @@ cd ..
 rm -rf seu-injection-framework
 ```
 
----
+______________________________________________________________________
 
-**Last Updated:** November 2025  
+**Last Updated:** November 2025\
 **Version:** 1.0.0 (Phase 3 Complete)

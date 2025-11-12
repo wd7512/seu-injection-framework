@@ -1,17 +1,17 @@
 <div align="center">
 
-  <h1>SEU Injection Framework</h1>
+<h1>SEU Injection Framework</h1>
 
-  <a href="https://pypi.org/project/seu-injection-framework/"><img alt="PyPI"
-    src="https://img.shields.io/pypi/v/seu-injection-framework.svg"/></a>
-  <a href="https://github.com/wd7512/seu-injection-framework"><img alt="Python Versions"
-    src="https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue"/></a>
-  <a href="https://opensource.org/licenses/MIT"><img alt="License: MIT"
-    src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
-  <br>
-  <a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">
-    <b><br>Research Paper<br></b>
-  </a>
+<a href="https://pypi.org/project/seu-injection-framework/"><img alt="PyPI"
+src="https://img.shields.io/pypi/v/seu-injection-framework.svg"/></a>
+<a href="https://github.com/wd7512/seu-injection-framework"><img alt="Python Versions"
+src="https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-blue"/></a>
+<a href="https://opensource.org/licenses/MIT"><img alt="License: MIT"
+src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
+<br>
+<a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">
+<b><br>Research Paper<br></b>
+</a>
 
 </div>
 
@@ -161,6 +161,6 @@ If you use this framework in your research, please cite both the software and th
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
+______________________________________________________________________
 
 *Built with ❤️ for the research community studying neural network robustness in harsh environments.*
