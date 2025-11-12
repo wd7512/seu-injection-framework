@@ -1,7 +1,7 @@
-# SEU Injection Framework
+<div align="center">
 
+  <h1>SEU Injection Framework</h1>
 
-<div align="center" style="line-height: 1;">
   <a href="https://pypi.org/project/seu-injection-framework/"><img alt="PyPI"
     src="https://img.shields.io/pypi/v/seu-injection-framework.svg"/></a>
   <a href="https://github.com/wd7512/seu-injection-framework"><img alt="Python Versions"
@@ -12,6 +12,7 @@
   <a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">
     <b><br>Research Paper<br></b>
   </a>
+
 </div>
 
 <hr>
@@ -28,7 +29,7 @@
 
 ## Installation
 
-**Option 1: Install from PyPI (Recommended)**
+**Option 1 (recommended): PyPI**
 
 ```bash
 # Minimal core dependencies (PyTorch, NumPy, SciPy, tqdm)
@@ -41,7 +42,7 @@ pip install "seu-injection-framework[analysis]"
 pip install "seu-injection-framework[all]"
 ```
 
-**Option 2: Install from Source (Development)**
+**Option 2: Source (development)**
 
 ```bash
 git clone https://github.com/wd7512/seu-injection-framework.git
@@ -54,9 +55,7 @@ uv sync --extra dev --extra analysis --extra vision --extra notebooks
 pip install -e ".[all]"
 ```
 
-**GPU Support (Optional):**
-
-If you need CUDA-enabled PyTorch, install it first:
+**GPU (optional):** install a CUDA-enabled PyTorch first if required:
 
 ```bash
 # Example for CUDA 12.x (adjust for your system)
@@ -64,15 +63,15 @@ pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 pip install seu-injection-framework
 ```
 
-**Verify Installation:**
+**Verify installation:**
 
 ```bash
-python -c "from seu_injection import SEUInjector; print('✅ Ready')"
+python -c "from seu_injection import SEUInjector; print('Ready')"
 ```
 
-> **Having issues?** See [`docs/installation.md`](docs/installation.md) for troubleshooting.
+Having issues? See [`docs/installation.md`](docs/installation.md).
 
-## Quick Example
+## Quick example
 
 ```python
 import torch
@@ -108,30 +107,30 @@ fault_impacts = [injector.baseline_score - score for score in results['criterion
 print(f"Average accuracy drop: {sum(fault_impacts)/len(fault_impacts):.1%}")
 ```
 
-💡 **Need a full tutorial?** See [`docs/quickstart.md`](docs/quickstart.md) for a complete 10-minute walkthrough.
+Full tutorial: [`docs/quickstart.md`](docs/quickstart.md).
 
-### 📚 Complete Examples
+### Examples
 
-- **Basic CNN Robustness:** [`examples/basic_cnn_robustness.py`](examples/basic_cnn_robustness.py)
-- **Architecture Comparison:** [`examples/architecture_comparison.py`](examples/architecture_comparison.py)
-- **Interactive Tutorial:** [`examples/Example_Attack_Notebook.ipynb`](examples/Example_Attack_Notebook.ipynb)
+- Basic CNN robustness: [`examples/basic_cnn_robustness.py`](examples/basic_cnn_robustness.py)
+- Architecture comparison: [`examples/architecture_comparison.py`](examples/architecture_comparison.py)
+- Interactive notebook: [`examples/Example_Attack_Notebook.ipynb`](examples/Example_Attack_Notebook.ipynb)
 
 ## Features
 
-- **Works with Any PyTorch Model**: Drop-in compatibility with standard PyTorch models - no modifications required
-- **Built for Research**: Designed for reliability analysis in space systems, nuclear environments, and harsh conditions
-- **High-Performance**: Optimized bit manipulation operations (10-100x faster than naive implementations)
-- **Multiple Injection Methods**: Systematic bit-by-bit analysis for small models, stochastic sampling for large-scale campaigns
-- **GPU Accelerated**: Full CUDA support for efficient fault injection on neural networks of any size
+- Works with standard PyTorch models (no code changes required)
+- Suitable for reliability studies in harsh environments (space, nuclear, radiation)
+- Optimized bit operations (10–100× faster than naive Python)
+- Multiple injection modes: systematic per-bit or stochastic sampling
+- Optional CUDA acceleration
 
-## 🤝 Contributing & Support
+## Contributing & support
 
-- **Documentation:** [`docs/`](docs/)
-- **Contributing:** [`CONTRIBUTING.md`](CONTRIBUTING.md)
-- **Issues:** [GitHub Issues](https://github.com/wd7512/seu-injection-framework/issues)
-- **Contact:** wwdennis.home@gmail.com
+- Documentation: [`docs/`](docs/)
+- Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- Issues: [GitHub Issues](https://github.com/wd7512/seu-injection-framework/issues)
+- Contact: wwdennis.home@gmail.com
 
-## 📝 Citation
+## Citation
 
 If you use this framework in your research, please cite both the software and the research paper:
 
@@ -158,7 +157,7 @@ If you use this framework in your research, please cite both the software and th
 }
 ```
 
-##  License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
