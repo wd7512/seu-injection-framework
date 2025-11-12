@@ -26,7 +26,11 @@ This move to v1.2.0 will also include testing on CUDA during experimentation. It
 - Look at other type of NNs
 - Look at SVM, DTR, Forest etc...
 
-**What is the minimum norm required ($\delta_{min}$) for critical failure and how does this vary with model properties?**
+**What easy changes can be made to pre-trained models to improve model robustness**
+- *At a fundamental level* we play with toy models and explore a wide range NN design choices. 
+- *At a high level* we take SOTA models and attempt to prove our best mitigating methods work.
+
+**What is the minimum norm required ($\delta_{min}$) for critical failure and how does this vary with model size?**
 
 - *Experimental setup*: can use a binary classifier, seu-injection is not strictly needed, can build a new injector based on $\delta_{\min} \in \mathbb{R}$
 - Use mathematical analysis to come up with a hypothesis on how to make the model misclassify
