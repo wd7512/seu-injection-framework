@@ -240,7 +240,7 @@ class TestPerformanceBenchmarks:
         assert overhead_results["overhead_absolute"] >= 0
 
         # Print results for visibility
-        print(f"\nSEU Injection Overhead Metrics:")
+        print("\nSEU Injection Overhead Metrics:")
         print(f"  Baseline inference: {overhead_results['baseline']['avg_time_ms']:.3f} ms")
         print(f"  Overhead: {overhead_results['overhead_absolute_ms']:.3f} ms")
         print(f"  Relative overhead: {overhead_results['overhead_relative']:.1f}%")
