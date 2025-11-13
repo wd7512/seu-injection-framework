@@ -111,7 +111,7 @@ def test_example_networks_import():
             sys.path.insert(0, repo_root)
 
         # The fixtures module should now be importable as a proper package
-        from ..fixtures.example_networks import get_example_network
+        from tests.fixtures.example_networks import get_example_network
 
         # Test that function exists
         assert get_example_network is not None

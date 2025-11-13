@@ -7,7 +7,7 @@ These tests focus on error handling and edge cases not covered by integration te
 import pytest
 import torch
 
-from ..fixtures.example_networks import get_example_network
+from tests.fixtures.example_networks import get_example_network
 
 
 class TestExampleNetworks:
