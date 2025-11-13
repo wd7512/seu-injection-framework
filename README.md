@@ -114,6 +114,38 @@ Full tutorial: [`docs/quickstart.md`](docs/quickstart.md).
 - Basic CNN robustness: [`examples/basic_cnn_robustness.py`](examples/basic_cnn_robustness.py)
 - Architecture comparison: [`examples/architecture_comparison.py`](examples/architecture_comparison.py)
 - Interactive notebook: [`examples/Example_Attack_Notebook.ipynb`](examples/Example_Attack_Notebook.ipynb)
+- Overhead calculation: [`examples/overhead_calculation_example.py`](examples/overhead_calculation_example.py)
+
+## Performance overhead measurement
+
+Want to know the computational cost of SEU injection? The framework includes utilities to measure and analyze overhead:
+
+```python
+from seu_injection import SEUInjector, calculate_overhead
+from seu_injection.metrics import classification_accuracy
+
+# Setup model and data
+injector = SEUInjector(
+    trained_model=model,
+    criterion=classification_accuracy,
+    x=x_test, y=y_test
+)
+
+# Calculate overhead
+overhead_results = calculate_overhead(
+    model=model,
+    injector=injector,
+    input_data=sample_input,
+    bit_position=0,
+    stochastic=True,
+    stochastic_probability=0.01  # 1% sampling
+)
+
+print(f"Baseline inference: {overhead_results['baseline']['avg_time_ms']:.2f} ms")
+print(f"SEU injection overhead: {overhead_results['overhead_relative']:.1f}%")
+```
+
+For a complete example with multiple network architectures, see [`examples/overhead_calculation_example.py`](examples/overhead_calculation_example.py).
 
 ## Features
 
@@ -122,6 +154,7 @@ Full tutorial: [`docs/quickstart.md`](docs/quickstart.md).
 - Optimized bit operations (10–100× faster than naive Python)
 - Multiple injection modes: systematic per-bit or stochastic sampling
 - Optional CUDA acceleration
+- Performance overhead measurement and benchmarking
 
 ## Contributing & support
 
