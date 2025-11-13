@@ -69,7 +69,7 @@ jobs:
       - name: Sync dev deps
         run: uv sync --extra dev --frozen
       - name: Unit tests (with coverage, no threshold)
-        run: uv run pytest tests/ -k "not integration" -v --cov=src/seu_injection --cov-report=term-missing
+        run: uv run pytest tests/unit_tests/ -v --cov=src/seu_injection --cov-report=term-missing
 
   dev_tests:
     name: Dev branch smoke + unit (middle matrix)

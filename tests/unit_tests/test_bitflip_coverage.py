@@ -9,7 +9,8 @@ import struct
 
 import numpy as np
 import pytest
-from src.seu_injection.bitops.float32 import (
+
+from seu_injection.bitops.float32 import (
     binary_to_float32,
     bitflip_float32,
     bitflip_float32_fast,
