@@ -4702,7 +4702,7 @@ wheels = [
 
 [[package]]
 name = "seu-injection-framework"
-version = "1.1.8"
+version = "1.1.9"
 source = { editable = "." }
 dependencies = [
     { name = "mdformat", version = "0.7.22", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.10'" },

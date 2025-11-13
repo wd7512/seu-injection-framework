@@ -37,7 +37,7 @@ try:  # Prefer dynamic version from installed metadata
 
     __version__ = _pkg_version("seu-injection-framework")
 except Exception:  # Fallback for editable/source checkouts prior to build
-    __version__ = "1.1.7"  # Latest stable PyPI release with working build pipeline
+    __version__ = "1.1.8"  # Latest stable PyPI release with working build pipeline
 __author__ = "William Dennis"
 __email__ = "wwdennis.home@gmail.com"
 
