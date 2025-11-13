@@ -38,8 +38,8 @@ jobs:
       - name: Type check (mypy)
         run: uv run mypy src/seu_injection --ignore-missing-imports
       
-      - name: Smoke tests
-        run: uv run python run_tests.py smoke
+      - name: All tests
+        run: uv run python run_tests.py all
       
       # Build distributions
       - name: Build distributions
