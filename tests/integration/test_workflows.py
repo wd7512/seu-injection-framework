@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import torch
 
-from fixtures.example_networks import get_example_network
+from ..fixtures.example_networks import get_example_network
 
 # Import from the new seu_injection package
 from seu_injection import SEUInjector as Injector
