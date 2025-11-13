@@ -113,13 +113,7 @@ def run_unit_tests():
         "uv",
         "run",
         "pytest",
-        "tests/test_bitflip.py",
-        "tests/test_bitflip_optimized.py",
-        "tests/test_bitflip_coverage.py",
-        "tests/test_criterion.py",
-        "tests/test_injector.py",
-        "tests/test_example_networks.py",
-        "tests/test_utils.py",
+        "tests/unit_tests/",
         "-v",
         "--tb=short",
     ]
@@ -182,7 +176,7 @@ def run_all_tests():
         # Removed: --cov=testing (directory no longer exists)
         "--cov-report=term-missing",
         "--cov-report=html:htmlcov",
-        "--cov-fail-under=50",  # TODO: Enforce 50% minimum per pipeline fix (currently achieving ~94%)
+        "--cov-fail-under=70",  # COVERAGE POLICY: Raised threshold to 70% per CI requirement (was 50%)
         "--tb=short",
     ]
     return run_command(cmd, "Complete test suite with coverage")

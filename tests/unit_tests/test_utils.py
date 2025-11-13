@@ -3,7 +3,8 @@ Basic tests for utils module to improve coverage.
 """
 
 import pytest
-from src.seu_injection.utils.device import detect_device, ensure_tensor
+
+from seu_injection.utils.device import detect_device, ensure_tensor
 
 
 class TestUtilsModule:
@@ -20,7 +21,7 @@ class TestUtilsModule:
 
     def test_utils_module_structure(self):
         """Test utils module structure."""
-        import src.seu_injection.utils as utils_module
+        import seu_injection.utils as utils_module
 
         # TODO TEST QUALITY: Weak assertion patterns reduce test value
         # ISSUE: Tests use trivial assertions that don't validate functionality

@@ -13,14 +13,15 @@ If you haven't installed the framework yet, see the [Installation Guide](install
 ## What You'll Build
 
 In this tutorial, you'll:
+
 1. Create a simple neural network
-2. Train it on a toy dataset
-3. Inject bit flips systematically
-4. Analyze robustness results
+1. Train it on a toy dataset
+1. Inject bit flips systematically
+1. Analyze robustness results
 
 **Time to complete:** ~10 minutes
 
----
+______________________________________________________________________
 
 ## Step 1: Setup and Imports (1 minute)
 
@@ -67,6 +68,7 @@ print(f"Test samples: {len(x_test)}")
 ```
 
 **Expected output:**
+
 ```
 Training samples: 700
 Test samples: 300
@@ -97,6 +99,7 @@ print(f"Model has {sum(p.numel() for p in model.parameters())} parameters")
 ```
 
 **Expected output:**
+
 ```
 Model has 33 parameters
 ```
@@ -135,6 +138,7 @@ with torch.no_grad():
 ```
 
 **Expected output:**
+
 ```
 Epoch 20/100, Loss: 0.3421
 Epoch 40/100, Loss: 0.1834
@@ -163,6 +167,7 @@ print(f"Baseline accuracy: {injector.baseline_score:.2%}")
 ```
 
 **Expected output:**
+
 ```
 Baseline accuracy: 95.33%
 ```
@@ -184,6 +189,7 @@ print(f"Max accuracy: {results['criterion_score'].max():.2%}")
 ```
 
 **Expected output:**
+
 ```
 Sign Bit Injection Results:
 Total parameters tested: 33
@@ -207,6 +213,7 @@ print(f"Min accuracy: {results_exp['criterion_score'].min():.2%}")
 ```
 
 **Expected output:**
+
 ```
 Exponent Bit Injection Results:
 Mean accuracy: 88.45%
@@ -267,6 +274,7 @@ print(f"Second layer impact: {results_layer1['criterion_score'].mean():.2%}")
 ```
 
 **Expected output:**
+
 ```
 First layer impact: 86.22%
 Second layer impact: 88.91%
@@ -365,6 +373,7 @@ print(f"Accuracy drop: {(injector.baseline_score - results['criterion_score'].me
 ## Next Steps
 
 Congratulations! 🎉 You've completed the quickstart tutorial. You now know how to:
+
 - ✅ Set up SEU injection experiments
 - ✅ Inject bit flips systematically
 - ✅ Analyze robustness across bit positions
@@ -374,12 +383,14 @@ Congratulations! 🎉 You've completed the quickstart tutorial. You now know how
 ### Continue Learning
 
 **Dive Deeper:**
+
 - 📖 [API Documentation](api/index.md) - Complete reference for all features
 - 📚 [Tutorials](tutorials/basic_usage.md) - Step-by-step guides for advanced topics
 - 🔬 [Example Notebooks](../Example_Attack_Notebook.ipynb) - Interactive Jupyter examples
 - 📊 [Research Examples](examples/notebooks/) - Real-world research applications
 
 **Advanced Topics:**
+
 - Stochastic sampling for large models
 - Batch processing with DataLoaders
 - GPU acceleration for faster experiments
@@ -387,6 +398,7 @@ Congratulations! 🎉 You've completed the quickstart tutorial. You now know how
 - Fault injection strategies for CNNs and RNNs
 
 **Research Applications:**
+
 - Study architectural robustness (skip connections, batch norm, etc.)
 - Develop radiation-hardened models
 - Benchmark fault tolerance across model families
@@ -395,6 +407,7 @@ Congratulations! 🎉 You've completed the quickstart tutorial. You now know how
 ### Common Use Cases
 
 **1. Quick Robustness Check**
+
 ```python
 # Test all critical bits quickly
 critical_bits = [0, 1, 2]  # Sign + top exponent bits
@@ -404,6 +417,7 @@ for bit in critical_bits:
 ```
 
 **2. Layer Vulnerability Analysis**
+
 ```python
 # Identify most vulnerable layer - check layer names first
 for layer_name, _ in model.named_parameters():
@@ -413,6 +427,7 @@ for layer_name, _ in model.named_parameters():
 ```
 
 **3. Comprehensive Robustness Profile**
+
 ```python
 # Test all bits (warning: time-consuming for large models)
 all_results = []
@@ -429,16 +444,20 @@ print(f"Most vulnerable bits: {vulnerable_bits}")
 ## Troubleshooting
 
 ### Issue: "No module named pytest" when running examples
+
 **Problem:** Missing development dependencies.
-**Solution:** 
+**Solution:**
+
 ```bash
 # Install all dependencies including testing tools
 uv sync --all-extras
 ```
 
 ### Issue: "No module named 'testing'" import errors
+
 **Problem:** Using older version without proper package structure.
 **Solution:**
+
 ```bash
 # Switch to the latest development branch
 git checkout ai_refactor
@@ -447,27 +466,34 @@ uv sync --all-extras
 ```
 
 ### Issue: Individual test files fail with coverage errors
+
 **Problem:** Coverage requirements too strict for single test files.
 **Solution:**
+
 ```bash
 # Run tests without coverage requirements
 uv run pytest tests/test_injector.py --no-cov
 ```
 
 ### Issue: Low baseline accuracy
+
 **Solution:** Train longer or adjust hyperparameters (learning rate, epochs, architecture).
 
 ### Issue: All SEUs show 0% accuracy
+
 **Problem:** Model might be too sensitive or criterion incorrect.
 **Solution:** Check that criterion matches task (classification vs regression), verify data format.
 
 ### Issue: SEU injection very slow
-**Solution:** 
+
+**Solution:**
+
 - Use GPU: `device='cuda'`
 - Use stochastic sampling: `injector.run_stochastic_seu(bit_i=31, p=0.01)`
 - Reduce test set size
 
 ### Issue: Results seem random
+
 **Solution:** Ensure model is in `eval()` mode, check baseline score is reasonable, verify data preprocessing.
 
 ## Getting Help
@@ -477,9 +503,9 @@ uv run pytest tests/test_injector.py --no-cov
 - 💬 **Discussions:** [GitHub Discussions](https://github.com/wd7512/seu-injection-framework/discussions)
 - 📧 **Contact:** See repository maintainers
 
----
+______________________________________________________________________
 
-**Last Updated:** November 2025  
-**Estimated Time:** 10-15 minutes  
-**Difficulty:** Beginner  
+**Last Updated:** November 2025\
+**Estimated Time:** 10-15 minutes\
+**Difficulty:** Beginner\
 **Version:** 1.1.1 (Distribution & packaging enhancements applied)
