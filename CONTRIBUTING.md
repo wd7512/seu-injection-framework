@@ -1,15 +1,12 @@
 # Contributing to SEU Injection Framework
 
-Thank you for your interest in contributing to the SEU Injection Framework! This project aims to provide robust, high-quality tools for Single Event Upset (SEU) injection in neural networks for harsh environment applications.
+Thank you for contributing to the SEU Injection Framework!
 
-## 🎯 Project Vision & Goals
+## 🎯 Project Goals
 
-The SEU Injection Framework serves the research community by providing:
-
-- **Production-grade tools** for systematic fault injection studies
-- **Reproducible research** with deterministic SEU injection
-- **Performance-optimized operations** for large-scale robustness analysis
-- **Community-driven development** with rigorous quality standards
+- Production-grade tools for systematic fault injection studies
+- Reproducible research with deterministic SEU injection
+- Performance-optimized operations for large-scale robustness analysis
 
 ## 📋 Quick Start for Contributors
 
@@ -50,52 +47,26 @@ The SEU Injection Framework serves the research community by providing:
 ### **Essential Development Commands**
 
 ```bash
-# Standard development workflow:
-uv sync --all-extras                       # Install dependencies
-uv run python run_tests.py smoke          # Quick validation (10 tests, ~30s)
-uv run python run_tests.py unit           # Unit tests (43 tests, ~2min)  
-uv run python run_tests.py integration    # Integration tests (7 tests, ~5min)
-uv run python run_tests.py all            # Full suite (109 tests, ~10s)
-uv run pytest --cov=src/seu_injection --cov-fail-under=70   # Coverage validation (94% achieved)
+# Development workflow:
+uv sync --all-extras                   # Install dependencies
+uv run python run_tests.py smoke       # Quick validation (30s)
+uv run python run_tests.py all         # Full suite (116 tests)
 
-# Code quality checks:
-uv run ruff check                          # Linting
-uv run ruff format                         # Code formatting
-uv run mypy src/seu_injection             # Type checking (future)
-
-# Performance testing:
-uv run python run_tests.py benchmarks     # Performance validation
-
-# Documentation generation:
-# API documentation is automatically generated from docstrings in src/seu_injection/
-# Ensure all public functions and classes have comprehensive docstrings
+# Code quality:
+uv run ruff check                      # Linting
+uv run ruff format                     # Code formatting
+uv run mypy src/seu_injection         # Type checking
 ```
 
-## 🧪 Quality Standards & Requirements
+## 🧪 Quality Requirements
 
-### Code Quality Gates
+All contributions must meet:
 
-All contributions must meet these **mandatory** requirements:
-
-#### **Testing Requirements**
-
-- ✅ **94% minimum test coverage** (current: 94%)
-- ✅ **All tests must pass** (109 tests, 2 skipped for CUDA)
-- ✅ **New features require corresponding tests** (unit + integration)
-- ✅ **Performance tests** for optimization-related changes
-
-#### **Code Quality Standards**
-
-- ✅ **Zero ruff violations** (`uv run ruff check src/ tests/`)
-- ✅ **Proper formatting** (`uv run ruff format src/ tests/`)
-- ✅ **Type hints** for all public APIs
-- ✅ **Comprehensive docstrings** for public methods
-
-#### **Security & Safety**
-
-- ✅ **Bandit security scan** passes (`uv run bandit -r src/seu_injection`)
-- ✅ **No critical security vulnerabilities**
-- ✅ **Input validation** for all public APIs
+- ✅ **94% test coverage** maintained
+- ✅ **All tests pass** (116 tests)
+- ✅ **Zero ruff violations**
+- ✅ **Type hints** for public APIs
+- ✅ **Docstrings** for public methods
 
 ### Running Quality Checks
 
@@ -122,13 +93,38 @@ The framework uses an embedded TODO system throughout the codebase to track impr
 
 ### TODO Format Standards
 
-```python
+````python
 # TODO CATEGORY: Brief description of issue
 # ISSUE: Detailed explanation of problem
 # IMPACT: Effect on users or performance
-# SOLUTION: Proposed fix or improvement
-# PRIORITY: HIGH/MEDIUM/LOW - indicates urgency
-```
+## 📊 TODO System
+
+The framework uses embedded TODOs to track improvements. See `docs/KNOWN_ISSUES.md` for details.
+
+Format:
+
+```python
+# TODO CATEGORY: Brief description
+# PRIORITY: HIGH/MEDIUM/LOW
+````
+
+## 🔄 Development Workflow
+
+### Branching Strategy
+
+- **`main`**: Stable, production-ready code
+- **Feature branches**: `feature/your-feature-name`
+- **Bug fixes**: `bugfix/issue-description`
+
+### Pull Request Process
+
+1. Create feature branch: `git checkout -b feature/your-feature-name`
+1. Implement changes following quality standards
+1. Test: `uv run python run_tests.py all`
+1. Update documentation if needed
+1. Submit pull request with clear description
+
+````
 
 ### TODO Categories
 
@@ -162,7 +158,7 @@ The framework uses an embedded TODO system throughout the codebase to track impr
 
    ```bash
    git checkout -b feature/your-feature-name
-   ```
+````
 
 1. **Implement your changes** following quality standards
 
@@ -203,183 +199,61 @@ perf(float32): optimize bit manipulation performance
 
 ## 🎓 Types of Contributions
 
-### 1. **Bug Reports & Fixes**
+1. **Bug Reports & Fixes** - Include minimal reproducible examples
+1. **New Features** - Discuss in issue first, maintain backward compatibility
+1. **Performance Optimizations** - Benchmark and document improvements
+1. **Research Contributions** - New methodologies, metrics, validation studies
+1. **Documentation** - API enhancements, tutorials, examples
 
-- Use the bug report issue template
-- Include minimal reproducible examples
-- Test on multiple platforms when possible
-- Provide performance impact assessment
+## 🔬 Research Contributions
 
-### 2. **New Features**
+Research contributions must be:
 
-- Discuss in feature request issue first
-- Maintain backward compatibility
-- Include comprehensive tests and documentation
-- Consider research community needs
+- **Reproducible** - Fully documented experimental design
+- **Validated** - Tested across multiple model architectures
+- **Cited** - Proper attribution to related work
 
-### 3. **Performance Optimizations**
-
-- Benchmark against current implementation
-- Document performance improvements quantitatively
-- Ensure accuracy is maintained
-- Add performance regression tests
-
-### 4. **Research Contributions**
-
-- New SEU injection methodologies
-- Novel robustness metrics
-- Integration with emerging ML frameworks
-- Validation studies and benchmarks
-
-### 5. **Documentation Improvements**
-
-- API documentation enhancements
-- Tutorial and example improvements
-- Research methodology documentation
-- Installation and setup guides
-
-## 🔬 Research Community Guidelines
-
-### Academic Standards
-
-- **Reproducibility**: All research contributions must be fully reproducible
-- **Methodology**: Clear documentation of experimental design and assumptions
-- **Validation**: Comprehensive testing across multiple model architectures
-- **Citation**: Proper attribution to related work and methodologies
-
-### Research Contribution Process
-
-1. **Proposal**: Create research issue with methodology overview
-1. **Implementation**: Follow development workflow with emphasis on reproducibility
-1. **Validation**: Comprehensive experiments with statistical significance testing
-1. **Documentation**: Detailed methodology documentation and usage examples
-1. **Review**: Peer review focusing on scientific rigor and practical applicability
-
-### Publication Guidelines
-
-If your contribution leads to academic publication:
-
-- Acknowledge the SEU Injection Framework and contributors
-- Share citation information for community benefit
-- Consider contributing benchmark results back to the project
+Publication guidelines: Acknowledge the framework and consider contributing benchmark results.
 
 ## 📊 Performance Expectations
 
-### Benchmarking Requirements
+Performance contributions must include quantitative benchmarks and memory analysis.
 
-All performance-related contributions must include:
+Targets:
 
-- **Quantitative benchmarks** with statistical significance testing
-- **Memory usage analysis** to prevent regressions
-- **Cross-platform validation** (Windows, macOS, Linux)
-- **GPU/CPU performance comparison** where applicable
+- Bitflip operations: \<1ms per operation
+- Memory overhead: \<2x baseline
+- Test suite: \<15 seconds
 
-### Performance Targets
+## 🛡️ Security
 
-- **Bitflip operations**: \<1ms per operation for typical neural networks
-- **Memory overhead**: \<2x baseline during injection campaigns
-- **Test suite**: Complete validation in \<15 seconds on modern hardware
-- **Import time**: Framework import \<2 seconds
+Report security vulnerabilities to wwdennis.home@gmail.com (not public issues). Response within 48 hours.
 
-## 🛡️ Security Considerations
+## 🤝 Community
 
-### Security Review Process
+Treat all community members with respect. Use GitHub Issues for bug reports, feature requests, and discussions.
 
-- All dependencies must be vetted for security vulnerabilities
-- Input validation required for all public APIs
-- No arbitrary code execution capabilities
-- Secure random number generation for stochastic operations
+## 🚀 Getting Started
 
-### Reporting Security Issues
+1. Set up development environment with UV
+1. Run test suite: `uv run python run_tests.py all`
+1. Choose a "good first issue"
+1. Submit pull request
 
-For security vulnerabilities:
+## 📚 Resources
 
-1. **Do not** create public GitHub issues
-1. **Email directly**: wwdennis.home@gmail.com
-1. **Include**: Detailed description and reproduction steps
-1. **Response**: We aim to respond within 48 hours
+- **README.md** - Project overview
+- **docs/** - Documentation and tutorials
+- **dev_docs/AI_AGENT_GUIDE.md** - For AI agents
 
-## 🤝 Community Standards
+## 📞 Support
 
-### Code of Conduct
+- Documentation: README.md and docs/
+- Issues: GitHub issues
+- Email: wwdennis.home@gmail.com
 
-We are committed to providing a welcoming and inclusive environment:
-
-- **Respect**: Treat all community members with respect and professionalism
-- **Collaboration**: Foster constructive discussion and knowledge sharing
-- **Inclusivity**: Welcome contributors from all backgrounds and experience levels
-- **Learning**: Support each other's growth and learning journey
-
-### Communication Channels
-
-- **GitHub Issues**: Bug reports, feature requests, research discussions
-- **Pull Request Reviews**: Code quality and technical discussions
-- **Research Applications**: Share your use cases and findings with the community
-
-## 🚀 Getting Started Checklist
-
-New contributors should:
-
-- [ ] Read through existing issues and pull requests
-- [ ] Set up development environment with UV
-- [ ] Run complete test suite successfully
-- [ ] Choose a "good first issue" or small bug fix
-- [ ] Follow the pull request process
-- [ ] Engage with code review feedback constructively
-
-## 📚 Additional Resources
-
-### Documentation
-
-- **README.md**: Project overview and quick start guide
-- **CHANGELOG.md**: Version history and notable changes
-- **docs/**: Comprehensive documentation and tutorials
-
-### Research Resources
-
-- **Research Paper**: Framework methodology and validation
-- **Example Notebooks**: Practical usage demonstrations
-- **Performance Benchmarks**: Baseline measurements and targets
-
-### Development Tools
-
-- **UV Package Manager**: Modern Python dependency management
-- **Ruff**: Fast Python linter and formatter
-- **pytest**: Testing framework with coverage reporting
-- **MyPy**: Static type checking for Python
-
-### AI Agent Development
-
-- **AI Agent Guide**: [`AI_AGENT_GUIDE.md`](AI_AGENT_GUIDE.md) - Comprehensive guidance for AI agents working on this codebase (includes critical restrictions and mandatory workflows)
-
-## 📞 Support & Questions
-
-### Getting Help
-
-- **Documentation**: Check README.md and docs/ first
-- **Issues**: Create GitHub issue with detailed description
-- **Research Questions**: Use research question issue template
-- **Email**: wwdennis.home@gmail.com for direct communication
-
-### Response Times
-
-- **Bug reports**: Within 48 hours for initial response
-- **Feature requests**: Within 1 week for initial feedback
-- **Pull requests**: Within 1 week for initial review
-- **Security issues**: Within 24 hours
+Response times: 48 hours for bugs, 1 week for features/PRs.
 
 ______________________________________________________________________
 
-## 🙏 Acknowledgments
-
-We appreciate all contributions to the SEU Injection Framework. Contributors are acknowledged in:
-
-- **CHANGELOG.md**: Notable contributions for each release
-- **GitHub Contributors**: Automatic recognition for merged pull requests
-- **Research Publications**: Co-authorship opportunities for significant research contributions
-
-Thank you for helping make neural networks more robust in harsh environments!
-
-______________________________________________________________________
-
-*This project maintains high standards to serve the research community effectively. We appreciate your commitment to quality and collaboration.*
+Thank you for contributing!
