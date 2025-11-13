@@ -196,8 +196,6 @@ def calculate_overhead(
     }
 
 
-
-
 def format_overhead_report(overhead_results: dict[str, Any]) -> str:
     """
     Format overhead analysis results as a readable report.

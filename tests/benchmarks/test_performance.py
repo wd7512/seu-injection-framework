@@ -242,10 +242,14 @@ class TestPerformanceBenchmarks:
 
         # Print results for visibility
         print("\nSEU Injection Overhead Metrics:")
-        print(f"  Baseline inference: {overhead_results['baseline']['avg_time_ms']:.3f} ms")
+        print(
+            f"  Baseline inference: {overhead_results['baseline']['avg_time_ms']:.3f} ms"
+        )
         print(f"  Overhead: {overhead_results['overhead_absolute_ms']:.3f} ms")
         print(f"  Relative overhead: {overhead_results['overhead_relative']:.1f}%")
-        print(f"  Injections performed: {overhead_results['injection']['num_injections']}")
+        print(
+            f"  Injections performed: {overhead_results['injection']['num_injections']}"
+        )
 
     def generate_performance_report(self, device) -> dict:
         """Generate a comprehensive performance report."""

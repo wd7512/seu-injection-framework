@@ -192,9 +192,9 @@ class TestCalculateOverhead:
 
         # Injection should take longer than baseline
         if results["injection"]["num_injections"] > 0:
-            assert (
-                results["overhead_absolute"] > 0
-            ), "Overhead should be positive (injection is slower)"
+            assert results["overhead_absolute"] > 0, (
+                "Overhead should be positive (injection is slower)"
+            )
 
     def test_different_bit_positions(self, simple_model, injector):
         """Test overhead calculation with different bit positions."""

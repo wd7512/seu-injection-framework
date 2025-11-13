@@ -153,7 +153,8 @@ def save_results_json(results, filename="overhead_results.json"):
         "framework_version": "1.1.9",
         "networks": results,
         "summary": {
-            "avg_overhead_percent": sum(r["overhead_percent"] for r in results) / len(results),
+            "avg_overhead_percent": sum(r["overhead_percent"] for r in results)
+            / len(results),
             "total_injections": sum(r["num_injections"] for r in results),
         },
     }
@@ -212,7 +213,9 @@ def main():
     print("\n\n" + "=" * 60)
     print("SUMMARY: OVERHEAD COMPARISON ACROSS ARCHITECTURES")
     print("=" * 60)
-    print(f"\n{'Architecture':<35} {'Params':>10} {'Base (ms)':>12} {'Overhead':>12} {'% Overhead':>12}")
+    print(
+        f"\n{'Architecture':<35} {'Params':>10} {'Base (ms)':>12} {'Overhead':>12} {'% Overhead':>12}"
+    )
     print("-" * 85)
 
     for r in results:
@@ -231,16 +234,24 @@ def main():
     max_overhead = max(results, key=lambda x: x["overhead_percent"])
 
     print(f"Average overhead across networks: {avg_overhead:.1f}%")
-    print(f"Lowest overhead: {min_overhead['name']} ({min_overhead['overhead_percent']:.1f}%)")
-    print(f"Highest overhead: {max_overhead['name']} ({max_overhead['overhead_percent']:.1f}%)")
-    print(f"\nTotal SEU injections performed: {sum(r['num_injections'] for r in results):,}")
+    print(
+        f"Lowest overhead: {min_overhead['name']} ({min_overhead['overhead_percent']:.1f}%)"
+    )
+    print(
+        f"Highest overhead: {max_overhead['name']} ({max_overhead['overhead_percent']:.1f}%)"
+    )
+    print(
+        f"\nTotal SEU injections performed: {sum(r['num_injections'] for r in results):,}"
+    )
 
     print("\nINTERPRETATION:")
     print("-" * 60)
     print("The overhead represents the additional time required for SEU injection")
     print("compared to normal inference. This includes parameter backup, bit flipping,")
     print("model evaluation, and parameter restoration.")
-    print(f"\nFor the tested networks, SEU injection adds approximately {avg_overhead:.0f}% overhead.")
+    print(
+        f"\nFor the tested networks, SEU injection adds approximately {avg_overhead:.0f}% overhead."
+    )
     print("This is the price of comprehensive fault tolerance analysis.")
 
     # Save results
@@ -250,7 +261,13 @@ def main():
     # Save individual reports for each network
     for r in results:
         if "report" in r:
-            safe_name = r["name"].replace("→", "_").replace(" ", "_").replace("(", "").replace(")", "")
+            safe_name = (
+                r["name"]
+                .replace("→", "_")
+                .replace(" ", "_")
+                .replace("(", "")
+                .replace(")", "")
+            )
             save_report_text(r["report"], f"overhead_report_{safe_name}.txt")
 
     print("\n" + "=" * 60)
