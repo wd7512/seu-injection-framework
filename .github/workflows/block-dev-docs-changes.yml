@@ -1,0 +1,30 @@
+name: Block dev_docs changes on PR to main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-dev-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code with full history
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base branch
+        run: git fetch origin main
+
+      - name: Check for changes in dev_docs/
+        run: |
+          files_changed=$(git diff --name-only origin/main...HEAD)
+          echo "Changed files:"
+          echo "$files_changed"
+
+          if echo "$files_changed" | grep -q "^dev_docs/"; then
+            echo "::error ::Changes to dev_docs/ are not allowed in PRs targeting main."
+            exit 1
+          fi
