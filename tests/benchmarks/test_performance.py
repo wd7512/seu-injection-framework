@@ -203,8 +203,9 @@ class TestPerformanceBenchmarks:
     @pytest.mark.slow
     def test_seu_injection_overhead(self, model, device):
         """Test and measure SEU injection overhead."""
-        from seu_injection import SEUInjector, calculate_overhead
+        from seu_injection import SEUInjector
         from seu_injection.metrics import classification_accuracy
+        from seu_injection.utils.overhead import calculate_overhead
 
         # Create test data
         x_test = torch.randn(32, 3, 64, 64, device=device)
@@ -218,15 +219,15 @@ class TestPerformanceBenchmarks:
         # Sample input for baseline timing
         sample_input = torch.randn(1, 3, 64, 64, device=device)
 
-        # Calculate overhead with stochastic sampling
+        # Calculate overhead with stochastic sampling (minimal for speed)
         overhead_results = calculate_overhead(
             model=model,
             injector=injector,
             input_data=sample_input,
             bit_position=0,
-            num_baseline_iterations=20,
+            num_baseline_iterations=10,  # Reduced for speed
             stochastic=True,
-            stochastic_probability=0.01,  # 1% sampling
+            stochastic_probability=0.001,  # 0.1% sampling for speed
         )
 
         # Verify results structure

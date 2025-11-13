@@ -196,6 +196,7 @@ cython_debug/
 # Overhead calculation results
 overhead_results.json
 overhead_results.csv
+overhead_report*.txt
 
 # Cursor
 #  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to

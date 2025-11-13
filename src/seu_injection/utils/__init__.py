@@ -10,7 +10,6 @@ from .device import detect_device, ensure_tensor
 
 # Import overhead calculation utilities
 from .overhead import (
-    benchmark_multiple_networks,
     calculate_overhead,
     format_overhead_report,
     measure_inference_time,
@@ -23,6 +22,5 @@ __all__ = [
     "measure_inference_time",
     "measure_seu_injection_time",
     "calculate_overhead",
-    "benchmark_multiple_networks",
     "format_overhead_report",
 ]

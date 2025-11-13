@@ -196,69 +196,6 @@ def calculate_overhead(
     }
 
 
-def benchmark_multiple_networks(
-    networks: list[tuple[str, nn.Module, torch.Tensor]],
-    criterion: Callable,
-    x_test: torch.Tensor,
-    y_test: torch.Tensor,
-    bit_position: int = 0,
-    num_baseline_iterations: int = 100,
-    device: Optional[torch.device] = None,
-) -> dict[str, dict[str, Any]]:
-    """
-    Benchmark overhead across multiple network architectures.
-
-    Args:
-        networks: List of (name, model, sample_input) tuples
-        criterion: Criterion function for SEUInjector
-        x_test: Test data for criterion evaluation
-        y_test: Test labels for criterion evaluation
-        bit_position: Bit position for SEU injection
-        num_baseline_iterations: Number of iterations for baseline timing
-        device: Device to use for computation
-
-    Returns:
-        Dictionary mapping network names to their overhead analysis results
-    """
-    from ..core.injector import SEUInjector
-
-    if device is None:
-        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-    results = {}
-
-    for name, model, sample_input in networks:
-        print(f"\nBenchmarking {name}...")
-
-        # Move model and data to device
-        model = model.to(device)
-        sample_input = sample_input.to(device)
-        x_test_dev = x_test.to(device) if isinstance(x_test, torch.Tensor) else x_test
-        y_test_dev = y_test.to(device) if isinstance(y_test, torch.Tensor) else y_test
-
-        # Create injector
-        injector = SEUInjector(
-            trained_model=model,
-            criterion=criterion,
-            x=x_test_dev,
-            y=y_test_dev,
-            device=device,
-        )
-
-        # Calculate overhead using stochastic sampling for efficiency
-        overhead_results = calculate_overhead(
-            model=model,
-            injector=injector,
-            input_data=sample_input,
-            bit_position=bit_position,
-            num_baseline_iterations=num_baseline_iterations,
-            stochastic=True,
-            stochastic_probability=0.01,  # 1% sampling
-        )
-
-        results[name] = overhead_results
-
-    return results
 
 
 def format_overhead_report(overhead_results: dict[str, Any]) -> str:

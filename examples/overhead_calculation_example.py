@@ -131,7 +131,8 @@ def measure_network_overhead(name, model, x_test, y_test):
         stochastic_probability=0.01,
     )
 
-    print("\n" + format_overhead_report(overhead_results))
+    report = format_overhead_report(overhead_results)
+    print("\n" + report)
 
     return {
         "name": name,
@@ -141,6 +142,7 @@ def measure_network_overhead(name, model, x_test, y_test):
         "overhead_percent": overhead_results["overhead_relative"],
         "num_injections": overhead_results["injection"]["num_injections"],
         "baseline_accuracy": injector.baseline_score,
+        "report": report,
     }
 
 
@@ -171,6 +173,13 @@ def save_results_csv(results, filename="overhead_results.csv"):
         writer.writeheader()
         writer.writerows(results)
     print(f"Results saved to {filename}")
+
+
+def save_report_text(report_text, filename="overhead_report.txt"):
+    """Save formatted report to text file."""
+    with open(filename, "w") as f:
+        f.write(report_text)
+    print(f"Report saved to {filename}")
 
 
 def main():
@@ -237,6 +246,12 @@ def main():
     # Save results
     save_results_json(results)
     save_results_csv(results)
+
+    # Save individual reports for each network
+    for r in results:
+        if "report" in r:
+            safe_name = r["name"].replace("→", "_").replace(" ", "_").replace("(", "").replace(")", "")
+            save_report_text(r["report"], f"overhead_report_{safe_name}.txt")
 
     print("\n" + "=" * 60)
     print("ANALYSIS COMPLETE")
