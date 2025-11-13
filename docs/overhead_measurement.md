@@ -5,12 +5,14 @@ This guide explains how to measure and analyze the performance overhead of SEU i
 ## Overview
 
 When using the SEU injection framework, there's a computational cost associated with:
+
 - Backing up parameter values
 - Performing bit-flip operations
 - Running model evaluation after each injection
 - Restoring original parameter values
 
 Understanding this overhead helps you:
+
 - Plan computational resources for large-scale studies
 - Choose between systematic vs. stochastic injection strategies
 - Estimate time requirements for different network architectures
@@ -76,6 +78,7 @@ print(report)
 ```
 
 Output:
+
 ```
 ============================================================
 SEU INJECTION OVERHEAD ANALYSIS
@@ -129,17 +132,20 @@ for name, overhead in results.items():
 ## Understanding the Metrics
 
 ### Baseline Metrics
+
 - `avg_time`: Average time per inference (seconds)
 - `avg_time_ms`: Average time per inference (milliseconds)
 - `total_time`: Total time for all iterations (seconds)
 - `throughput`: Inferences per second
 
 ### Injection Metrics
+
 - `num_injections`: Total number of bit flips performed
 - `avg_time_per_injection`: Average time per injection (seconds)
 - `total_time`: Total time for injection campaign (seconds)
 
 ### Overhead Metrics
+
 - `overhead_absolute`: Extra time per injection compared to baseline (seconds)
 - `overhead_relative`: Percentage increase over baseline
 - `throughput_with_injection`: Effective injection throughput (injections/sec)
@@ -197,11 +203,11 @@ injector = SEUInjector(
 Based on benchmarks with small-to-medium networks:
 
 | Network Type | Parameters | Overhead | Time per Injection |
-|--------------|------------|----------|-------------------|
-| Small MLP    | 641        | ~4000%   | ~1.3 ms          |
-| Medium MLP   | 2,817      | ~3200%   | ~1.4 ms          |
-| Large MLP    | 11,265     | ~2800%   | ~1.5 ms          |
-| Small CNN    | ~50K       | ~2700%   | ~40 ms           |
+| ------------ | ---------- | -------- | ------------------ |
+| Small MLP    | 641        | ~4000%   | ~1.3 ms            |
+| Medium MLP   | 2,817      | ~3200%   | ~1.4 ms            |
+| Large MLP    | 11,265     | ~2800%   | ~1.5 ms            |
+| Small CNN    | ~50K       | ~2700%   | ~40 ms             |
 
 Note: Overhead percentage is high because baseline inference is very fast (microseconds).
 The absolute overhead time is what matters for planning large studies.
@@ -209,10 +215,10 @@ The absolute overhead time is what matters for planning large studies.
 ## Best Practices
 
 1. **Always measure first**: Overhead varies significantly with network architecture
-2. **Use appropriate sampling**: For >10M parameters, use stochastic with p<0.01
-3. **Consider batch processing**: Larger batch sizes reduce per-sample overhead
-4. **Profile before large runs**: Test with small subset first to estimate total time
-5. **Use GPU when available**: Can provide 10-100× speedup for large models
+1. **Use appropriate sampling**: For >10M parameters, use stochastic with p\<0.01
+1. **Consider batch processing**: Larger batch sizes reduce per-sample overhead
+1. **Profile before large runs**: Test with small subset first to estimate total time
+1. **Use GPU when available**: Can provide 10-100× speedup for large models
 
 ## Example: Estimating Study Duration
 
