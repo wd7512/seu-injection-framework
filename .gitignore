@@ -1,6 +1,3 @@
-Research/Data/
-Research/model_weights.pth
-
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

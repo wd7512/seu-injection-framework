@@ -1,5 +1,0 @@
-# Keep .gitignore branch-local (so main and dev can have different rules)
-.gitignore merge=ours
-
-# If dev_docs exist in both branches, prefer the current branch's version
-dev_docs/* merge=ours
