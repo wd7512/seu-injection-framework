@@ -4,15 +4,20 @@ SEU Injection Overhead Calculation Example
 
 This script demonstrates how to measure the performance overhead of SEU injection
 operations compared to baseline inference. It tests several small network architectures
-and generates a comprehensive overhead report.
+and generates overhead reports in JSON/CSV format.
 
 Usage:
     python overhead_calculation_example.py
 
 Output:
-    - Console output with overhead metrics for each network
-    - Summary report comparing overhead across architectures
+    - Console output with overhead metrics
+    - overhead_results.json (structured results)
+    - overhead_results.csv (tabular results)
 """
+
+import csv
+import json
+from datetime import datetime
 
 import torch
 import torch.nn as nn
@@ -21,85 +26,58 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # SEU Injection Framework imports
-from seu_injection import (
-    SEUInjector,
+from seu_injection import SEUInjector
+from seu_injection.metrics import classification_accuracy
+from seu_injection.utils.overhead import (
     calculate_overhead,
     format_overhead_report,
     measure_inference_time,
 )
-from seu_injection.metrics import classification_accuracy
 
 
-def create_small_mlp():
-    """Create a small Multi-Layer Perceptron."""
-    return nn.Sequential(
-        nn.Linear(2, 32),
-        nn.ReLU(),
-        nn.Linear(32, 16),
-        nn.ReLU(),
-        nn.Linear(16, 1),
-        nn.Sigmoid(),
-    )
+def create_mlp(layer_sizes):
+    """
+    Create a Multi-Layer Perceptron with specified layer sizes.
 
+    Args:
+        layer_sizes: List of layer sizes, e.g., [2, 32, 16, 1]
 
-def create_medium_mlp():
-    """Create a medium Multi-Layer Perceptron."""
-    return nn.Sequential(
-        nn.Linear(2, 64),
-        nn.ReLU(),
-        nn.Linear(64, 32),
-        nn.ReLU(),
-        nn.Linear(32, 16),
-        nn.ReLU(),
-        nn.Linear(16, 1),
-        nn.Sigmoid(),
-    )
-
-
-def create_large_mlp():
-    """Create a larger Multi-Layer Perceptron."""
-    return nn.Sequential(
-        nn.Linear(2, 128),
-        nn.ReLU(),
-        nn.Linear(128, 64),
-        nn.ReLU(),
-        nn.Linear(64, 32),
-        nn.ReLU(),
-        nn.Linear(32, 16),
-        nn.ReLU(),
-        nn.Linear(16, 1),
-        nn.Sigmoid(),
-    )
+    Returns:
+        Sequential model with ReLU activations and final Sigmoid
+    """
+    layers = []
+    for i in range(len(layer_sizes) - 1):
+        layers.append(nn.Linear(layer_sizes[i], layer_sizes[i + 1]))
+        if i < len(layer_sizes) - 2:  # ReLU for hidden layers
+            layers.append(nn.ReLU())
+        else:  # Sigmoid for output
+            layers.append(nn.Sigmoid())
+    return nn.Sequential(*layers)
 
 
 def prepare_data():
     """Prepare training and test data."""
     print("Preparing dataset...")
-
-    # Generate moon-shaped data for binary classification
     X, y = make_moons(n_samples=1000, noise=0.2, random_state=42)
-
-    # Normalize features
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
-    # Split data
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.3, random_state=42, stratify=y
     )
 
-    # Convert to PyTorch tensors
+    X_train = torch.tensor(X_train, dtype=torch.float32)
     X_test = torch.tensor(X_test, dtype=torch.float32)
+    y_train = torch.tensor(y_train, dtype=torch.float32).unsqueeze(1)
     y_test = torch.tensor(y_test, dtype=torch.float32).unsqueeze(1)
 
     print(f"Dataset ready: {len(X_test)} test samples")
-    return X_test, y_test
+    return X_train, X_test, y_train, y_test
 
 
-def train_model(model, x_train, y_train, epochs=50):
+def train_model(model, x_train, y_train, epochs=30):
     """Quickly train a model for demonstration."""
     print("Training model...")
-
     criterion = nn.BCELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
 
@@ -116,19 +94,15 @@ def train_model(model, x_train, y_train, epochs=50):
     return model
 
 
-def measure_network_overhead(
-    name: str, model: nn.Module, x_test: torch.Tensor, y_test: torch.Tensor
-):
+def measure_network_overhead(name, model, x_test, y_test):
     """Measure overhead for a single network architecture."""
     print(f"\n{'=' * 60}")
     print(f"ANALYZING: {name}")
     print(f"{'=' * 60}")
 
-    # Count parameters
     num_params = sum(p.numel() for p in model.parameters())
     print(f"Total parameters: {num_params:,}")
 
-    # Create a sample input for baseline timing
     sample_input = torch.randn(1, 2)
 
     # Measure baseline inference time
@@ -136,9 +110,7 @@ def measure_network_overhead(
     baseline_metrics = measure_inference_time(
         model=model, input_data=sample_input, num_iterations=100
     )
-    print(
-        f"Baseline inference: {baseline_metrics['avg_time_ms']:.3f} ms per inference"
-    )
+    print(f"Baseline inference: {baseline_metrics['avg_time_ms']:.3f} ms per inference")
 
     # Create SEU injector
     print("\nInitializing SEU injector...")
@@ -147,19 +119,18 @@ def measure_network_overhead(
     )
     print(f"Baseline accuracy: {injector.baseline_score:.2%}")
 
-    # Calculate overhead with stochastic sampling for efficiency
+    # Calculate overhead with stochastic sampling
     print("\nCalculating SEU injection overhead (using 1% stochastic sampling)...")
     overhead_results = calculate_overhead(
         model=model,
         injector=injector,
         input_data=sample_input,
-        bit_position=0,  # Sign bit
+        bit_position=0,
         num_baseline_iterations=100,
         stochastic=True,
-        stochastic_probability=0.01,  # 1% sampling
+        stochastic_probability=0.01,
     )
 
-    # Print detailed report
     print("\n" + format_overhead_report(overhead_results))
 
     return {
@@ -169,7 +140,37 @@ def measure_network_overhead(
         "overhead_ms": overhead_results["overhead_absolute_ms"],
         "overhead_percent": overhead_results["overhead_relative"],
         "num_injections": overhead_results["injection"]["num_injections"],
+        "baseline_accuracy": injector.baseline_score,
     }
+
+
+def save_results_json(results, filename="overhead_results.json"):
+    """Save results to JSON file."""
+    output = {
+        "timestamp": datetime.now().isoformat(),
+        "framework_version": "1.1.9",
+        "networks": results,
+        "summary": {
+            "avg_overhead_percent": sum(r["overhead_percent"] for r in results) / len(results),
+            "total_injections": sum(r["num_injections"] for r in results),
+        },
+    }
+
+    with open(filename, "w") as f:
+        json.dump(output, f, indent=2)
+    print(f"\nResults saved to {filename}")
+
+
+def save_results_csv(results, filename="overhead_results.csv"):
+    """Save results to CSV file."""
+    if not results:
+        return
+
+    with open(filename, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=results[0].keys())
+        writer.writeheader()
+        writer.writerows(results)
+    print(f"Results saved to {filename}")
 
 
 def main():
@@ -177,44 +178,32 @@ def main():
     print("=" * 60)
     print("SEU INJECTION OVERHEAD CALCULATION")
     print("=" * 60)
-    print("\nThis example demonstrates how to measure the performance overhead")
-    print("of SEU injection operations on different network architectures.\n")
+    print("\nMeasuring performance overhead of SEU injection operations.\n")
 
     # Prepare data
-    x_test, y_test = prepare_data()
+    X_train, X_test, y_train, y_test = prepare_data()
 
-    # For quick training, we'll use a subset for training
-    X, y = make_moons(n_samples=500, noise=0.2, random_state=42)
-    scaler = StandardScaler()
-    X = scaler.fit_transform(X)
-    X_train = torch.tensor(X, dtype=torch.float32)
-    y_train = torch.tensor(y, dtype=torch.float32).unsqueeze(1)
-
-    # Test different network architectures
-    networks = [
-        ("Small MLP (2→32→16→1)", create_small_mlp()),
-        ("Medium MLP (2→64→32→16→1)", create_medium_mlp()),
-        ("Large MLP (2→128→64→32→16→1)", create_large_mlp()),
+    # Define network architectures using layer sizes
+    network_configs = [
+        ("Small MLP (2→32→16→1)", [2, 32, 16, 1]),
+        ("Medium MLP (2→64→32→16→1)", [2, 64, 32, 16, 1]),
+        ("Large MLP (2→128→64→32→16→1)", [2, 128, 64, 32, 16, 1]),
     ]
 
     results = []
 
-    for name, model in networks:
-        # Train the model
+    for name, layer_sizes in network_configs:
         print(f"\n\nPreparing {name}...")
-        model = train_model(model, X_train, y_train, epochs=30)
-
-        # Measure overhead
-        result = measure_network_overhead(name, model, x_test, y_test)
+        model = create_mlp(layer_sizes)
+        model = train_model(model, X_train, y_train)
+        result = measure_network_overhead(name, model, X_test, y_test)
         results.append(result)
 
-    # Print summary comparison
+    # Print summary
     print("\n\n" + "=" * 60)
     print("SUMMARY: OVERHEAD COMPARISON ACROSS ARCHITECTURES")
     print("=" * 60)
-    print(
-        f"\n{'Architecture':<35} {'Params':>10} {'Base (ms)':>12} {'Overhead':>12} {'% Overhead':>12}"
-    )
+    print(f"\n{'Architecture':<35} {'Params':>10} {'Base (ms)':>12} {'Overhead':>12} {'% Overhead':>12}")
     print("-" * 85)
 
     for r in results:
@@ -228,35 +217,26 @@ def main():
     print("KEY FINDINGS:")
     print("-" * 60)
 
-    # Calculate some statistics
     avg_overhead = sum(r["overhead_percent"] for r in results) / len(results)
     min_overhead = min(results, key=lambda x: x["overhead_percent"])
     max_overhead = max(results, key=lambda x: x["overhead_percent"])
 
     print(f"Average overhead across networks: {avg_overhead:.1f}%")
-    print(
-        f"Lowest overhead: {min_overhead['name']} ({min_overhead['overhead_percent']:.1f}%)"
-    )
-    print(
-        f"Highest overhead: {max_overhead['name']} ({max_overhead['overhead_percent']:.1f}%)"
-    )
-
-    total_injections = sum(r["num_injections"] for r in results)
-    print(f"\nTotal SEU injections performed: {total_injections:,}")
+    print(f"Lowest overhead: {min_overhead['name']} ({min_overhead['overhead_percent']:.1f}%)")
+    print(f"Highest overhead: {max_overhead['name']} ({max_overhead['overhead_percent']:.1f}%)")
+    print(f"\nTotal SEU injections performed: {sum(r['num_injections'] for r in results):,}")
 
     print("\nINTERPRETATION:")
     print("-" * 60)
-    print(
-        "The overhead represents the additional time required for SEU injection"
-    )
-    print(
-        "compared to normal inference. This includes parameter backup, bit flipping,"
-    )
+    print("The overhead represents the additional time required for SEU injection")
+    print("compared to normal inference. This includes parameter backup, bit flipping,")
     print("model evaluation, and parameter restoration.")
-    print(
-        f"\nFor the tested networks, SEU injection adds approximately {avg_overhead:.0f}% overhead."
-    )
+    print(f"\nFor the tested networks, SEU injection adds approximately {avg_overhead:.0f}% overhead.")
     print("This is the price of comprehensive fault tolerance analysis.")
+
+    # Save results
+    save_results_json(results)
+    save_results_csv(results)
 
     print("\n" + "=" * 60)
     print("ANALYSIS COMPLETE")

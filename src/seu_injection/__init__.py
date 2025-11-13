@@ -21,7 +21,6 @@ This package provides tools for:
 - Systematic SEU injection in PyTorch models
 - Performance evaluation under radiation-induced bit flips
 - Analysis of neural network robustness in space and nuclear environments
-- Performance overhead measurement and benchmarking
 
 Basic Usage:
     >>> from seu_injection import SEUInjector
@@ -50,15 +49,6 @@ from .core.injector import SEUInjector
 from .core.injector import SEUInjector as Injector  # Short alias
 from .metrics.accuracy import classification_accuracy, classification_accuracy_loader
 
-# Overhead calculation utilities
-from .utils.overhead import (
-    benchmark_multiple_networks,
-    calculate_overhead,
-    format_overhead_report,
-    measure_inference_time,
-    measure_seu_injection_time,
-)
-
 __all__ = [
     # Core classes
     "SEUInjector",
@@ -68,12 +58,6 @@ __all__ = [
     "classification_accuracy_loader",
     # Bitflip operations
     "bitflip_float32",
-    # Overhead calculation utilities
-    "measure_inference_time",
-    "measure_seu_injection_time",
-    "calculate_overhead",
-    "benchmark_multiple_networks",
-    "format_overhead_report",
     # Package metadata
     "__version__",
     "__author__",
