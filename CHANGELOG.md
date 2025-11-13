@@ -5,6 +5,15 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.9] - 2025-11-13
+
+*Pipeline overhaul*
+
+- **Consolidated github actions**: two `python-tests.yml` and `pylint.yml` deleted and `ci.yml` has three test levels
+- **mdformat added**: mdformat added to ensure consistent `.md` style, similar to ruff for `.py` files
+- **Unit tests folder created**: unit tests moved to their own folder and coverage changed to 50% globally
+- **Shipsnet folder created**: with readme added
+
 ## [1.1.8] - 2025-11-11
 
 - **Branching Rework**: `dev` branch created and most older branches removed
