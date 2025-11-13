@@ -6,7 +6,7 @@ introduced by SEU injection operations compared to baseline inference.
 """
 
 import time
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import Any, Callable, Optional
 
 import torch
 import torch.nn as nn
@@ -18,7 +18,7 @@ def measure_inference_time(
     num_iterations: int = 100,
     warmup_iterations: int = 10,
     device: Optional[torch.device] = None,
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Measure baseline inference time for a model without SEU injection.
 
@@ -74,7 +74,7 @@ def measure_seu_injection_time(
     layer_name: Optional[str] = None,
     stochastic: bool = False,
     stochastic_probability: float = 0.01,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Measure time taken for SEU injection operations.
 
@@ -126,7 +126,7 @@ def calculate_overhead(
     layer_name: Optional[str] = None,
     stochastic: bool = False,
     stochastic_probability: float = 0.01,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Calculate the overhead of SEU injection compared to baseline inference.
 
@@ -197,14 +197,14 @@ def calculate_overhead(
 
 
 def benchmark_multiple_networks(
-    networks: List[Tuple[str, nn.Module, torch.Tensor]],
+    networks: list[tuple[str, nn.Module, torch.Tensor]],
     criterion: Callable,
     x_test: torch.Tensor,
     y_test: torch.Tensor,
     bit_position: int = 0,
     num_baseline_iterations: int = 100,
     device: Optional[torch.device] = None,
-) -> Dict[str, Dict[str, Any]]:
+) -> dict[str, dict[str, Any]]:
     """
     Benchmark overhead across multiple network architectures.
 
@@ -261,7 +261,7 @@ def benchmark_multiple_networks(
     return results
 
 
-def format_overhead_report(overhead_results: Dict[str, Any]) -> str:
+def format_overhead_report(overhead_results: dict[str, Any]) -> str:
     """
     Format overhead analysis results as a readable report.
 
