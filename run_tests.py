@@ -182,7 +182,7 @@ def run_all_tests():
         # Removed: --cov=testing (directory no longer exists)
         "--cov-report=term-missing",
         "--cov-report=html:htmlcov",
-        "--cov-fail-under=50",  # TODO: Enforce 50% minimum per pipeline fix (currently achieving ~94%)
+        "--cov-fail-under=70",  # COVERAGE POLICY: Raised threshold to 70% per CI requirement (was 50%)
         "--tb=short",
     ]
     return run_command(cmd, "Complete test suite with coverage")

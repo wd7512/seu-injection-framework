@@ -2,47 +2,21 @@ name: CI
 
 on:
   push:
-    branches: [ main , dev]
+    branches: ['**']
   pull_request:
-    branches: [ main , dev]
+    branches: ['**']
+
+concurrency:
+  group: ci-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
 
 jobs:
-
-  test:
-    name: Tests (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
-
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: latest
-      - name: Sync dependencies (dev extra)
-        run: uv sync --extra dev --frozen
-      - name: Run tests with coverage
-        run: uv run pytest tests/ -v --cov=src/seu_injection --cov-report=term --cov-fail-under=50
-      - name: Upload coverage HTML (only latest Python)
-        if: matrix.python-version == '3.11'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-html
-          path: htmlcov
-
-  lint:
-    name: Lint & Type Check
+  code_quality:
+    name: Lint / Type / Mdformat
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
+      - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
@@ -50,11 +24,128 @@ jobs:
         uses: astral-sh/setup-uv@v3
         with:
           version: latest
-      - name: Sync dev dependencies
+      - name: Cache virtual env
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: ${{ runner.os }}-uv-
+      - name: Sync dev deps
         run: uv sync --extra dev --frozen
       - name: Ruff lint
         run: uv run ruff check src tests
-      - name: Mypy (loose)
+      - name: Ruff format check
+        run: uv run ruff format src tests --check
+      - name: Mypy
         run: uv run mypy src/seu_injection --ignore-missing-imports
-      - name: Security scan (bandit)
-        run: uv run bandit -r src/seu_injection -ll -q || echo "Bandit issues found (non-blocking)"
+      - name: Markdown formatting
+        run: uv run mdformat .
+
+  unit_minimal:
+    name: Unit (minimal matrix w/ coverage collection)
+    if: ${{ !(github.ref == 'refs/heads/main') && !(github.ref == 'refs/heads/dev') && !((github.event_name == 'pull_request') && (github.base_ref == 'main' || github.base_ref == 'dev')) }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.11']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: latest
+      - name: Cache virtual env
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: unit-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: unit-${{ runner.os }}-
+      - name: Sync dev deps
+        run: uv sync --extra dev --frozen
+      - name: Unit tests (with coverage, no threshold)
+        run: uv run pytest tests/ -k "not integration" -v --cov=src/seu_injection --cov-report=term-missing
+
+  dev_tests:
+    name: Dev branch smoke + unit (middle matrix)
+    if: ${{ github.ref == 'refs/heads/dev' || github.base_ref == 'dev' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ['3.11','3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: latest
+      - name: Cache virtual env
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: dev-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: dev-${{ runner.os }}-
+      - name: Sync dev deps
+        run: uv sync --extra dev --frozen
+      - name: Smoke tests
+        run: uv run python run_tests.py smoke
+      - name: Unit tests (coverage, no threshold)
+        run: uv run python run_tests.py unit
+      - name: Coverage report (aggregate)
+        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
+        run: uv run pytest tests/ --cov=src/seu_injection --cov-report=xml --cov-report=term-missing || true
+      - name: Upload coverage xml (informational)
+        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: dev-coverage
+          path: coverage.xml
+
+  full_tests:
+    name: Full test suite (main branch)
+    if: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10','3.11','3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: latest
+      - name: Cache virtual env
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: full-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: full-${{ runner.os }}-
+      - name: Sync dev deps
+        run: uv sync --extra dev --frozen
+      - name: Full test suite (enforced coverage 70%)
+        run: uv run python run_tests.py all
+      - name: Upload HTML coverage (python 3.11 ubuntu only)
+        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov
+
+  # Summary / gating stage can be added here if needed to aggregate statuses.
