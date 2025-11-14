@@ -45,19 +45,19 @@ def measure_baseline(model, input_data, iterations=50):
         for _ in range(5):
             _ = model(input_data)
 
-    start = time.time()
+    start = time.perf_counter()
     with torch.no_grad():
         for _ in range(iterations):
             _ = model(input_data)
-    total_time = time.time() - start
+    total_time = time.perf_counter() - start
     return total_time / iterations
 
 
-def measure_injection(injector, bit_position=0, probability=0.01):
+def measure_injection(injector, bit_position=0, probability=0.05):
     """Measure SEU injection time."""
-    start = time.time()
+    start = time.perf_counter()
     results = injector.run_stochastic_seu(bit_i=bit_position, p=probability)
-    total_time = time.time() - start
+    total_time = time.perf_counter() - start
     num_injections = len(results["criterion_score"])
     return total_time, num_injections
 

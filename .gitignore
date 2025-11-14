@@ -1,3 +1,9 @@
+# Overhead measurement results
+overhead_results.csv
+overhead_results.json
+
+##### ----- default ignores ----- ######
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -193,13 +199,10 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Overhead measurement results
-tests/overhead/overhead_results.json
-tests/overhead/overhead_results.csv
-
 # Cursor
 #  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
 #  exclude from AI features like autocomplete and code analysis. Recommended for sensitive data
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
