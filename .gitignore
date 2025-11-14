@@ -1,3 +1,9 @@
+# Overhead measurement results
+overhead_results.csv
+overhead_results.json
+
+##### ----- default ignores ----- ######
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -199,3 +205,4 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
