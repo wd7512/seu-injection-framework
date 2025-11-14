@@ -200,57 +200,6 @@ class TestPerformanceBenchmarks:
 
         assert all(c is not None for c in classes)
 
-    @pytest.mark.slow
-    def test_seu_injection_overhead(self, model, device):
-        """Test and measure SEU injection overhead."""
-        from seu_injection import SEUInjector
-        from seu_injection.metrics import classification_accuracy
-        from seu_injection.utils.overhead import calculate_overhead
-
-        # Create test data
-        x_test = torch.randn(32, 3, 64, 64, device=device)
-        y_test = torch.randint(0, 10, (32,), device=device)
-
-        # Create injector
-        injector = SEUInjector(
-            trained_model=model, criterion=classification_accuracy, x=x_test, y=y_test
-        )
-
-        # Sample input for baseline timing
-        sample_input = torch.randn(1, 3, 64, 64, device=device)
-
-        # Calculate overhead with stochastic sampling (minimal for speed)
-        overhead_results = calculate_overhead(
-            model=model,
-            injector=injector,
-            input_data=sample_input,
-            bit_position=0,
-            num_baseline_iterations=10,  # Reduced for speed
-            stochastic=True,
-            stochastic_probability=0.001,  # 0.1% sampling for speed
-        )
-
-        # Verify results structure
-        assert "baseline" in overhead_results
-        assert "injection" in overhead_results
-        assert "overhead_absolute" in overhead_results
-        assert "overhead_relative" in overhead_results
-
-        # Verify positive overhead
-        assert overhead_results["baseline"]["total_time"] > 0
-        assert overhead_results["overhead_absolute"] >= 0
-
-        # Print results for visibility
-        print("\nSEU Injection Overhead Metrics:")
-        print(
-            f"  Baseline inference: {overhead_results['baseline']['avg_time_ms']:.3f} ms"
-        )
-        print(f"  Overhead: {overhead_results['overhead_absolute_ms']:.3f} ms")
-        print(f"  Relative overhead: {overhead_results['overhead_relative']:.1f}%")
-        print(
-            f"  Injections performed: {overhead_results['injection']['num_injections']}"
-        )
-
     def generate_performance_report(self, device) -> dict:
         """Generate a comprehensive performance report."""
         report = {

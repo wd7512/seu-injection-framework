@@ -193,10 +193,9 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# Overhead calculation results
-overhead_results.json
-overhead_results.csv
-overhead_report*.txt
+# Overhead measurement results
+tests/overhead/overhead_results.json
+tests/overhead/overhead_results.csv
 
 # Cursor
 #  Cursor is an AI-powered code editor. `.cursorignore` specifies files/directories to
