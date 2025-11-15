@@ -23,7 +23,7 @@ class ExhaustiveSEUInjector(BaseInjector):
     """
 
     def run_injector(
-        self, bit_i: int, layer_name: Optional[str] = None
+        self, bit_i: int, layer_name: Optional[str] = None, **kwargs
     ) -> dict[str, list[Any]]:
         """
         Perform systematic exhaustive SEU injection across model parameters.

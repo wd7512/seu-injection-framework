@@ -23,65 +23,52 @@ class StochasticSEUInjector(BaseInjector):
     """
 
     def run_injector(
-        self, bit_i: int, p: float, layer_name: Optional[str] = None
+        self, bit_i: int, layer_name: Optional[str] = None, **kwargs
     ) -> dict[str, list[Any]]:
         """
-        Perform probabilistic stochastic SEU injection for large-scale analysis.
-
         This method uses Monte Carlo sampling to randomly select parameters for
         fault injection based on a specified probability. Each parameter has an
-        independent probability p of being selected for injection, making this
-        approach computationally feasible for large models where exhaustive
-        injection would be prohibitive.
-
-        The stochastic approach provides statistical estimates of fault impact
-        with controllable computational cost. Higher probability values increase
-        statistical confidence but require more computation time.
+        independent chance `p` (provided via kwargs) of being injected.
 
         Args:
             bit_i (int): Bit position to flip in IEEE 754 float32 representation.
                 Range: [0, 31] where 0 is the sign bit, 1-8 are exponent bits,
                 and 9-31 are mantissa bits. Each bit position has different
                 statistical impact on parameter values and model behavior.
-            p (float): Probability of injection for each parameter. Range: [0.0, 1.0]
+            layer_name (Optional[str]): Specific layer name to target for injection.
+                If None, samples from all targetable layers in the model.
+            p (float, via kwargs): Probability of injection for each parameter. Range: [0.0, 1.0]
                 where 0.0 means no injections and 1.0 means all parameters are
                 injected (equivalent to run_seu). Typical values: 0.001-0.01 for
                 large models, 0.1-0.5 for focused analysis.
-            layer_name (Optional[str]): Specific layer name to target for injection.
-                If None, samples from all targetable layers in the model. Useful
-                for layer-wise statistical analysis or focusing on critical
-                components like classifier layers.
 
-                Returns:
-                        dict[str, list[Any]]: Injection results with identical structure to run_injector():
-                                - 'tensor_location' (list[int]): Indices of randomly selected parameters
-                                    that received bit flip injections, in order of processing.
-                                - 'criterion_score' (list[float]): Model performance after each
-                                    injection, enabling statistical analysis of fault impact distribution.
-                                - 'layer_name' (list[str]): Layer names containing each selected
-                                    parameter, useful for layer-wise vulnerability assessment.
-                                - 'value_before' (list[float]): Original parameter values before
-                                    injection, allowing impact magnitude analysis.
-                                - 'value_after' (list[float]): Parameter values after bit flip,
-                                    showing actual fault manifestation in each case.
+        Returns:
+            dict[str, list[Any]]: Injection results with identical structure to run_injector():
+                - 'tensor_location' (list[int]): Indices of randomly selected parameters
+                    that received bit flip injections, in order of processing.
+                - 'criterion_score' (list[float]): Model performance after each
+                    injection, enabling statistical analysis of fault impact distribution.
+                - 'layer_name' (list[str]): Layer names containing each selected
+                    parameter, useful for layer-wise vulnerability assessment.
+                - 'value_before' (list[float]): Original parameter values before
+                    injection, allowing impact magnitude analysis.
+                - 'value_after' (list[float]): Parameter values after bit flip,
+                    showing actual fault manifestation in each case.
 
         Raises:
-            AssertionError: If p is not in valid range [0.0, 1.0] or bit_i is
-                not in valid range [0, 32]. Both parameters must be within their
-                respective valid domains for proper operation.
+            ValueError: If p is not in valid range [0.0, 1.0] or bit_i is
+                not in valid range [0, 32].
             RuntimeError: If model evaluation fails during criterion computation
                 or if random sampling produces no injections (very rare with p>0).
 
         Example:
             >>> # Large model statistical analysis
             >>> injector = StochasticSEUInjector(large_model, accuracy_top1, x=data, y=labels)
-            >>>
             >>> # Sample 0.1% of parameters for sign bit analysis
             >>> results = injector.run_injector(bit_i=0, p=0.001)
             >>> expected_injections = sum(p.numel() for p in model.parameters()) * 0.001
             >>> actual_injections = len(results['tensor_location'])
             >>> print(f"Expected ~{expected_injections:.0f}, got {actual_injections}")
-            >>>
             >>> # Statistical analysis of fault impact
             >>> baseline = injector.baseline_score
             >>> scores = results['criterion_score']
@@ -89,23 +76,21 @@ class StochasticSEUInjector(BaseInjector):
             >>> mean_drop = np.mean(drops)
             >>> std_drop = np.std(drops)
             >>> print(f"Mean accuracy drop: {mean_drop:.4f} ± {std_drop:.4f}")
-            >>>
             >>> # Layer-specific sampling
             >>> classifier_results = injector.run_injector(
             ...     bit_i=15, p=0.1, layer_name='classifier.weight'
             ... )
 
         Performance:
-            Expected computational complexity is O(p×n) where n is the number of
+            Expected computational complexity is O(p*n) where n is the number of
             parameters in scope and p is the injection probability. For p=0.001
-            and a 100M parameter model, expect ~100K injections requiring:
-
+            and a 100_000_000 parameter model, expect ~100_000 injections requiring:
             - GPU memory: Same as single forward pass
             - Time: ~5-15 minutes depending on criterion complexity
-            - Statistical confidence: √(p×n) effective sample size
+            - Statistical confidence: sqrt(p*n) effective sample size
 
             The method is particularly efficient for:
-            - Large language models (>1B parameters)
+            - Large language models (>1_000_000_000 parameters)
             - Convolutional networks with many parameters
             - Comparative studies across different bit positions
             - Monte Carlo estimation of fault tolerance metrics
@@ -115,6 +100,8 @@ class StochasticSEUInjector(BaseInjector):
             get_criterion_score: Direct evaluation without injection
             numpy.random: Underlying random sampling implementation
         """
+
+        p = kwargs.get("p", 0.0)
         if not (0.0 <= p <= 1.0):
             raise ValueError(f"Probability p must be in [0, 1], got {p}")
         if bit_i not in range(0, 33):
@@ -148,7 +135,7 @@ class StochasticSEUInjector(BaseInjector):
                 # PERFORMANCE GAIN: ~30x faster per operation (100μs → 3μs per bitflip)
                 # FUTURE OPPORTUNITY: Could still vectorize by creating boolean mask and applying bitflips in parallel
                 # APPROACH: mask = np.random.random(tensor.shape) < p; tensor[mask] = vectorized_bitflip(tensor[mask])
-                # CURRENT: O(p×n×1) optimized operations, POSSIBLE: O(1) vectorized + O(p×n) selection
+                # CURRENT: O(p*n*1) optimized operations, POSSIBLE: O(1) vectorized + O(p*n) selection
 
                 # Iterate through parameters with stochastic sampling
                 for idx in tqdm(
