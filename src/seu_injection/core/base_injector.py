@@ -81,7 +81,7 @@ class BaseInjector(ABC):
         ...     criterion=accuracy_top1,
         ...     x=x, y=y
         ... )
-        >>> results = injector.run_seu(bit_i=15)
+        >>> results = injector.run_injector(bit_i=15)
         >>> print(f"Baseline accuracy: {injector.baseline_score:.3f}")
         >>> print(f"Injected {len(results['criterion_score'])} faults")
         >>>
@@ -91,7 +91,7 @@ class BaseInjector(ABC):
         ...     criterion=accuracy_top1,
         ...     x=x, y=y
         ... )
-        >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
+        >>> results = injector.run_injector(bit_i=15, p=0.01)
         >>> print(f"Injected {len(results['criterion_score'])} faults (stochastic)")
 
     See Also:

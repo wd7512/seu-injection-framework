@@ -18,7 +18,7 @@ class ExhaustiveSEUInjector(BaseInjector):
     Example:
         >>> from seu_injection.core import ExhaustiveSEUInjector
         >>> injector = ExhaustiveSEUInjector(model, criterion, x=data, y=labels)
-        >>> results = injector.run_seu(bit_i=15)
+        >>> results = injector.run_injector(bit_i=15)
         >>> print(f"Injected {len(results['criterion_score'])} faults")
     """
 
@@ -35,7 +35,7 @@ class ExhaustiveSEUInjector(BaseInjector):
 
         The method is ideal for detailed vulnerability analysis of smaller models or
         specific layers, providing complete coverage of all parameters. For large
-        models, consider using run_stochastic_seu() for computational efficiency.
+        models, consider using StochasticSEUInjector for computational efficiency.
 
         Args:
             bit_i (int): Bit position to flip in IEEE 754 float32 representation.
@@ -47,20 +47,20 @@ class ExhaustiveSEUInjector(BaseInjector):
                 model.named_parameters() to see available layer names. Useful for
                 focused analysis of specific network components.
 
-        Returns:
-            dict[str, list[Any]]: Comprehensive injection results dictionary containing:
-                - 'tensor_location' (list[int]): Flat parameter indices where each
-                  injection was performed, allowing precise identification of
-                  affected parameters across the model.
-                - 'criterion_score' (list[float]): Model performance score after
-                  each injection, measured using the configured criterion function.
-                  Enables statistical analysis of fault impact distribution.
-                - 'layer_name' (list[str]): Layer name containing each injected
-                  parameter, facilitating layer-wise vulnerability analysis.
-                - 'value_before' (list[float]): Original parameter values before
-                  injection, enabling impact magnitude calculation.
-                - 'value_after' (list[float]): Parameter values immediately after
-                  bit flip injection, showing exact fault manifestation.
+                Returns:
+                        dict[str, list[Any]]: Comprehensive injection results dictionary containing:
+                                - 'tensor_location' (list[int]): Flat parameter indices where each
+                                    injection was performed, allowing precise identification of
+                                    affected parameters across the model.
+                                - 'criterion_score' (list[float]): Model performance score after
+                                    each injection, measured using the configured criterion function.
+                                    Enables statistical analysis of fault impact distribution.
+                                - 'layer_name' (list[str]): Layer name containing each injected
+                                    parameter, facilitating layer-wise vulnerability analysis.
+                                - 'value_before' (list[float]): Original parameter values before
+                                    injection, enabling impact magnitude calculation.
+                                - 'value_after' (list[float]): Parameter values immediately after
+                                    bit flip injection, showing exact fault manifestation.
 
         Raises:
             AssertionError: If bit_i is not in valid range [0, 32]. Note that
@@ -71,7 +71,7 @@ class ExhaustiveSEUInjector(BaseInjector):
         Example:
             >>> # Basic systematic injection
             >>> injector = ExhaustiveSEUInjector(model, accuracy_top1, x=data, y=labels)
-            >>> results = injector.run_seu(bit_i=15)  # Flip middle mantissa bit
+            >>> results = injector.run_injector(bit_i=15)  # Flip middle mantissa bit
             >>>
             >>> # Analyze results
             >>> baseline = injector.baseline_score
@@ -84,7 +84,7 @@ class ExhaustiveSEUInjector(BaseInjector):
             >>> print(f"Critical faults (>10% drop): {len(critical_faults)}")
             >>>
             >>> # Layer-specific analysis
-            >>> layer_results = injector.run_seu(bit_i=0, layer_name='classifier.weight')
+            >>> layer_results = injector.run_injector(bit_i=0, layer_name='classifier.weight')
             >>> print(f"Sign bit flips in classifier: {len(layer_results['tensor_location'])}")
 
         Performance:
@@ -99,7 +99,7 @@ class ExhaustiveSEUInjector(BaseInjector):
             bit position on modern GPU hardware, depending on criterion complexity.
 
         See Also:
-            run_stochastic_seu: Probabilistic sampling for large-scale analysis
+            StochasticSEUInjector: Probabilistic sampling for large-scale analysis
             get_criterion_score: Manual evaluation without injection
             bitops.float32.flip_bit: Underlying bit manipulation function
         """

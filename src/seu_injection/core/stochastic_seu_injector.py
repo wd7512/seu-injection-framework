@@ -18,7 +18,7 @@ class StochasticSEUInjector(BaseInjector):
     Example:
         >>> from seu_injection.core import StochasticSEUInjector
         >>> injector = StochasticSEUInjector(model, criterion, x=data, y=labels)
-        >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
+        >>> results = injector.run_injector(bit_i=15, p=0.01)
         >>> print(f"Injected {len(results['criterion_score'])} faults (stochastic)")
     """
 
@@ -52,18 +52,18 @@ class StochasticSEUInjector(BaseInjector):
                 for layer-wise statistical analysis or focusing on critical
                 components like classifier layers.
 
-        Returns:
-            dict[str, list[Any]]: Injection results with identical structure to run_seu():
-                - 'tensor_location' (list[int]): Indices of randomly selected parameters
-                  that received bit flip injections, in order of processing.
-                - 'criterion_score' (list[float]): Model performance after each
-                  injection, enabling statistical analysis of fault impact distribution.
-                - 'layer_name' (list[str]): Layer names containing each selected
-                  parameter, useful for layer-wise vulnerability assessment.
-                - 'value_before' (list[float]): Original parameter values before
-                  injection, allowing impact magnitude analysis.
-                - 'value_after' (list[float]): Parameter values after bit flip,
-                  showing actual fault manifestation in each case.
+                Returns:
+                        dict[str, list[Any]]: Injection results with identical structure to run_injector():
+                                - 'tensor_location' (list[int]): Indices of randomly selected parameters
+                                    that received bit flip injections, in order of processing.
+                                - 'criterion_score' (list[float]): Model performance after each
+                                    injection, enabling statistical analysis of fault impact distribution.
+                                - 'layer_name' (list[str]): Layer names containing each selected
+                                    parameter, useful for layer-wise vulnerability assessment.
+                                - 'value_before' (list[float]): Original parameter values before
+                                    injection, allowing impact magnitude analysis.
+                                - 'value_after' (list[float]): Parameter values after bit flip,
+                                    showing actual fault manifestation in each case.
 
         Raises:
             AssertionError: If p is not in valid range [0.0, 1.0] or bit_i is
@@ -77,7 +77,7 @@ class StochasticSEUInjector(BaseInjector):
             >>> injector = StochasticSEUInjector(large_model, accuracy_top1, x=data, y=labels)
             >>>
             >>> # Sample 0.1% of parameters for sign bit analysis
-            >>> results = injector.run_stochastic_seu(bit_i=0, p=0.001)
+            >>> results = injector.run_injector(bit_i=0, p=0.001)
             >>> expected_injections = sum(p.numel() for p in model.parameters()) * 0.001
             >>> actual_injections = len(results['tensor_location'])
             >>> print(f"Expected ~{expected_injections:.0f}, got {actual_injections}")
@@ -91,7 +91,7 @@ class StochasticSEUInjector(BaseInjector):
             >>> print(f"Mean accuracy drop: {mean_drop:.4f} ± {std_drop:.4f}")
             >>>
             >>> # Layer-specific sampling
-            >>> classifier_results = injector.run_stochastic_seu(
+            >>> classifier_results = injector.run_injector(
             ...     bit_i=15, p=0.1, layer_name='classifier.weight'
             ... )
 
@@ -111,7 +111,7 @@ class StochasticSEUInjector(BaseInjector):
             - Monte Carlo estimation of fault tolerance metrics
 
         See Also:
-            run_seu: Exhaustive systematic injection for complete coverage
+            ExhaustiveSEUInjector: Exhaustive systematic injection for complete coverage
             get_criterion_score: Direct evaluation without injection
             numpy.random: Underlying random sampling implementation
         """

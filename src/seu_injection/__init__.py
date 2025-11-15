@@ -26,9 +26,9 @@ Basic Usage:
     >>> from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
     >>> from seu_injection.metrics import classification_accuracy
     >>> injector = ExhaustiveSEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
-    >>> results = injector.run_seu(bit_i=15)
+    >>> results = injector.run_injector(bit_i=15)
     >>> injector = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
-    >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
+    >>> results = injector.run_injector(bit_i=15, p=0.01)
 
 For detailed examples, see the documentation at:
 https://github.com/wd7512/seu-injection-framework/blob/main/README.md
