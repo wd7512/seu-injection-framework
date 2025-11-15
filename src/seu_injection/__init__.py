@@ -23,9 +23,11 @@ This package provides tools for:
 - Analysis of neural network robustness in space and nuclear environments
 
 Basic Usage:
-    >>> from seu_injection import SEUInjector
+    >>> from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
     >>> from seu_injection.metrics import classification_accuracy
-    >>> injector = SEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
+    >>> injector = ExhaustiveSEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
+    >>> results = injector.run_seu(bit_i=15)
+    >>> injector = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
     >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
 
 For detailed examples, see the documentation at:
@@ -43,16 +45,13 @@ __email__ = "wwdennis.home@gmail.com"
 
 # Core public API
 from .bitops.float32 import bitflip_float32
-from .core.injector import SEUInjector
-
-# Convenience imports for common use cases
-from .core.injector import SEUInjector as Injector  # Short alias
+from .core import ExhaustiveSEUInjector, StochasticSEUInjector
 from .metrics.accuracy import classification_accuracy, classification_accuracy_loader
 
 __all__ = [
     # Core classes
-    "SEUInjector",
-    "Injector",  # Short alias
+    "ExhaustiveSEUInjector",
+    "StochasticSEUInjector",
     # Metrics functions
     "classification_accuracy",
     "classification_accuracy_loader",

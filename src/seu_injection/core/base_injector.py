@@ -1,7 +1,7 @@
 """
 Core SEU injection functionality.
 
-This module provides the main SEUInjector class for systematic fault injection
+This module provides the abstract BaseInjector class and its concrete implementations (ExhaustiveSEUInjector and StochasticSEUInjector) for systematic and stochastic fault injection
 in PyTorch neural networks to study robustness in harsh environments.
 
 # TODO PRODUCTION READINESS: Major architectural improvements needed per PRODUCTION_READINESS_PLAN.md
@@ -63,7 +63,7 @@ class BaseInjector(ABC):
 
     Example:
         >>> import torch
-        >>> from seu_injection import SEUInjector
+        >>> from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
         >>> from seu_injection.metrics import accuracy_top1
         >>>
         >>> # Setup model and data
@@ -75,21 +75,28 @@ class BaseInjector(ABC):
         >>> x = torch.randn(100, 784)
         >>> y = torch.randint(0, 10, (100,))
         >>>
-        >>> # Create injector
-        >>> injector = SEUInjector(
+        >>> # Systematic (exhaustive) injection
+        >>> injector = ExhaustiveSEUInjector(
         ...     trained_model=model,
         ...     criterion=accuracy_top1,
         ...     x=x, y=y
         ... )
-        >>>
-        >>> # Run systematic injection
         >>> results = injector.run_seu(bit_i=15)
         >>> print(f"Baseline accuracy: {injector.baseline_score:.3f}")
-        >>> print(f"Injected {len(results)} faults")
+        >>> print(f"Injected {len(results['criterion_score'])} faults")
+        >>>
+        >>> # Stochastic injection
+        >>> injector = StochasticSEUInjector(
+        ...     trained_model=model,
+        ...     criterion=accuracy_top1,
+        ...     x=x, y=y
+        ... )
+        >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
+        >>> print(f"Injected {len(results['criterion_score'])} faults (stochastic)")
 
     See Also:
-        run_seu: Systematic fault injection across all parameters
-        run_stochastic_seu: Probabilistic fault injection sampling
+        ExhaustiveSEUInjector: Systematic fault injection across all parameters
+        StochasticSEUInjector: Probabilistic fault injection sampling
         get_criterion_score: Manual criterion evaluation
     """
 
@@ -109,8 +116,8 @@ class BaseInjector(ABC):
         #   - Mutually exclusive x/y vs data_loader not clear from signature
         #   - No convenience constructors for common scenarios
         # IMPROVEMENTS NEEDED:
-        #   - Add SEUInjector.from_model(model) with classification_accuracy default
-        #   - Add SEUInjector.quick_setup(model, test_data) for simple cases
+        #   - Add ExhaustiveSEUInjector.from_model(model) with classification_accuracy default
+        #   - Add ExhaustiveSEUInjector.quick_setup(model, test_data) for simple cases
         #   - Better error messages when x/y and data_loader both provided
         #   - Auto-detect device if None provided (already implemented)
         # PRIORITY: MEDIUM - Affects new user onboarding
@@ -147,7 +154,7 @@ class BaseInjector(ABC):
 
         Example:
             >>> # Basic usage with tensor data
-            >>> injector = SEUInjector(
+            >>> injector = ExhaustiveSEUInjector(
             ...     trained_model=model,
             ...     criterion=accuracy_top1,
             ...     x=test_images,
@@ -155,7 +162,7 @@ class BaseInjector(ABC):
             ... )
             >>>
             >>> # Usage with DataLoader for large datasets
-            >>> injector = SEUInjector(
+            >>> injector = ExhaustiveSEUInjector(
             ...     trained_model=model,
             ...     criterion=accuracy_top1,
             ...     data_loader=test_loader,
@@ -262,7 +269,7 @@ class BaseInjector(ABC):
 
         Example:
             >>> # Manual evaluation during analysis
-            >>> injector = SEUInjector(model, accuracy_top1, x=data, y=labels)
+            >>> injector = ExhaustiveSEUInjector(model, accuracy_top1, x=data, y=labels)
             >>> baseline = injector.get_criterion_score()
             >>> print(f"Baseline accuracy: {baseline:.3f}")
             >>>
@@ -290,8 +297,8 @@ class BaseInjector(ABC):
 
         See Also:
             __init__: Criterion function specification and requirements
-            run_seu: Systematic injection with automatic evaluation
-            run_stochastic_seu: Statistical injection with automatic evaluation
+            ExhaustiveSEUInjector: Systematic injection with automatic evaluation
+            StochasticSEUInjector: Statistical injection with automatic evaluation
         """
         if self.use_data_loader:
             return float(

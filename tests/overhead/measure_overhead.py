@@ -11,7 +11,7 @@ import torch.nn as nn
 from sklearn.datasets import make_moons
 from sklearn.preprocessing import StandardScaler
 
-from seu_injection import SEUInjector
+from seu_injection.core import StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 
@@ -56,7 +56,7 @@ def measure_baseline(model, input_data, iterations=50):
 def measure_injection(injector, bit_position=0, probability=0.05):
     """Measure SEU injection time."""
     start = time.perf_counter()
-    results = injector.run_stochastic_seu(bit_i=bit_position, p=probability)
+    results = injector.run_injector(bit_i=bit_position, p=probability)
     total_time = time.perf_counter() - start
     num_injections = len(results["criterion_score"])
     return total_time, num_injections
@@ -79,7 +79,7 @@ def main():
 
     # Measure injection
     print("\nMeasuring SEU injection overhead...")
-    injector = SEUInjector(
+    injector = StochasticSEUInjector(
         trained_model=model, criterion=classification_accuracy, x=x_test, y=y_test
     )
     injection_time, num_injections = measure_injection(injector)

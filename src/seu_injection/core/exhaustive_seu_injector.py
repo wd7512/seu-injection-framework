@@ -14,6 +14,12 @@ class ExhaustiveSEUInjector(BaseInjector):
     This class systematically flips each bit in the floating-point representation
     of weights across all layers (or a specified layer) and evaluates the model's
     performance after each injection.
+
+    Example:
+        >>> from seu_injection.core import ExhaustiveSEUInjector
+        >>> injector = ExhaustiveSEUInjector(model, criterion, x=data, y=labels)
+        >>> results = injector.run_seu(bit_i=15)
+        >>> print(f"Injected {len(results['criterion_score'])} faults")
     """
 
     def run_injector(
@@ -64,7 +70,7 @@ class ExhaustiveSEUInjector(BaseInjector):
 
         Example:
             >>> # Basic systematic injection
-            >>> injector = SEUInjector(model, accuracy_top1, x=data, y=labels)
+            >>> injector = ExhaustiveSEUInjector(model, accuracy_top1, x=data, y=labels)
             >>> results = injector.run_seu(bit_i=15)  # Flip middle mantissa bit
             >>>
             >>> # Analyze results
@@ -156,7 +162,7 @@ class ExhaustiveSEUInjector(BaseInjector):
                     tensor.data[idx] = torch.tensor(
                         seu_val, device=self.device, dtype=tensor.dtype
                     )
-                    criterion_score = self.get_criterion_score()
+                    criterion_score = self._get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]  # Restore original value
 
                     # Record results

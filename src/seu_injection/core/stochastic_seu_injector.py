@@ -14,6 +14,12 @@ class StochasticSEUInjector(BaseInjector):
     This class randomly flips bits in the floating-point representation of weights
     across all layers (or a specified layer) and evaluates the model's performance
     after each injection.
+
+    Example:
+        >>> from seu_injection.core import StochasticSEUInjector
+        >>> injector = StochasticSEUInjector(model, criterion, x=data, y=labels)
+        >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
+        >>> print(f"Injected {len(results['criterion_score'])} faults (stochastic)")
     """
 
     def run_injector(
@@ -68,7 +74,7 @@ class StochasticSEUInjector(BaseInjector):
 
         Example:
             >>> # Large model statistical analysis
-            >>> injector = SEUInjector(large_model, accuracy_top1, x=data, y=labels)
+            >>> injector = StochasticSEUInjector(large_model, accuracy_top1, x=data, y=labels)
             >>>
             >>> # Sample 0.1% of parameters for sign bit analysis
             >>> results = injector.run_stochastic_seu(bit_i=0, p=0.001)
@@ -162,7 +168,7 @@ class StochasticSEUInjector(BaseInjector):
                     tensor.data[idx] = torch.tensor(
                         seu_val, device=self.device, dtype=tensor.dtype
                     )
-                    criterion_score = self.get_criterion_score()
+                    criterion_score = self._get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]  # Restore original value
 
                     # Record results
