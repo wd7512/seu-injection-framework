@@ -4,13 +4,14 @@ import numpy as np
 import pytest
 import torch
 
-# Import from the new seu_injection package
-from seu_injection import SEUInjector as Injector
 from seu_injection import classification_accuracy
+
+# Import from the new seu_injection package
+from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
 
 
 class TestInjector:
-    """Test suite for the SEU Injector class."""
+    """Test suite for the SEU Injector classes (ExhaustiveSEUInjector, StochasticSEUInjector)."""
 
     # TODO TESTING IMPROVEMENTS: Test coverage gaps and enhancements per improvement plans
     # COVERAGE GAPS:
@@ -31,7 +32,7 @@ class TestInjector:
         """Test Injector initialization with tensor data."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -51,7 +52,7 @@ class TestInjector:
         X, y = sample_data
 
         # Test with device=None to trigger auto-detection
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=None,  # This should trigger auto-detection
@@ -83,7 +84,7 @@ class TestInjector:
             return
 
         # Test with explicit device to ensure CUDA path coverage
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=cuda_device,
@@ -106,7 +107,7 @@ class TestInjector:
         # Convert to binary classification format
         y_numpy = (y_numpy > 0.5).astype(np.float32)
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -128,7 +129,7 @@ class TestInjector:
         dataset = torch.utils.data.TensorDataset(X, y)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=32)
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -151,7 +152,7 @@ class TestInjector:
         with pytest.raises(
             ValueError, match="Cannot pass both a dataloader and x and y values"
         ):
-            Injector(
+            ExhaustiveSEUInjector(
                 trained_model=simple_model,
                 criterion=classification_accuracy,
                 device=device,
@@ -164,7 +165,7 @@ class TestInjector:
         """Test that get_criterion_score returns consistent results."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -173,8 +174,8 @@ class TestInjector:
         )
 
         # Get score multiple times - should be consistent
-        score1 = injector.get_criterion_score()
-        score2 = injector.get_criterion_score()
+        score1 = injector._get_criterion_score()
+        score2 = injector._get_criterion_score()
 
         assert score1 == score2, "Criterion score should be consistent"
         assert score1 == injector.baseline_score, (
@@ -191,7 +192,7 @@ class TestInjector:
         dataset = torch.utils.data.TensorDataset(X, y)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=32)
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -199,7 +200,7 @@ class TestInjector:
         )
 
         # This should trigger the DataLoader branch in get_criterion_score
-        score = injector.get_criterion_score()
+        score = injector._get_criterion_score()
         assert isinstance(score, (float, np.floating))
         assert 0.0 <= score <= 1.0
 
@@ -207,7 +208,7 @@ class TestInjector:
         """Test basic SEU injection functionality."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -216,7 +217,7 @@ class TestInjector:
         )
 
         # Run SEU injection on sign bit (bit 0)
-        results = injector.run_seu(bit_i=0)
+        results = injector.run_injector(bit_i=0)
 
         # Validate results structure
         assert isinstance(results, dict)
@@ -244,7 +245,7 @@ class TestInjector:
         """Test that run_seu validates bit positions correctly."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -254,21 +255,21 @@ class TestInjector:
 
         # Test valid bit positions
         for bit_pos in [0, 15, 31]:
-            results = injector.run_seu(bit_i=bit_pos)
-            assert len(results["tensor_location"]) > 0
+            results = injector.run_injector(bit_i=bit_pos)
+        assert len(results["tensor_location"]) > 0
 
         # Test invalid bit positions should raise ValueError
         with pytest.raises(ValueError):
-            injector.run_seu(bit_i=-1)
+            injector.run_injector(bit_i=-1)
 
         with pytest.raises(ValueError):
-            injector.run_seu(bit_i=33)
+            injector.run_injector(bit_i=33)
 
     def test_run_seu_layer_targeting(self, simple_model, sample_data, device):
         """Test SEU injection with layer targeting."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -282,7 +283,7 @@ class TestInjector:
 
         # Target specific layer
         target_layer = layer_names[0]
-        results = injector.run_seu(bit_i=0, layer_name=target_layer)
+        results = injector.run_injector(bit_i=0, layer_name=target_layer)
 
         # All results should be from the targeted layer
         assert all(layer == target_layer for layer in results["layer_name"]), (
@@ -293,7 +294,7 @@ class TestInjector:
         """Test SEU injection with layer filtering to trigger continue statement."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -310,7 +311,7 @@ class TestInjector:
         # This should iterate through ALL layers ['0.weight', '0.bias', '2.weight', '2.bias']
         # but only process '2.weight'. The continue statement should be executed for
         # '0.weight', '0.bias', and '2.bias'
-        results = injector.run_seu(bit_i=0, layer_name=target_layer)
+        results = injector.run_injector(bit_i=0, layer_name=target_layer)
 
         # Verify results only come from the targeted layer
         assert all(layer == target_layer for layer in results["layer_name"]), (
@@ -325,13 +326,13 @@ class TestInjector:
 
         # Also test with non-existent layer to ensure all layers are skipped
         # This MUST trigger the continue statement for ALL layers
-        results_empty = injector.run_seu(bit_i=0, layer_name="nonexistent_layer")
+        results_empty = injector.run_injector(bit_i=0, layer_name="nonexistent_layer")
         assert len(results_empty["layer_name"]) == 0, (
             "Should have no results for non-existent layer"
         )
 
         # Test with first layer to ensure other layers are skipped
-        results_first = injector.run_seu(bit_i=0, layer_name="0.weight")
+        results_first = injector.run_injector(bit_i=0, layer_name="0.weight")
         # This should process 0.weight and skip 0.bias, 2.weight, 2.bias
         assert all(layer == "0.weight" for layer in results_first["layer_name"])
         assert len(results_first["layer_name"]) > 0
@@ -340,7 +341,7 @@ class TestInjector:
         """Test basic stochastic SEU injection functionality."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = StochasticSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -349,7 +350,7 @@ class TestInjector:
         )
 
         # Run stochastic SEU with 50% probability
-        results = injector.run_stochastic_seu(bit_i=0, p=0.5)
+        results = injector.run_injector(bit_i=0, p=0.5)
 
         # Validate results structure (same as regular SEU)
         assert isinstance(results, dict)
@@ -374,7 +375,7 @@ class TestInjector:
         """Test probability validation in stochastic SEU."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = StochasticSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -384,15 +385,15 @@ class TestInjector:
 
         # Test valid probabilities
         for p in [0.0, 0.1, 0.5, 1.0]:
-            results = injector.run_stochastic_seu(bit_i=0, p=p)
-            assert isinstance(results, dict)
+            results = injector.run_injector(bit_i=0, p=p)
+        assert isinstance(results, dict)
 
         # Test invalid probabilities
         with pytest.raises(ValueError):
-            injector.run_stochastic_seu(bit_i=0, p=-0.1)
+            injector.run_injector(bit_i=0, p=-0.1)
 
         with pytest.raises(ValueError):
-            injector.run_stochastic_seu(bit_i=0, p=1.1)
+            injector.run_injector(bit_i=0, p=1.1)
 
     def test_stochastic_seu_probability_effects(
         self, simple_model, sample_data, device
@@ -400,7 +401,7 @@ class TestInjector:
         """Test that different probabilities affect the number of injections."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = StochasticSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -410,10 +411,10 @@ class TestInjector:
 
         # Set random seed for reproducible results
         np.random.seed(42)
-        results_low = injector.run_stochastic_seu(bit_i=0, p=0.1)
+        results_low = injector.run_injector(bit_i=0, p=0.1)
 
         np.random.seed(42)
-        results_high = injector.run_stochastic_seu(bit_i=0, p=0.9)
+        results_high = injector.run_injector(bit_i=0, p=0.9)
 
         # Higher probability should generally result in more injections
         # (though with randomness, this isn't guaranteed, so we use a loose check)
@@ -433,7 +434,7 @@ class TestInjector:
         for name, param in simple_model.named_parameters():
             original_params[name] = param.data.clone()
 
-        injector = Injector(
+        injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -442,7 +443,7 @@ class TestInjector:
         )
 
         # Run SEU injection
-        injector.run_seu(bit_i=0)
+        injector.run_injector(bit_i=0)
 
         # Check that model parameters are restored
         for name, param in simple_model.named_parameters():
@@ -458,7 +459,7 @@ class TestInjector:
         """Test stochastic SEU injection with layer filtering to trigger continue statement."""
         X, y = sample_data
 
-        injector = Injector(
+        injector = StochasticSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
@@ -467,7 +468,7 @@ class TestInjector:
         )
 
         # Target specific layer in stochastic SEU - this should trigger continue for other layers
-        results = injector.run_stochastic_seu(bit_i=0, p=1.0, layer_name="0.weight")
+        results = injector.run_injector(bit_i=0, p=1.0, layer_name="0.weight")
 
         # Should only process the targeted layer, skipping others via continue
         assert all(layer == "0.weight" for layer in results["layer_name"]), (
@@ -475,7 +476,7 @@ class TestInjector:
         )
 
         # Also test with nonexistent layer to trigger continue for all layers
-        results_empty = injector.run_stochastic_seu(
+        results_empty = injector.run_injector(
             bit_i=0, p=1.0, layer_name="nonexistent_layer"
         )
         assert len(results_empty["layer_name"]) == 0, (

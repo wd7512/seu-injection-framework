@@ -145,7 +145,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # Check SEU injection framework
-from seu_injection import SEUInjector
+from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 print("All dependencies available!")

@@ -37,7 +37,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 # SEU Injection Framework
-from seu_injection import SEUInjector
+from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
 ```
 
@@ -155,7 +155,7 @@ Now let's inject Single Event Upsets (bit flips) and measure the impact:
 
 ```python
 # Initialize SEU injector
-injector = SEUInjector(
+injector = ExhaustiveSEUInjector(
     trained_model=model,
     x=x_test,
     y=y_test,
@@ -178,14 +178,14 @@ The sign bit (bit 0 in our indexing) controls whether a value is positive or neg
 
 ```python
 # Test sign bit flips across all parameters
-results = injector.run_seu(bit_i=0)
+results = injector.run_injector(bit_i=0)
 
 print(f"\nSign Bit Injection Results:")
-print(f"Total parameters tested: {len(results)}")
-print(f"Mean accuracy: {results['criterion_score'].mean():.2%}")
-print(f"Std accuracy: {results['criterion_score'].std():.2%}")
-print(f"Min accuracy: {results['criterion_score'].min():.2%}")
-print(f"Max accuracy: {results['criterion_score'].max():.2%}")
+print(f"Total parameters tested: {len(results['criterion_score'])}")
+print(f"Mean accuracy: {np.mean(results['criterion_score']):.2%}")
+print(f"Std accuracy: {np.std(results['criterion_score']):.2%}")
+print(f"Min accuracy: {np.min(results['criterion_score']):.2%}")
+print(f"Max accuracy: {np.max(results['criterion_score']):.2%}")
 ```
 
 **Expected output:**
@@ -205,11 +205,11 @@ Exponent bits (bits 23-30) control the magnitude:
 
 ```python
 # Test exponent bit flips (bit 1 = most significant exponent bit)
-results_exp = injector.run_seu(bit_i=1)
+results_exp = injector.run_injector(bit_i=1)
 
 print(f"\nExponent Bit Injection Results:")
-print(f"Mean accuracy: {results_exp['criterion_score'].mean():.2%}")
-print(f"Min accuracy: {results_exp['criterion_score'].min():.2%}")
+print(f"Mean accuracy: {np.mean(results_exp['criterion_score']):.2%}")
+print(f"Min accuracy: {np.min(results_exp['criterion_score']):.2%}")
 ```
 
 **Expected output:**
@@ -232,8 +232,8 @@ bit_positions = [0, 1, 2, 11, 21, 31]  # Sign, exponent, mantissa bits
 mean_accuracies = []
 
 for bit_pos in bit_positions:
-    results = injector.run_seu(bit_i=bit_pos)
-    mean_accuracies.append(results['criterion_score'].mean())
+    results = injector.run_injector(bit_i=bit_pos)
+    mean_accuracies.append(np.mean(results['criterion_score']))
 
 # Create visualization
 plt.figure(figsize=(10, 6))
@@ -258,19 +258,19 @@ Target specific layers to understand vulnerability:
 
 ```python
 # Test only the first layer
-results_layer0 = injector.run_seu(
+results_layer0 = injector.run_injector(
     bit_i=0,
     layer_name="0.weight"  # Target only first Linear layer weights
 )
 
 # Test only the second layer  
-results_layer1 = injector.run_seu(
+results_layer1 = injector.run_injector(
     bit_i=0,
     layer_name="2.weight"  # Target only second Linear layer weights  
 )
 
-print(f"First layer impact: {results_layer0['criterion_score'].mean():.2%}")
-print(f"Second layer impact: {results_layer1['criterion_score'].mean():.2%}")
+print(f"First layer impact: {np.mean(results_layer0['criterion_score']):.2%}")
+print(f"Second layer impact: {np.mean(results_layer1['criterion_score']):.2%}")
 ```
 
 **Expected output:**
@@ -295,7 +295,7 @@ def custom_metric(y_true, y_pred):
     return f1_score(y_true_flat, y_pred_class)
 
 # Re-initialize with custom criterion
-injector_custom = SEUInjector(
+injector_custom = ExhaustiveSEUInjector(
     trained_model=model,
     x=x_test,
     y=y_test,
@@ -303,8 +303,8 @@ injector_custom = SEUInjector(
     device='cpu'
 )
 
-results_f1 = injector_custom.run_seu(bit_i=0)
-print(f"Mean F1 Score after SEU: {results_f1['criterion_score'].mean():.3f}")
+results_f1 = injector_custom.run_injector(bit_i=0)
+print(f"Mean F1 Score after SEU: {np.mean(results_f1['criterion_score']):.3f}")
 ```
 
 ## Complete Example Script
@@ -322,7 +322,7 @@ import torch.optim as optim
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from seu_injection import SEUInjector
+from seu_injection.core import ExhaustiveSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 # 1. Prepare data
@@ -360,14 +360,14 @@ for epoch in range(100):
 
 # 4. Run SEU injection
 model.eval()
-injector = SEUInjector(trained_model=model, x=x_test, y=y_test, 
+injector = ExhaustiveSEUInjector(trained_model=model, x=x_test, y=y_test, 
                        criterion=classification_accuracy, device='cpu')
 print(f"Baseline: {injector.baseline_score:.2%}")
 
 # 5. Analyze results
-results = injector.run_seu(bit_i=0)
-print(f"Mean accuracy after sign bit flips: {results['criterion_score'].mean():.2%}")
-print(f"Accuracy drop: {(injector.baseline_score - results['criterion_score'].mean()):.2%}")
+results = injector.run_injector(bit_i=0)
+print(f"Mean accuracy after sign bit flips: {np.mean(results['criterion_score']):.2%}")
+print(f"Accuracy drop: {(injector.baseline_score - np.mean(results['criterion_score'])):.2%}")
 ```
 
 ## Next Steps
@@ -412,8 +412,8 @@ Congratulations! 🎉 You've completed the quickstart tutorial. You now know how
 # Test all critical bits quickly
 critical_bits = [0, 1, 2]  # Sign + top exponent bits
 for bit in critical_bits:
-    results = injector.run_seu(bit_i=bit)
-    print(f"Bit {bit}: {results['criterion_score'].mean():.2%}")
+    results = injector.run_injector(bit_i=bit)
+    print(f"Bit {bit}: {np.mean(results['criterion_score']):.2%}")
 ```
 
 **2. Layer Vulnerability Analysis**
@@ -422,8 +422,8 @@ for bit in critical_bits:
 # Identify most vulnerable layer - check layer names first
 for layer_name, _ in model.named_parameters():
     if 'weight' in layer_name:
-        results = injector.run_seu(bit_i=0, layer_name=layer_name)
-        print(f"Layer {layer_name}: {results['criterion_score'].mean():.2%}")
+        results = injector.run_injector(bit_i=0, layer_name=layer_name)
+        print(f"Layer {layer_name}: {np.mean(results['criterion_score']):.2%}")
 ```
 
 **3. Comprehensive Robustness Profile**
@@ -432,8 +432,8 @@ for layer_name, _ in model.named_parameters():
 # Test all bits (warning: time-consuming for large models)
 all_results = []
 for bit in range(32):
-    results = injector.run_seu(bit_i=bit)
-    all_results.append(results['criterion_score'].mean())
+    results = injector.run_injector(bit_i=bit)
+    all_results.append(np.mean(results['criterion_score']))
     
 # Find most vulnerable bits
 import numpy as np

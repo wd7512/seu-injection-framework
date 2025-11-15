@@ -296,7 +296,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
         for bit_pos in bit_positions:
             try:
                 # Target only one specific layer for speed
-                result = injector.run_stochastic_seu(
+                result = injector.run_injector(
                     bit_i=bit_pos, p=0.001, layer_name=target_layer
                 )
 
@@ -321,7 +321,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
         for prob in injection_probabilities:
             try:
                 # Test mantissa bits with varying probabilities, target layer only
-                result = injector.run_stochastic_seu(
+                result = injector.run_injector(
                     bit_i=15, p=prob, layer_name=target_layer
                 )
 

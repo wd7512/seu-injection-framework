@@ -95,10 +95,10 @@ def test_basic_cnn_robustness_minimal_execution():
 def test_basic_cnn_robustness_seu_framework_integration():
     """Test that the example properly integrates with SEU framework."""
     # Test imports work
-    from seu_injection import SEUInjector
+    from seu_injection.core import ExhaustiveSEUInjector
     from seu_injection.metrics import classification_accuracy
 
-    assert SEUInjector is not None
+    assert ExhaustiveSEUInjector is not None
     assert classification_accuracy is not None
     print("SUCCESS: SEU framework integration confirmed")
 

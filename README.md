@@ -75,31 +75,31 @@ Having issues? See [`docs/installation.md`](docs/installation.md).
 
 ```python
 import torch
-from seu_injection import SEUInjector
+from seu_injection.core import ExhaustiveSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 # Create a simple model and test data
 model = torch.nn.Sequential(
-    torch.nn.Linear(10, 64),
-    torch.nn.ReLU(), 
-    torch.nn.Linear(64, 2)
+  torch.nn.Linear(10, 64),
+  torch.nn.ReLU(), 
+  torch.nn.Linear(64, 2)
 )
 x_test = torch.randn(100, 10)
 y_test = torch.randint(0, 2, (100,))
 
 # Initialize SEU injector
-injector = SEUInjector(
-    trained_model=model,
-    criterion=classification_accuracy, 
-    x=x_test,
-    y=y_test
+injector = ExhaustiveSEUInjector(
+  trained_model=model,
+  criterion=classification_accuracy, 
+  x=x_test,
+  y=y_test
 )
 
 # Check baseline performance
 print(f"Baseline accuracy: {injector.baseline_score:.2%}")
 
 # Inject bit flips into sign bits (bit position 0)
-results = injector.run_seu(bit_i=0)
+results = injector.run_injector(bit_i=0)
 print(f"Performed {len(results['criterion_score'])} injections")
 
 # Sample some results

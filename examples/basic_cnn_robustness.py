@@ -33,7 +33,7 @@ matplotlib.use("Agg")  # Use non-interactive backend for headless execution
 import matplotlib.pyplot as plt
 
 # SEU Injection Framework - CORRECT imports
-from seu_injection import SEUInjector
+from seu_injection.core import ExhaustiveSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 
@@ -104,7 +104,7 @@ def run_baseline_analysis(model, x_test, y_test):
     print("=" * 50)
 
     # Initialize SEU injector - CORRECT API
-    injector = SEUInjector(
+    injector = ExhaustiveSEUInjector(
         trained_model=model, criterion=classification_accuracy, x=x_test, y=y_test
     )
 
@@ -121,7 +121,7 @@ def analyze_sign_bit_vulnerability(injector):
 
     # Test sign bit flips (bit 0) - CORRECT API
     print("Running sign bit injection across all parameters...")
-    results = injector.run_seu(bit_i=0)
+    results = injector.run_injector(bit_i=0)
 
     # Analyze results
     fault_scores = results["criterion_score"]
@@ -152,7 +152,7 @@ def analyze_layer_vulnerability(injector):
             print(f"Testing layer: {layer_name}")
 
             # Test sign bit for this specific layer - CORRECT API
-            results = injector.run_seu(bit_i=0, layer_name=layer_name)
+            results = injector.run_injector(bit_i=0, layer_name=layer_name)
 
             fault_scores = results["criterion_score"]
             avg_accuracy = np.mean(fault_scores)
@@ -200,11 +200,21 @@ def analyze_bit_position_sensitivity(injector):
 
     print("Testing bit positions (this may take a while for larger models)...")
 
+    # Use a StochasticSEUInjector for stochastic sampling
+    from seu_injection.core import StochasticSEUInjector
+
+    stochastic_injector = StochasticSEUInjector(
+        trained_model=injector.model,
+        criterion=injector.criterion,
+        x=injector.X,
+        y=injector.y,
+        device=injector.device,
+    )
+
     for i, bit_pos in enumerate(bit_positions):
         print(f"  Testing bit {bit_pos} ({bit_names[i]})...")
 
-        # Use stochastic sampling for faster analysis - CORRECT API
-        results = injector.run_stochastic_seu(bit_i=bit_pos, p=0.1)  # 10% sampling
+        results = stochastic_injector.run_injector(bit_i=bit_pos, p=0.1)  # 10% sampling
 
         if len(results["criterion_score"]) > 0:
             fault_scores = results["criterion_score"]
