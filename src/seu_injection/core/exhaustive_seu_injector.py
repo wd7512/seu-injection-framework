@@ -2,10 +2,10 @@ from typing import Any, Optional
 
 import numpy as np
 import torch
-from base_injector import BaseInjector
 from tqdm import tqdm
 
 from ..bitops.float32 import bitflip_float32_optimized
+from .base_injector import BaseInjector
 
 
 class ExhaustiveSEUInjector(BaseInjector):
