@@ -1,6 +1,6 @@
 # SEU Injection Framework Documentation
 
-**Version 1.1.9** - Documentation hub for the SEU Injection Framework.
+**Version 1.1.10** - Documentation hub for the SEU Injection Framework.
 
 ## 📚 Quick Access
 
