@@ -43,17 +43,17 @@ All studies implement IEEE 754-compliant fault injection methodology:
 You can easily adapt these examples for your own models and data:
 
 ```python
-from seu_injection import SEUInjector
+from seu_injection.core import ExhaustiveSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 # Use your own model and data
-injector = SEUInjector(
-    trained_model=your_model,
-    criterion=classification_accuracy,
-    x=your_test_data,
-    y=your_labels
+injector = ExhaustiveSEUInjector(
+  trained_model=your_model,
+  criterion=classification_accuracy,
+  x=your_test_data,
+  y=your_labels
 )
-results = injector.run_seu(bit_i=0)
+results = injector.run_injector(bit_i=0)
 ```
 
 ## Results
@@ -74,7 +74,7 @@ When using these examples in research, please cite:
   title = {SEU Injection Framework: Fault Tolerance Analysis for Neural Networks},
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
-  version = {1.1.9}
+  version = {1.1.10}
 }
 ```
 

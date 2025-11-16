@@ -183,13 +183,11 @@ class TestPerformanceBenchmarks:
                     del sys.modules[module]
 
             # Import framework
-            from seu_injection import (
-                SEUInjector,
-                bitflip_float32,
-                classification_accuracy,
-            )
+            from seu_injection.bitops.float32 import bitflip_float32
+            from seu_injection.core import ExhaustiveSEUInjector
+            from seu_injection.metrics import classification_accuracy
 
-            return SEUInjector, classification_accuracy, bitflip_float32
+            return ExhaustiveSEUInjector, classification_accuracy, bitflip_float32
 
         start = time.time()
         classes = import_framework()

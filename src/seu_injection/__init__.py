@@ -23,10 +23,12 @@ This package provides tools for:
 - Analysis of neural network robustness in space and nuclear environments
 
 Basic Usage:
-    >>> from seu_injection import SEUInjector
+    >>> from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
     >>> from seu_injection.metrics import classification_accuracy
-    >>> injector = SEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
-    >>> results = injector.run_stochastic_seu(bit_i=15, p=0.01)
+    >>> injector = ExhaustiveSEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
+    >>> results = injector.run_injector(bit_i=15)
+    >>> injector = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
+    >>> results = injector.run_injector(bit_i=15, p=0.01)
 
 For detailed examples, see the documentation at:
 https://github.com/wd7512/seu-injection-framework/blob/main/README.md
@@ -37,22 +39,19 @@ try:  # Prefer dynamic version from installed metadata
 
     __version__ = _pkg_version("seu-injection-framework")
 except Exception:  # Fallback for editable/source checkouts prior to build
-    __version__ = "1.1.8"  # Latest stable PyPI release with working build pipeline
+    __version__ = "1.1.9"  # Latest stable PyPI release with working build pipeline
 __author__ = "William Dennis"
 __email__ = "wwdennis.home@gmail.com"
 
 # Core public API
 from .bitops.float32 import bitflip_float32
-from .core.injector import SEUInjector
-
-# Convenience imports for common use cases
-from .core.injector import SEUInjector as Injector  # Short alias
+from .core import ExhaustiveSEUInjector, StochasticSEUInjector
 from .metrics.accuracy import classification_accuracy, classification_accuracy_loader
 
 __all__ = [
     # Core classes
-    "SEUInjector",
-    "Injector",  # Short alias
+    "ExhaustiveSEUInjector",
+    "StochasticSEUInjector",
     # Metrics functions
     "classification_accuracy",
     "classification_accuracy_loader",

@@ -6,13 +6,13 @@ import torch
 def test_basic_imports():
     """Test that all framework modules can be imported without errors."""
     try:
-        from seu_injection import SEUInjector as Injector
         from seu_injection import classification_accuracy
         from seu_injection.bitops.float32 import (
             binary_to_float32,
             bitflip_float32,
             float32_to_binary,
         )
+        from seu_injection.core import ExhaustiveSEUInjector as Injector
         from seu_injection.metrics.accuracy import multiclass_classification_accuracy
 
         # Basic validation that classes/functions exist
@@ -54,8 +54,8 @@ def test_basic_model_creation():
 
 def test_basic_injector_creation():
     """Test that Injector can be created and initialized."""
-    from seu_injection import SEUInjector as Injector
     from seu_injection import classification_accuracy
+    from seu_injection.core import ExhaustiveSEUInjector as Injector
 
     # Create simple model and data
     model = torch.nn.Sequential(torch.nn.Linear(2, 1), torch.nn.Sigmoid())

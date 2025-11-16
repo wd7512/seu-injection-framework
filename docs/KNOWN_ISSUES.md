@@ -1,42 +1,38 @@
 # Known Issues
 
-## Examples Directory Issue
+## Known Issues (Summary)
 
-**Issue**: Examples hang during pandas import (dependency resolution issue)
-
-**Status**: Non-critical for PyPI release
-
-**Details**:
-
-- Running `python basic_cnn_robustness.py` hangs during pandas import
-- Appears to be dependency/environment related
-- Examples code is correct but dependency chain is slow/problematic
-- Not blocking PyPI release as core framework works correctly
-
-**Workaround**: Use `uv run python` instead of direct python execution
-
-**Priority**: Low - address in future maintenance release
-
-## Code Quality Improvements (Tracked via TODOs)
-
-**Issue**: Various code quality improvements identified during comprehensive review
-
-**Status**: Tracked via embedded TODO system throughout codebase
-
-**Details**:
-
-- Import optimization opportunities (function-specific imports)
-- Error handling standardization (consistent exception types)
-- Test quality enhancements (stronger assertions)
-- Dead code cleanup (unused utility functions)
-- Performance optimization opportunities (documented in critical paths)
-
-**Workaround**: These are tracked as TODOs in relevant source files for contextual awareness
-
-**Priority**: Variable by category - see individual TODO priorities in source code
+This file lists only unique, actionable issues not covered in other documentation. For installation, usage, contributing, and roadmap, see the respective guides.
 
 ______________________________________________________________________
 
-**Note**: The framework uses an embedded TODO system to track improvements. This is normal development practice and indicates active maintenance, not technical debt.
+### 1. Examples Directory - Pandas Import Performance
 
-This file tracks non-critical issues that don't block the v1.1.1 PyPI release.
+Some example scripts (e.g. `basic_cnn_robustness.py`) may hang during pandas import in certain Python environments. Use `uv run python` for faster startup. Does not affect framework usage as a library.
+
+### 2. Performance Optimization
+
+Some functions (e.g. `bitflip_float32`) are not fully vectorized. Optimized versions exist but further improvements are possible, especially for GPU workloads.
+
+### 3. Error Handling
+
+Exception types are not fully standardized. Custom exception classes are planned for future releases.
+
+### 4. Test Coverage
+
+Some edge cases (NaN/Inf, multi-GPU, custom criterion) are not fully tested. Coverage is high (>90%) but not exhaustive.
+
+### 5. Unused Code
+
+Some utility functions (e.g. `get_model_info` in `device.py`) appear unused and may be removed in future cleanups.
+
+______________________________________________________________________
+
+For details on planned improvements, contributing, or reporting issues, see:
+
+- `CONTRIBUTING.md`
+- `CHANGELOG.md`
+- `docs/installation.md`
+- `docs/quickstart.md`
+
+For the full TODO system and categories, refer to code comments and the contributing guide.

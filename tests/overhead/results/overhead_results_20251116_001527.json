@@ -1,0 +1,18 @@
+{
+  "timestamp": "2025-11-16T00:15:27.952395",
+  "baseline_ms": 0.09269799998946837,
+  "injection_ms": 1.537336363650287,
+  "overhead_ms": 1.4446383636608187,
+  "overhead_percent": 1558.4353101738411,
+  "num_injections": 33,
+  "system_info": {
+    "os": "Windows-10-10.0.26100-SP0",
+    "python_version": "3.11.8",
+    "cpu": "Intel64 Family 6 Model 154 Stepping 3, GenuineIntel",
+    "cpu_count": 16,
+    "ram_gb": 15.7,
+    "is_laptop": true,
+    "battery_percent": 88,
+    "plugged_in": false
+  }
+}

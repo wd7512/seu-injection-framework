@@ -1,102 +1,67 @@
 # Installation Guide
 
-This guide provides comprehensive instructions for installing the SEU Injection Framework on various platforms and environments.
+Comprehensive instructions for installing the SEU Injection Framework.
 
-## Quick Install (Recommended)
+## Quick Install
 
-**Method 1: Install from PyPI (Easiest)**
-
-The fastest way to get started for end users:
+**From PyPI (Recommended for users):**
 
 ```bash
-# Install the latest stable release (v1.1.9)
+# Latest stable release (v1.1.9)
 pip install seu-injection-framework
 
-# Or with analysis tools
+# With analysis tools
 pip install "seu-injection-framework[analysis]"
 
-# Verify installation
-python -c "from seu_injection import SEUInjector; print('✅ Installation successful!')"
+# Verify
+python -c "from seu_injection import SEUInjector; print('✅ Success!')"
 ```
 
-**Method 2: Development Setup with UV**
-
-For contributors and advanced users:
+**Development Setup:**
 
 ```bash
-# Install UV (if not already installed)
+# Install UV
 curl -LsSf https://astral.sh/uv/install.sh | sh  # Unix/macOS
 # or
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
 
-# Clone the repository
+# Clone and install
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
-
-# Install all dependencies (IMPORTANT: Use --all-extras for full functionality)
 uv sync --all-extras
 
-# Verify installation
+# Verify
 uv run python run_tests.py smoke
 ```
 
-> **⚠️ Important**: Always use `--all-extras` when running `uv sync` to avoid missing dependencies that cause test failures. See troubleshooting section below for common setup issues.
-
 ## Installation Methods
 
-### Method 1: UV Package Manager (Recommended)
+### UV Package Manager (Recommended for Development)
 
-UV provides fast, reliable dependency resolution and virtual environment management.
-
-**Advantages:**
-
-- Fastest dependency resolution (10-100x faster than pip)
-- Reproducible builds with `uv.lock`
-- Automatic virtual environment management
-- Cross-platform compatibility
-
-**Installation:**
+Fast dependency resolution and reproducible builds:
 
 ```bash
 # Install UV
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
+curl -LsSf https://astral.sh/uv/install.sh | sh  # Unix/macOS
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
 
-# Windows (PowerShell)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# Verify installation
-uv --version
-
-# Clone and install framework
+# Clone and install
 git clone https://github.com/wd7512/seu-injection-framework.git
 cd seu-injection-framework
-
-# Install with all extras (recommended for development)
 uv sync --all-extras
-
-# Or install only core dependencies
-uv sync
 ```
 
-### Method 2: pip from PyPI (Production Use)
-
-Install the stable release from PyPI:
+### pip from PyPI (Production Use)
 
 ```bash
-# Create virtual environment (recommended)
+# Create virtual environment
 python -m venv .venv
+source .venv/bin/activate  # Unix/macOS
+# or .venv\Scripts\activate  # Windows
 
-# Activate virtual environment
-# Windows
-.venv\Scripts\activate
-# Unix/macOS
-source .venv/bin/activate
-
-# Install from PyPI
+# Install
 pip install seu-injection-framework
-
-# Or with extras
+# or with extras
 pip install "seu-injection-framework[all]"
 ```
 
@@ -197,50 +162,31 @@ uv sync --all-extras
 pip install -e ".[dev,notebooks,extras]"
 ```
 
-## Platform-Specific Instructions
+## Platform-Specific
 
 ### Windows
 
-**Prerequisites:**
+Python 3.9+, Windows 10/11+
 
-- Python 3.9 or later
-- Windows 10/11 or Windows Server 2019+
-- PowerShell or Command Prompt
-
-**CUDA Support (Optional):**
+**CUDA Support:**
 
 ```powershell
-# Install CUDA-enabled PyTorch
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 ```
 
 ### macOS
 
-**Prerequisites:**
+Python 3.9+, macOS 11+, Xcode Command Line Tools
 
-- Python 3.9 or later
-- macOS 11 (Big Sur) or later
-- Xcode Command Line Tools: `xcode-select --install`
-
-**Apple Silicon (M1/M2/M3):**
-
-```bash
-# MPS acceleration supported
-# No additional configuration needed
-```
+Apple Silicon (M1/M2/M3) supports MPS acceleration.
 
 ### Linux
 
-**Prerequisites:**
-
-- Python 3.9 or later
-- GCC compiler
-- CUDA toolkit (optional, for GPU support)
+Python 3.9+, GCC compiler
 
 **CUDA Support:**
 
 ```bash
-# Install CUDA-enabled PyTorch
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
 ```
 
@@ -351,54 +297,17 @@ uv run python run_tests.py unit
 
 **Solution:**
 
-```bash
-# Ensure you're in the correct directory
-cd seu-injection-framework
+### Common Issues
 
-# Reinstall in editable mode
-pip install -e .
+**Missing pytest:** Install all extras with `uv sync --all-extras`
 
-# Or verify UV environment
-uv sync --all-extras
-```
+**Import errors:** Reinstall in editable mode: `pip install -e .`
 
-#### Issue: CUDA out of memory
+**CUDA out of memory:** Reduce batch size or use `device='cpu'`
 
-**Problem:** GPU runs out of memory during SEU injection
+**Permission denied:** Use virtual environment or `pip install --user`
 
-**Solution:**
-
-- Reduce batch size in your experiments
-- Use CPU mode: `device='cpu'`
-- Use smaller models for testing
-- Close other GPU-intensive applications
-
-#### Issue: Permission denied during installation
-
-**Problem:** Cannot install packages due to permissions
-
-**Solution:**
-
-```bash
-# Use virtual environment (recommended)
-python -m venv .venv
-source .venv/bin/activate  # Unix/macOS
-.venv\Scripts\activate     # Windows
-
-# Or use user installation
-pip install --user -e .
-```
-
-#### Issue: Slow dependency resolution with pip
-
-**Problem:** pip takes a long time to resolve dependencies
-
-**Solution:**
-
-- Switch to UV package manager (10-100x faster)
-- Use pre-built wheels
-- Check your internet connection
-- Try a different PyPI mirror
+**Slow pip:** Switch to UV package manager (10-100x faster)
 
 ### Getting Help
 

@@ -1,6 +1,5 @@
-Research/Data/
-Research/model_weights.pth
-dev_docs/
+
+##### ----- default ignores ----- ######
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -203,3 +202,4 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
