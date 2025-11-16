@@ -40,9 +40,9 @@ def prepare_data():
 def measure_baseline(model, input_data, iterations=50):
     """Measure baseline inference time."""
     model.eval()
-    # Warmup
+    # Warmup (extra)
     with torch.no_grad():
-        for _ in range(5):
+        for _ in range(10):
             _ = model(input_data)
 
     start = time.perf_counter()
@@ -55,6 +55,10 @@ def measure_baseline(model, input_data, iterations=50):
 
 def measure_injection(injector, bit_position=0, probability=0.05):
     """Measure SEU injection time."""
+    # Warmup injector
+    for _ in range(2):
+        _ = injector.run_injector(bit_i=bit_position, p=probability)
+
     start = time.perf_counter()
     results = injector.run_injector(bit_i=bit_position, p=probability)
     total_time = time.perf_counter() - start
@@ -74,7 +78,7 @@ def main():
 
     # Measure baseline
     print("\nMeasuring baseline inference...")
-    baseline_time = measure_baseline(model, sample_input)
+    baseline_time = measure_baseline(model, sample_input, iterations=100)
     print(f"Baseline: {baseline_time * 1000:.3f} ms per inference")
 
     # Measure injection
@@ -94,7 +98,32 @@ def main():
 
     print(f"\nOverhead: {overhead_abs * 1000:.3f} ms ({overhead_rel:.1f}%)")
 
-    # Save JSON
+    # Gather system info
+    import os
+    import platform
+
+    import psutil
+
+    sys_info = {
+        "os": platform.platform(),
+        "python_version": platform.python_version(),
+        "cpu": platform.processor() or platform.machine(),
+        "cpu_count": os.cpu_count(),
+        "ram_gb": round(psutil.virtual_memory().total / (1024**3), 2),
+    }
+
+    # Battery info (laptop detection)
+    battery = psutil.sensors_battery() if hasattr(psutil, "sensors_battery") else None
+    if battery:
+        sys_info["is_laptop"] = True
+        sys_info["battery_percent"] = battery.percent
+        sys_info["plugged_in"] = battery.power_plugged
+    else:
+        sys_info["is_laptop"] = False
+        sys_info["battery_percent"] = None
+        sys_info["plugged_in"] = None
+
+    # Results
     results = {
         "timestamp": datetime.now().isoformat(),
         "baseline_ms": baseline_time * 1000,
@@ -102,18 +131,18 @@ def main():
         "overhead_ms": overhead_abs * 1000,
         "overhead_percent": overhead_rel,
         "num_injections": num_injections,
+        "system_info": sys_info,
     }
 
-    with open("overhead_results.json", "w") as f:
+    # Save JSON in results folder with timestamp
+    results_dir = os.path.join(os.path.dirname(__file__), "results")
+    os.makedirs(results_dir, exist_ok=True)
+    timestamp_str = datetime.now().strftime("%Y%m%d_%H%M%S")
+    results_path = os.path.join(results_dir, f"overhead_results_{timestamp_str}.json")
+    with open(results_path, "w") as f:
         json.dump(results, f, indent=2)
 
-    # Save CSV
-    with open("overhead_results.csv", "w", newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=results.keys())
-        writer.writeheader()
-        writer.writerow(results)
-
-    print("\nResults saved to overhead_results.json and overhead_results.csv")
+    print(f"\nResults saved to {results_path}")
     print("=" * 50)
 
 
