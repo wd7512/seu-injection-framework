@@ -37,7 +37,7 @@ import torch.nn as nn
 import torch.nn.functional as functional
 from torch.utils.data import DataLoader, TensorDataset
 
-from seu_injection.core import Injector
+from seu_injection.core import StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 
@@ -276,7 +276,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
 
         print(f"   Target layer: {target_layer}")
 
-        injector = Injector(
+        injector = StochasticSEUInjector(
             trained_model=model,
             criterion=classification_accuracy,
             data_loader=test_loader,
