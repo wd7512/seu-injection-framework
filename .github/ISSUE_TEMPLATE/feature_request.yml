@@ -68,9 +68,9 @@ body:
       description: Show how the feature would be used
       placeholder: |
         # Example usage:
-        from seu_injection import SEUInjector
+        from seu_injection import ExhaustiveSEUInjector
         
-        injector = SEUInjector(model)
+        injector = ExhaustiveSEUInjector(model)
         result = injector.new_feature(...)
       render: python
 
