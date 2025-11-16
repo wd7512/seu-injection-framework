@@ -1,11 +1,10 @@
 """
 Core SEU injection functionality.
 
-This module provides the main SEUInjector class for systematic fault injection
+This module provides the main Injector class for systematic fault injection
 in PyTorch neural networks to study robustness in harsh environments.
 """
 
-from .exhaustive_seu_injector import ExhaustiveSEUInjector
-from .stochastic_seu_injector import StochasticSEUInjector
+from .injector import Injector
 
-__all__ = ["ExhaustiveSEUInjector", "StochasticSEUInjector"]
+__all__ = ["Injector"]
