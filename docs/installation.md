@@ -14,7 +14,7 @@ pip install seu-injection-framework
 pip install "seu-injection-framework[analysis]"
 
 # Verify
-python -c "from seu_injection import SEUInjector; print('✅ Success!')"
+python -c "from seu_injection import ExhaustiveSEUInjector; print('\u2705 Success!')"
 ```
 
 **Development Setup:**
@@ -202,7 +202,7 @@ uv run python run_tests.py smoke
 python -m pytest tests/smoke/ -v
 
 # Quick import test
-python -c "from seu_injection import SEUInjector; print('Installation successful!')"
+python -c "from seu_injection import ExhaustiveSEUInjector; print('Installation successful!')"
 ```
 
 ## GPU Support

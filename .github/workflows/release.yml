@@ -71,7 +71,7 @@ jobs:
           pip install numpy scipy tqdm
           pip install --no-deps dist/*.whl
           python -c "import seu_injection; print('✓ Import successful'); print('Version:', seu_injection.__version__)"
-          python -c "from seu_injection import SEUInjector; print('✓ Core classes importable')"
+          python -c "from seu_injection import ExhaustiveSEUInjector; print('\u2713 Core classes importable')"
           python -c "from seu_injection.bitops.float32 import bitflip_float32; print('✓ Bitops module working')"
           deactivate
       

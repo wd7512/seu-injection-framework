@@ -48,6 +48,10 @@ from .bitops.float32 import bitflip_float32
 from .core import ExhaustiveSEUInjector, StochasticSEUInjector
 from .metrics.accuracy import classification_accuracy, classification_accuracy_loader
 
+# Alias SEUInjector to ExhaustiveSEUInjector for convenience
+# DEPRECATION NOTE: SEUInjector will be removed in future releases
+SEUInjector = ExhaustiveSEUInjector
+
 __all__ = [
     # Core classes
     "ExhaustiveSEUInjector",
@@ -62,6 +66,13 @@ __all__ = [
     "__author__",
     "__email__",
 ]
+
+# TODO DEPRECATION: Remove SEUInjector alias in future release
+__all__.extend(
+    [
+        "SEUInjector",
+    ]
+)
 
 
 print("Initialised version:", __version__)

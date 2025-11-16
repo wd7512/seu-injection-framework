@@ -99,7 +99,7 @@ body:
       description: Share relevant code or experimental setup
       placeholder: |
         # Share your current approach or what you're trying to implement
-        from seu_injection import SEUInjector
+        from seu_injection import ExhaustiveSEUInjector
         
         # Your experimental setup...
       render: python
