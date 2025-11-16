@@ -4,8 +4,8 @@ Architecture Comparison Study
 
 # ✅ UPDATED: Fast architecture comparison with correct API
 # IMPROVEMENTS:
-# - Uses correct SEUInjector API (trained_model, criterion, x/y or data_loader)
-# - Stochastic SEU injection for speed (1-5% sampling vs exhaustive)
+## Uses new injector API (trained_model, criterion, x/y or data_loader)
+## Fast injection for speed (sampling vs exhaustive)
 # - Quick model training for meaningful comparison (5 epochs)
 # - Smaller datasets (200 train, 100 test) for faster execution
 # - Focus on critical bit positions (sign, exponent MSB, mantissa)
@@ -37,7 +37,7 @@ import torch.nn as nn
 import torch.nn.functional as functional
 from torch.utils.data import DataLoader, TensorDataset
 
-from seu_injection import SEUInjector
+from seu_injection.core import Injector
 from seu_injection.metrics import classification_accuracy
 
 
@@ -242,16 +242,16 @@ def analyze_model_complexity(architectures):
 
 def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
     """
-    Fast robustness analysis across all architectures using stochastic SEU injection.
+    Fast robustness analysis across all architectures using run_injector method.
 
     Optimizations:
-    - Use stochastic sampling instead of exhaustive injection
+    - Use sampling instead of exhaustive injection
     - Focus on most critical bit positions (sign, exponent MSB, mantissa)
     - Pre-train models for meaningful comparison
     - Use smaller sampling rates for speed
     """
 
-    print("\n🔬 Fast Robustness Analysis (Stochastic SEU)")
+    print("\n🔬 Fast Robustness Analysis (run_injector)")
     print("=" * 80)
 
     results = defaultdict(dict)
@@ -276,7 +276,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
 
         print(f"   Target layer: {target_layer}")
 
-        injector = SEUInjector(
+        injector = Injector(
             trained_model=model,
             criterion=classification_accuracy,
             data_loader=test_loader,
@@ -289,8 +289,8 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
 
         print(f"   Baseline accuracy: {baseline:.4f}")
 
-        # 1. Ultra-fast bit position analysis (stochastic, 0.1% sampling)
-        print("   Testing bit sensitivity (stochastic, 0.1% sampling)...")
+        # 1. Ultra-fast bit position analysis (sampling, 0.1% rate)
+        print("   Testing bit sensitivity (sampling, 0.1% rate)...")
         bit_results = {}
 
         for bit_pos in bit_positions:
@@ -316,7 +316,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
 
         # 2. Overall robustness test (different injection probabilities)
         print("   Testing overall robustness (multiple intensities)...")
-        stochastic_results = {}
+        injection_results = {}
 
         for prob in injection_probabilities:
             try:
@@ -329,15 +329,15 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
                     baseline_acc = injector.baseline_score
                     mean_corrupted_acc = np.mean(result["criterion_score"])
                     accuracy_drop = baseline_acc - mean_corrupted_acc
-                    stochastic_results[prob] = accuracy_drop
+                    injection_results[prob] = accuracy_drop
                 else:
-                    stochastic_results[prob] = 0.0
+                    injection_results[prob] = 0.0
 
             except Exception as e:
                 print(f"     Error at probability {prob}: {str(e)}")
-                stochastic_results[prob] = 0.0
+                injection_results[prob] = 0.0
 
-        results[arch_name]["stochastic_robustness"] = stochastic_results
+        results[arch_name]["injection_robustness"] = injection_results
 
         # Skip detailed layer analysis for speed - focus on overall robustness
         results[arch_name]["layer_vulnerability"] = {}  # Empty for now
@@ -413,20 +413,19 @@ def create_comparison_visualizations(results, complexity_data, output_dir=None):
     ax2.legend()
     ax2.grid(True, alpha=0.3)
 
-    # Plot 3: Stochastic Robustness
+    # Plot 3: Injection Robustness
     probabilities = [0.001, 0.005]  # Updated to match new injection probabilities
     prob_labels = ["0.1%", "0.5%"]
 
     for name in arch_names:
-        stoch_data = [
-            results[name]["stochastic_robustness"].get(prob, 0)
-            for prob in probabilities
+        inj_data = [
+            results[name]["injection_robustness"].get(prob, 0) for prob in probabilities
         ]
-        ax3.plot(prob_labels, stoch_data, marker="s", label=name, linewidth=2)
+        ax3.plot(prob_labels, inj_data, marker="s", label=name, linewidth=2)
 
     ax3.set_xlabel("Injection Probability")
     ax3.set_ylabel("Accuracy Drop")
-    ax3.set_title("Stochastic SEU Robustness")
+    ax3.set_title("Injection Robustness")
     ax3.legend()
     ax3.grid(True, alpha=0.3)
 
@@ -435,11 +434,11 @@ def create_comparison_visualizations(results, complexity_data, output_dir=None):
     robustness_scores = {}
     for name in arch_names:
         bit_score = np.nanmean(list(results[name]["bit_sensitivity"].values()))
-        stoch_score = np.nanmean(list(results[name]["stochastic_robustness"].values()))
+        inj_score = np.nanmean(list(results[name]["injection_robustness"].values()))
         layer_score = np.nanmean(list(results[name]["layer_vulnerability"].values()))
 
         # Lower is better (less accuracy drop = more robust)
-        composite_score = np.nanmean([bit_score, stoch_score, layer_score])
+        composite_score = np.nanmean([bit_score, inj_score, layer_score])
         robustness_scores[name] = composite_score
 
     # Sort by robustness (ascending - lower drop is better)
@@ -555,10 +554,10 @@ def generate_comparative_report(
             f"   • Most Vulnerable Bit: {most_vulnerable_bit[0]} ({most_vulnerable_bit[1]:.6f} drop)"
         )
 
-        # Stochastic robustness
-        stoch_rob = results[arch_name]["stochastic_robustness"]
-        avg_stoch = np.nanmean(list(stoch_rob.values()))
-        report.append(f"   • Average Stochastic Impact: {avg_stoch:.6f}")
+        # Injection robustness
+        inj_rob = results[arch_name]["injection_robustness"]
+        avg_inj = np.nanmean(list(inj_rob.values()))
+        report.append(f"   • Average Injection Impact: {avg_inj:.6f}")
 
         # Layer vulnerability (top 3 most vulnerable)
         layer_vuln = results[arch_name]["layer_vulnerability"]

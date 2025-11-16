@@ -6,10 +6,7 @@ optimized for Single Event Upset (SEU) injection experiments. It supports multip
 input formats (tensors, DataLoaders), automatic batch processing, device-aware
 computation, and handles both binary and multiclass classification scenarios.
 
-tolerance analysis, providing consistent and reliable performance measurements
-across different model architectures and dataset configurations.
-
-The metrics are designed to work seamlessly with ExhaustiveSEUInjector and StochasticSEUInjector for systematic fault tolerance analysis, providing consistent and reliable performance measurements across different model architectures and dataset configurations.
+The metrics are designed to work seamlessly with the Injector class for systematic fault tolerance analysis, providing consistent and reliable performance measurements across different model architectures and dataset configurations.
 
 Key Features:
     - Automatic input type detection (tensor vs DataLoader)
@@ -33,7 +30,7 @@ Performance Characteristics:
     - Vectorized operations: NumPy and PyTorch optimizations throughout
 
 Typical Usage in SEU Experiments:
-    >>> from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
+    >>> from seu_injection.core import Injector
     >>> from seu_injection.metrics.accuracy import classification_accuracy
     >>>
     >>> # Define evaluation criterion
@@ -41,7 +38,7 @@ Typical Usage in SEU Experiments:
     ...     return classification_accuracy(model, x, y, device)
     >>>
     >>> # Create injector with accuracy evaluation
-    >>> injector = ExhaustiveSEUInjector(
+    >>> injector = Injector(
     ...     trained_model=model,
     ...     criterion=accuracy_criterion,
     ...     x=test_data, y=test_labels
@@ -59,8 +56,7 @@ Integration with Common Frameworks:
     - CUDA: Automatic GPU acceleration when available
 
 See Also:
-    seu_injection.core.ExhaustiveSEUInjector: Systematic fault injection
-    seu_injection.core.StochasticSEUInjector: Stochastic fault injection
+    seu_injection.core.Injector: Systematic fault injection
     sklearn.metrics.accuracy_score: Underlying accuracy computation
     torch.utils.data.DataLoader: Batch data loading for large datasets
 """
@@ -173,13 +169,13 @@ def classification_accuracy_loader(
         ...     )
         ...     print(f"GPU accuracy: {accuracy_gpu:.4f}")
         >>>
-        >>> # Integration with SEUInjector for large-scale experiments
-        >>> from seu_injection.core import StochasticSEUInjector
+        >>> # Integration with Injector for large-scale experiments
+        >>> from seu_injection.core import Injector
         >>>
         >>> def loader_criterion(model, data_loader, device):
         ...     return classification_accuracy_loader(model, data_loader, device)
         >>>
-        >>> injector = StochasticSEUInjector(
+        >>> injector = Injector(
         ...     trained_model=model,
         ...     criterion=loader_criterion,
         ...     data_loader=loader
@@ -229,7 +225,7 @@ def classification_accuracy_loader(
         classification_accuracy: General-purpose accuracy with automatic type detection
         multiclass_classification_accuracy: Core accuracy computation logic
         torch.utils.data.DataLoader: PyTorch batch data loading
-        seu_injection.core.injector.SEUInjector: Framework integration point
+        seu_injection.core.injector.Injector: Framework integration point
     """
     model.eval()
     if device:
@@ -268,7 +264,7 @@ def classification_accuracy(
     DataLoaders) and applies the optimal evaluation strategy, handling device placement,
     memory management, and batch processing transparently.
 
-    The function is designed for seamless integration with SEUInjector as a criterion
+    The function is designed for seamless integration with Injector as a criterion
     function, providing consistent accuracy measurements across different model
     architectures and dataset configurations during fault injection campaigns.
 
@@ -336,13 +332,13 @@ def classification_accuracy(
         >>> accuracy_loader = classification_accuracy(model, loader, device='cuda')
         >>> print(f"DataLoader accuracy: {accuracy_loader:.3f}")
         >>>
-        >>> # Integration with SEUInjector
-        >>> from seu_injection.core import StochasticSEUInjector
+        >>> # Integration with Injector
+        >>> from seu_injection.core import Injector
         >>>
         >>> def accuracy_criterion(model, x, y, device):
         ...     return classification_accuracy(model, x, y, device, batch_size=256)
         >>>
-        >>> injector = StochasticSEUInjector(
+        >>> injector = Injector(
         ...     trained_model=model,
         ...     criterion=accuracy_criterion,
         ...     x=x_test, y=y_test
@@ -390,8 +386,7 @@ def classification_accuracy(
     See Also:
         classification_accuracy_loader: Direct DataLoader evaluation
         multiclass_classification_accuracy: Core accuracy computation logic
-        seu_injection.core.ExhaustiveSEUInjector: Systematic fault injection
-        seu_injection.core.StochasticSEUInjector: Stochastic fault injection
+        seu_injection.core.Injector: Systematic fault injection
         sklearn.metrics.accuracy_score: Underlying accuracy computation standard
     """
     # Check if x_tensor is actually a DataLoader

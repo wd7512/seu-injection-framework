@@ -102,7 +102,7 @@ def bitflip_float32(
         bit_i (Optional[int]): Bit position to flip in IEEE 754 representation.
             Range: [0, 31] where 0 is most significant bit (sign), 31 is least
             significant bit (mantissa LSB). If None, randomly selects position
-            using numpy.random.randint(0, 32) for stochastic analysis.
+            using numpy.random.randint(0, 32) for sampling analysis.
 
     Returns:
         Union[float, np.ndarray]: Value(s) with the specified bit flipped,
@@ -145,7 +145,7 @@ def bitflip_float32(
         >>> print(f"Original: {weights}")
         >>> print(f"Corrupted: {corrupted}")  # [-1.0, -2.0, -3.0, -4.0]
         >>>
-        >>> # Random bit selection for stochastic analysis
+        >>> # Random bit selection for sampling analysis
         >>> np.random.seed(42)  # For reproducible results
         >>> random_corrupted = bitflip_float32(1.0)  # Random bit position
         >>> print(f"Random corruption: 1.0 -> {random_corrupted}")
@@ -487,7 +487,7 @@ def bitflip_float32_fast(
         bit_i (Optional[int]): Bit position to flip in IEEE 754 representation.
             Range: [0, 31] where 0 is most significant bit (sign), 31 is least
             significant bit (mantissa LSB). If None, randomly selects position using
-            numpy.random.randint(0, 32) for stochastic fault injection scenarios.
+            numpy.random.randint(0, 32) for sampling fault injection scenarios.
 
     Returns:
         Union[float, np.ndarray]: Value(s) with specified bit flipped, maintaining
@@ -526,7 +526,7 @@ def bitflip_float32_fast(
         >>> # Graceful fallback for edge cases
         >>> mixed_result = bitflip_float32_fast([1.0, "2.0"], 0)  # String fallback
         >>>
-        >>> # Random bit selection for stochastic analysis
+        >>> # Random bit selection for sampling analysis
         >>> np.random.seed(123)  # For reproducible experiments
         >>> weights = np.random.randn(10000).astype(np.float32)
         >>> corrupted = bitflip_float32_fast(weights)  # Random bit per element? No, same bit
@@ -591,7 +591,7 @@ def bitflip_float32_fast(
     if hasattr(x, "__iter__") and not isinstance(x, str):
         try:
             # TODO VECTORIZATION OPPORTUNITY: This function should be the default in all injection loops
-            # PROBLEM: SEUInjector still calls slow bitflip_float32() instead of this optimized version
+            # PROBLEM: Previous injector classes still called slow bitflip_float32() instead of this optimized version
             # IMPACT: Users get 10-100x speedup if they use this function, but critical paths don't
             # SOLUTION: Make this the default import, deprecate string-based version for educational use
 
