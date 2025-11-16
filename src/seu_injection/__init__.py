@@ -42,7 +42,6 @@ except Exception:  # Fallback for editable/source checkouts prior to build
     __version__ = "1.1.10"  # Latest stable PyPI release with working build pipeline
 __author__ = "William Dennis"
 __email__ = "wwdennis.home@gmail.com"
-print(__version__)
 
 # Core public API
 from .bitops.float32 import bitflip_float32
@@ -63,3 +62,6 @@ __all__ = [
     "__author__",
     "__email__",
 ]
+
+
+print("Initialised version:", __version__)
