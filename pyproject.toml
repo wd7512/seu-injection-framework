@@ -99,9 +99,14 @@ docs = [
     "mkdocstrings[python]>=0.24.0",
 ]
 
+# Examples
+examples = [
+    "kagglehub>=0.1.0"
+]
+
 # Aggregate convenience extra
 all = [
-    "seu-injection-framework[dev,analysis,vision,notebooks,docs]"
+    "seu-injection-framework[dev,analysis,vision,notebooks,docs,examples]"
 ]
 
 [project.urls]
