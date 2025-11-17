@@ -2,6 +2,8 @@
 
 This folder contains experiments re-creating the methodology from the 2025 paper, [A Framework for Developing Robust Machine Learning Models in Harsh Environments: A Review of CNN Design Choices](https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars/), focusing on fault injection and robustness analysis for the ShipsNet dataset.
 
+To run files in this folder make sure to use `uv run --extra examples [SCRIPT.py]`
+
 ## Overview
 
 The goal is to systematically evaluate the robustness of CNN models trained on the ShipsNet dataset under Single Event Upset (SEU) fault injection, following the experimental design and analysis described in the referenced publication.
