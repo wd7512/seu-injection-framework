@@ -246,7 +246,9 @@ class BaseInjector(ABC):
             raise ValueError(f"bit_i must be in range [0, 32], got {bit_i}")
 
         if layer_name is not None and layer_name not in self._layer_names:
-            raise ValueError(f"layer_name '{layer_name}' not found in model parameters")
+            print(
+                f"WARNING - layer_name '{layer_name}' not found in model parameters. Skipping..."
+            )
 
         self.model.eval()
 
