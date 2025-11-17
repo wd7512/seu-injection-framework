@@ -10,100 +10,46 @@ from .base_injector import BaseInjector
 
 class ExhaustiveSEUInjector(BaseInjector):
     """
-    Exhaustive Single Event Upset (SEU) injector for PyTorch neural networks.
-    This class systematically flips each bit in the floating-point representation
-    of weights across all layers (or a specified layer) and evaluates the model's
-    performance after each injection.
+    Exhaustive SEU injector for PyTorch models.
+
+    Systematically flips each bit in float32 weights across all layers (or a specified layer),
+    evaluating model performance after each injection.
+
+    Notes:
+        - Use for detailed vulnerability analysis of small models or specific layers.
+        - For large models, use StochasticSEUInjector for efficiency.
+        - All injections are reversible; model is restored after each run.
 
     Example:
-        >>> from seu_injection.core import ExhaustiveSEUInjector
         >>> injector = ExhaustiveSEUInjector(model, criterion, x=data, y=labels)
         >>> results = injector.run_injector(bit_i=15)
-        >>> print(f"Injected {len(results['criterion_score'])} faults")
+        >>> print(len(results['criterion_score']))
     """
 
-    def run_injector(
+    def _run_injector_impl(
         self, bit_i: int, layer_name: Optional[str] = None, **kwargs
     ) -> dict[str, list[Any]]:
         """
-        Perform systematic exhaustive SEU injection across model parameters.
+        Perform systematic SEU injection across model parameters.
 
-        This method conducts a comprehensive fault injection campaign by systematically
-        injecting a single bit flip at the specified bit position in every float32
-        parameter of the neural network. Each injection is performed individually,
-        with the parameter restored to its original value before the next injection.
-
-        The method is ideal for detailed vulnerability analysis of smaller models or
-        specific layers, providing complete coverage of all parameters. For large
-        models, consider using StochasticSEUInjector for computational efficiency.
+        Flips a single bit at the specified position in every float32 parameter of the model (or a specific layer),
+        evaluates the model, and restores the original value.
 
         Args:
-            bit_i (int): Bit position to flip in IEEE 754 float32 representation.
-                Range: [0, 31] where 0 is the most significant bit (sign bit),
-                1-8 are exponent bits, and 9-31 are mantissa bits. Different bit
-                positions have varying impact on parameter magnitude and sign.
-            layer_name (Optional[str]): Specific layer name to target for injection.
-                If None, injects across all targetable layers in the model. Use
-                model.named_parameters() to see available layer names. Useful for
-                focused analysis of specific network components.
+            bit_i (int): Bit position to flip (0-31).
+            layer_name (Optional[str]): Layer to target (None for all).
 
-                Returns:
-                        dict[str, list[Any]]: Comprehensive injection results dictionary containing:
-                                - 'tensor_location' (list[int]): Flat parameter indices where each
-                                    injection was performed, allowing precise identification of
-                                    affected parameters across the model.
-                                - 'criterion_score' (list[float]): Model performance score after
-                                    each injection, measured using the configured criterion function.
-                                    Enables statistical analysis of fault impact distribution.
-                                - 'layer_name' (list[str]): Layer name containing each injected
-                                    parameter, facilitating layer-wise vulnerability analysis.
-                                - 'value_before' (list[float]): Original parameter values before
-                                    injection, enabling impact magnitude calculation.
-                                - 'value_after' (list[float]): Parameter values immediately after
-                                    bit flip injection, showing exact fault manifestation.
+        Returns:
+            dict[str, list[Any]]: Results including tensor locations, scores, layer names, values before/after.
 
         Raises:
-            AssertionError: If bit_i is not in valid range [0, 32]. Note that
-                while IEEE 754 has 32 bits (0-31), bit position 32 is included
-                for boundary testing purposes.
-            RuntimeError: If model evaluation fails during criterion computation.
+            AssertionError: If bit_i is not in [0, 32].
+            RuntimeError: If model evaluation fails.
 
-        Example:
-            >>> # Basic systematic injection
-            >>> injector = ExhaustiveSEUInjector(model, accuracy_top1, x=data, y=labels)
-            >>> results = injector.run_injector(bit_i=15)  # Flip middle mantissa bit
-            >>>
-            >>> # Analyze results
-            >>> baseline = injector.baseline_score
-            >>> scores = results['criterion_score']
-            >>> accuracy_drops = [baseline - score for score in scores]
-            >>> critical_faults = [i for i, drop in enumerate(accuracy_drops) if drop > 0.1]
-            >>>
-            >>> print(f"Baseline accuracy: {baseline:.3f}")
-            >>> print(f"Total injections: {len(scores)}")
-            >>> print(f"Critical faults (>10% drop): {len(critical_faults)}")
-            >>>
-            >>> # Layer-specific analysis
-            >>> layer_results = injector.run_injector(bit_i=0, layer_name='classifier.weight')
-            >>> print(f"Sign bit flips in classifier: {len(layer_results['tensor_location'])}")
-
-        Performance:
-            The computational complexity is O(n) where n is the number of parameters
-            in the target scope. Each injection requires:
-            - One bit flip operation (~1μs)
-            - One forward pass through the model
-            - One criterion evaluation
-            - Parameter restoration
-
-            For a typical ResNet-18 with ~11M parameters, expect ~30-60 minutes per
-            bit position on modern GPU hardware, depending on criterion complexity.
-
-        See Also:
-            StochasticSEUInjector: Probabilistic sampling for large-scale analysis
-            get_criterion_score: Manual evaluation without injection
-            bitops.float32.flip_bit: Underlying bit manipulation function
+        Notes:
+            - For large models, this is computationally expensive.
+            - All injections are reversible; model is restored after each run.
         """
-        super().run_injector(bit_i, layer_name, **kwargs)
         results: dict[str, list[Any]] = {
             "tensor_location": [],
             "criterion_score": [],
