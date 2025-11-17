@@ -100,14 +100,10 @@ class StochasticSEUInjector(BaseInjector):
             get_criterion_score: Direct evaluation without injection
             numpy.random: Underlying random sampling implementation
         """
-
+        super().run_injector(bit_i, layer_name, **kwargs)
         p = kwargs.get("p", 0.0)
         if not (0.0 <= p <= 1.0):
             raise ValueError(f"Probability p must be in [0, 1], got {p}")
-        if bit_i not in range(0, 33):
-            raise ValueError(f"bit_i must be in range [0, 32], got {bit_i}")
-
-        self.model.eval()
 
         results: dict[str, list[Any]] = {
             "tensor_location": [],

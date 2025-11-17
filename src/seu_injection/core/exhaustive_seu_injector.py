@@ -103,11 +103,7 @@ class ExhaustiveSEUInjector(BaseInjector):
             get_criterion_score: Manual evaluation without injection
             bitops.float32.flip_bit: Underlying bit manipulation function
         """
-        if bit_i not in range(0, 33):
-            raise ValueError(f"bit_i must be in range [0, 32], got {bit_i}")
-
-        self.model.eval()
-
+        super().run_injector(bit_i, layer_name, **kwargs)
         results: dict[str, list[Any]] = {
             "tensor_location": [],
             "criterion_score": [],

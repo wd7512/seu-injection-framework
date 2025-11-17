@@ -236,11 +236,19 @@ class BaseInjector(ABC):
 
         print(f"Baseline Criterion Score: {self.baseline_score}")
 
+        self._layer_names = [name for name, _ in self.model.named_parameters()]
+
     @abstractmethod
     def run_injector(
         self, bit_i: int, layer_name: Optional[str] = None, **kwargs
     ) -> dict[str, list[Any]]:
-        pass
+        if bit_i not in range(0, 33):
+            raise ValueError(f"bit_i must be in range [0, 32], got {bit_i}")
+
+        if layer_name is not None and layer_name not in self._layer_names:
+            raise ValueError(f"layer_name '{layer_name}' not found in model parameters")
+
+        self.model.eval()
 
     def _get_criterion_score(self) -> float:
         """
