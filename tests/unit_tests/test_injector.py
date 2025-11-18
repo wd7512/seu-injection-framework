@@ -161,6 +161,17 @@ class TestInjector:
                 data_loader=dataloader,
             )
 
+    def test_injector_missing_data(self, simple_model):
+        """Test that Injector raises error when neither data_loader nor X/y are provided."""
+        with pytest.raises(
+            ValueError, match="Must provide either data_loader or at least one of X, y"
+        ):
+            ExhaustiveSEUInjector(
+                trained_model=simple_model,
+                criterion=classification_accuracy,
+                device="cpu",
+            )
+
     def test_get_criterion_score(self, simple_model, sample_data, device):
         """Test that get_criterion_score returns consistent results."""
         X, y = sample_data
