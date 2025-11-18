@@ -247,3 +247,10 @@ class TestBitflipOperations:
         value = CustomScalar()
         with pytest.raises(struct.error, match="required argument is not a float"):
             bitflip_float32_fast(value, 0)
+
+    def test_bitflip_float32_invalid_bit_position(self):
+        """Test that bitflip_float32 raises ValueError for invalid bit positions."""
+        with pytest.raises(ValueError, match="Bit position must be between 0 and 31"):
+            bitflip_float32(1.0, -1)
+        with pytest.raises(ValueError, match="Bit position must be between 0 and 31"):
+            bitflip_float32(1.0, 32)
