@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **ShipsNet experiments and notebook added**: see `examples/shipsnet/` for reproducible experiments and improved injection protocols/metrics
 - **Bitops refactor**: `src/bitops` split into `float32_legacy`, `float32` and `utils` python files
 - **Versioning improved**: `test_init_` created to assess correct version behavior in the `__init__` file
-- **Testing improved**:
+- **Testing improved**: Coverage increased to 98%. the only missing tests are for legacy operations in `float32_legacy.py`
 
 ## [1.1.10] - 2025-11-15
 
