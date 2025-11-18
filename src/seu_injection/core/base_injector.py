@@ -32,72 +32,21 @@ import torch
 
 class BaseInjector(ABC):
     """
-    Injector for PyTorch neural networks.
+    Abstract base class for SEU fault injection in PyTorch models.
 
-    This class provides comprehensive fault injection capabilities to study neural network
-    robustness under radiation-induced bit flips. It supports both systematic exhaustive
-    injection across all model parameters and stochastic probabilistic injection for
-    large-scale analysis.
+    Supports systematic and stochastic bit-flip injection to evaluate model robustness.
+    Device-aware operation and flexible evaluation via user-supplied criterion.
 
-    The injector operates by temporarily modifying model parameters through bit-flip
-    operations, evaluating model performance using provided criteria, and collecting
-    detailed results for analysis. All injections are reversible, leaving the original
-    model unchanged.
-
-    Key Features:
-        - Systematic injection across all targetable layers
-        - Stochastic sampling for large model analysis
-        - Flexible criterion-based evaluation
-        - Device-aware operation (CPU/CUDA)
-        - Comprehensive result tracking
-        - Layer-specific targeting support
-
-    Attributes:
-        model (torch.nn.Module): The PyTorch model under test
-        criterion (callable): Evaluation function for measuring model performance
-        device (torch.device): Computing device (CPU/CUDA)
-        baseline_score (float): Model performance without fault injection
-        x (torch.Tensor): Input data tensor for evaluation
-        y (torch.Tensor): Target labels for evaluation
-        data_loader (DataLoader): Alternative data source for evaluation
+    Notes:
+        - All injections are reversible; model is unchanged after each run.
+        - Use either (x, y) or data_loader for evaluation, not both.
+        - Model parameters must be float32 tensors for bit-flip operations.
+        - Device is auto-detected if not specified.
 
     Example:
-        >>> import torch
-        >>> from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
-        >>> from seu_injection.metrics import accuracy_top1
-        >>>
-        >>> # Setup model and data
-        >>> model = torch.nn.Sequential(
-        ...     torch.nn.Linear(784, 128),
-        ...     torch.nn.ReLU(),
-        ...     torch.nn.Linear(128, 10)
-        ... )
-        >>> x = torch.randn(100, 784)
-        >>> y = torch.randint(0, 10, (100,))
-        >>>
-        >>> # Systematic (exhaustive) injection
-        >>> injector = ExhaustiveSEUInjector(
-        ...     trained_model=model,
-        ...     criterion=accuracy_top1,
-        ...     x=x, y=y
-        ... )
+        >>> injector = ExhaustiveSEUInjector(model, criterion, x=x, y=y)
         >>> results = injector.run_injector(bit_i=15)
-        >>> print(f"Baseline accuracy: {injector.baseline_score:.3f}")
-        >>> print(f"Injected {len(results['criterion_score'])} faults")
-        >>>
-        >>> # Stochastic injection
-        >>> injector = StochasticSEUInjector(
-        ...     trained_model=model,
-        ...     criterion=accuracy_top1,
-        ...     x=x, y=y
-        ... )
-        >>> results = injector.run_injector(bit_i=15, p=0.01)
-        >>> print(f"Injected {len(results['criterion_score'])} faults (stochastic)")
-
-    See Also:
-        ExhaustiveSEUInjector: Systematic fault injection across all parameters
-        StochasticSEUInjector: Probabilistic fault injection sampling
-        get_criterion_score: Manual criterion evaluation
+        >>> print(injector.baseline_score)
     """
 
     def __init__(
@@ -122,58 +71,18 @@ class BaseInjector(ABC):
         #   - Auto-detect device if None provided (already implemented)
         # PRIORITY: MEDIUM - Affects new user onboarding
         """
-        Initialize the SEU injector with model, data, and evaluation criterion.
-
-        Sets up the fault injection environment by configuring the target model,
-        evaluation data, and performance criterion. Automatically detects optimal
-        computing device and establishes baseline performance metrics.
+        Initialize injector with model, criterion, device, and data.
 
         Args:
-            trained_model (torch.nn.Module): PyTorch neural network model to inject
-                faults into. Should be pre-trained and in evaluation mode. The model
-                parameters must be float32 tensors for bit-flip operations.
-            criterion (callable): Function to evaluate model performance after fault
-                injection. Should accept (model, x, y, device) and return a numeric
-                score. Higher scores typically indicate better performance.
-            device (Optional[Union[str, torch.device]]): Computing device for operations.
-                Options: 'cpu', 'cuda', 'cuda:0', etc., or torch.device object.
-                If None, automatically selects CUDA if available, otherwise CPU.
-            x (Optional[Union[torch.Tensor, np.ndarray]]): Input data tensor for model
-                evaluation. Shape should match model's expected input. Mutually
-                exclusive with data_loader parameter. Will be moved to target device.
-            y (Optional[Union[torch.Tensor, np.ndarray]]): Target labels tensor for
-                supervised evaluation. Must have same batch size as x. Mutually
-                exclusive with data_loader parameter. Will be moved to target device.
-                x and y parameters. Useful for large datasets that don't fit in memory.
+            trained_model: PyTorch model to inject faults into.
+            criterion: Function to evaluate model performance.
+            device: Target device ('cpu', 'cuda', etc.). Auto-detects if None.
+            x: Input data tensor (optional).
+            y: Target labels tensor (optional).
+            data_loader: DataLoader for evaluation (optional).
 
         Raises:
-            ValueError: If both data_loader and (x, y) are provided simultaneously,
-                or if neither data source is provided.
-            TypeError: If model parameters are not float32 tensors.
-            RuntimeError: If CUDA is specified but not available.
-
-        Example:
-            >>> # Basic usage with tensor data
-            >>> injector = ExhaustiveSEUInjector(
-            ...     trained_model=model,
-            ...     criterion=accuracy_top1,
-            ...     x=test_images,
-            ...     y=test_labels
-            ... )
-            >>>
-            >>> # Usage with DataLoader for large datasets
-            >>> injector = ExhaustiveSEUInjector(
-            ...     trained_model=model,
-            ...     criterion=accuracy_top1,
-            ...     data_loader=test_loader,
-            ...     device='cuda'
-            ... )
-
-        Note:
-            This implementation assumes float32 precision for IEEE 754 bit manipulation.
-            Other precisions (float16, float64) will be supported in future versions.
-            The model is automatically moved to the specified device and set to
-            evaluation mode for consistent injection results.
+            ValueError: If both data_loader and (x, y) are provided, or neither.
         """
         # Device detection and setup
         if device is None:
@@ -236,69 +145,31 @@ class BaseInjector(ABC):
 
         print(f"Baseline Criterion Score: {self.baseline_score}")
 
-    @abstractmethod
+        self._layer_names = [name for name, _ in self.model.named_parameters()]
+
     def run_injector(
         self, bit_i: int, layer_name: Optional[str] = None, **kwargs
     ) -> dict[str, list[Any]]:
-        pass
+        if bit_i not in range(33):
+            raise ValueError(f"bit_i must be in [0, 32], got {bit_i}")
+
+        if layer_name is not None and layer_name not in self._layer_names:
+            print(f"WARNING - layer '{layer_name}' missing. Skipping...")
+
+        self.model.eval()
+        return self._run_injector_impl(bit_i, layer_name, **kwargs)
+
+    @abstractmethod
+    def _run_injector_impl(
+        self, bit_i: int, layer_name: Optional[str], **kwargs
+    ) -> dict[str, list[Any]]: ...
 
     def _get_criterion_score(self) -> float:
         """
-        Evaluate current model performance using the configured criterion function.
-
-        This method provides on-demand evaluation of the model's current state using
-        the criterion function specified during initialization. It handles both
-        tensor-based and DataLoader-based evaluation automatically based on the
-        configured data source.
-
-        The method is used internally during fault injection campaigns but can also
-        be called directly for manual performance assessment at any time. It ensures
-        consistent evaluation methodology across all injection experiments.
+        Evaluate model performance using the configured criterion.
 
         Returns:
-            float: Current model performance score as computed by the criterion function.
-                The interpretation depends on the specific criterion:
-                - Accuracy metrics: Higher values indicate better performance (0.0-1.0)
-                - Loss metrics: Lower values indicate better performance (0.0+)
-                - Custom metrics: Interpretation depends on implementation
-
-        Raises:
-            RuntimeError: If model evaluation fails due to data/device mismatches,
-                insufficient memory, or criterion function errors.
-            ValueError: If the criterion function returns non-numeric results.
-
-        Example:
-            >>> # Manual evaluation during analysis
-            >>> injector = ExhaustiveSEUInjector(model, accuracy_top1, x=data, y=labels)
-            >>> baseline = injector.get_criterion_score()
-            >>> print(f"Baseline accuracy: {baseline:.3f}")
-            >>>
-            >>> # Check performance after manual model modifications
-            >>> with torch.no_grad():
-            ...     model.classifier.weight.data *= 0.5  # Simulate parameter corruption
-            >>> corrupted_score = injector.get_criterion_score()
-            >>> print(f"Performance drop: {baseline - corrupted_score:.3f}")
-            >>>
-            >>> # Restore and verify
-            >>> with torch.no_grad():
-            ...     model.classifier.weight.data *= 2.0  # Restore
-            >>> restored_score = injector.get_criterion_score()
-            >>> assert abs(restored_score - baseline) < 1e-6
-
-        Performance:
-            Computational cost equals one forward pass through the model plus criterion
-            evaluation overhead. For typical scenarios:
-            - Small models (<1M params): <10ms on GPU
-            - Medium models (1-100M params): 10-100ms on GPU
-            - Large models (>100M params): 100ms-1s on GPU
-
-            Memory usage scales with batch size and model size, identical to normal
-            inference requirements.
-
-        See Also:
-            __init__: Criterion function specification and requirements
-            ExhaustiveSEUInjector: Systematic injection with automatic evaluation
-            StochasticSEUInjector: Statistical injection with automatic evaluation
+            float: Current model score.
         """
         if self.use_data_loader:
             return float(

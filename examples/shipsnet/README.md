@@ -1,6 +1,9 @@
 # ShipsNet Fault Injection Experiments
 
 This folder contains experiments re-creating the methodology from the 2025 paper, [A Framework for Developing Robust Machine Learning Models in Harsh Environments: A Review of CNN Design Choices](https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars/), focusing on fault injection and robustness analysis for the ShipsNet dataset.
+Recent updates include improved injection protocols, new metrics, and expanded analysis scripts. See the latest scripts and notebooks for details.
+
+To run files in this folder make sure to use `uv run --extra examples [SCRIPT.py]`
 
 ## Overview
 
@@ -9,7 +12,7 @@ The goal is to systematically evaluate the robustness of CNN models trained on t
 ## Dataset
 
 - **ShipsNet**: A satellite image dataset for ship classification.
-- Download and preprocessing instructions will be provided here.
+- Download and preprocessing: Use `shipsnet/dataset/download.py` to fetch and preprocess the data. See `shipsnet/dataset/README.md` for details.
 
 ## Methodology
 
@@ -28,7 +31,7 @@ The goal is to systematically evaluate the robustness of CNN models trained on t
 
 ## Results
 
-Results and analysis will be added here as experiments progress.
+Results and analysis are being updated as experiments progress. See notebooks and scripts in this folder for current outputs and visualizations.
 
 ## References
 
