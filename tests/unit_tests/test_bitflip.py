@@ -3,12 +3,7 @@ import struct
 import numpy as np
 import pytest
 
-from seu_injection.bitops.float32 import (
-    binary_to_float32,
-    bitflip_float32_fast,
-    float32_to_binary,
-)
-from seu_injection.bitops.float32_legacy import bitflip_float32
+from seu_injection.bitops import binary_to_float32, bitflip_float32, bitflip_float32_fast, float32_to_binary
 
 
 class TestBitflipOperations:

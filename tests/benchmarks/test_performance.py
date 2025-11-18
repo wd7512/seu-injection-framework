@@ -82,7 +82,7 @@ class TestPerformanceBenchmarks:
         """Benchmark bitflip operations for performance regression."""
         import numpy as np
 
-        from seu_injection.bitops.float32 import bitflip_float32
+        from seu_injection.bitops import bitflip_float32
 
         # Test data
         test_values = np.random.randn(1000).astype(np.float32)
@@ -174,7 +174,7 @@ class TestPerformanceBenchmarks:
                     del sys.modules[module]
 
             # Import framework
-            from seu_injection.bitops.float32 import bitflip_float32
+            from seu_injection.bitops import bitflip_float32
             from seu_injection.core import ExhaustiveSEUInjector
             from seu_injection.metrics import classification_accuracy
 

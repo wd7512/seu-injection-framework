@@ -34,7 +34,7 @@ https://github.com/wd7512/seu-injection-framework/blob/main/README.md
 """
 
 # Core public API
-from .bitops.float32_legacy import bitflip_float32
+from .bitops import bitflip_float32
 from .core import ExhaustiveSEUInjector, StochasticSEUInjector
 from .metrics.accuracy import classification_accuracy, classification_accuracy_loader
 from .version import __version__

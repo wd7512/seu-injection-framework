@@ -10,7 +10,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from ..bitops.float32 import bitflip_float32_optimized
+from ..bitops import bitflip_float32_optimized
 from .base_injector import BaseInjector
 
 

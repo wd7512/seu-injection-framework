@@ -2,7 +2,7 @@ import time
 
 import numpy as np
 
-from seu_injection.bitops.float32 import bitflip_float32, bitflip_float32_optimized
+from seu_injection.bitops import bitflip_float32, bitflip_float32_optimized
 
 
 class TestBitflipPerformance:

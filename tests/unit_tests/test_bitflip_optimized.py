@@ -7,11 +7,7 @@ compatibility with the original implementation.
 import numpy as np
 import pytest
 
-from seu_injection.bitops.float32 import (
-    bitflip_float32_fast,
-    bitflip_float32_optimized,
-)
-from seu_injection.bitops.float32_legacy import bitflip_float32
+from seu_injection.bitops import bitflip_float32, bitflip_float32_fast, bitflip_float32_optimized
 
 
 class TestOptimizedBitflipOperations:

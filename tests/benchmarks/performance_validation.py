@@ -9,7 +9,7 @@ import time
 
 import torch
 
-from seu_injection.bitops.float32 import bitflip_float32, bitflip_float32_optimized
+from seu_injection.bitops import bitflip_float32, bitflip_float32_optimized
 
 
 def benchmark_bitflip_functions():

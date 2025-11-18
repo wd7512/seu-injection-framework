@@ -7,7 +7,7 @@ def test_basic_imports():
     """Test that all framework modules can be imported without errors."""
     try:
         from seu_injection import classification_accuracy
-        from seu_injection.bitops.float32 import (
+        from seu_injection.bitops import (
             binary_to_float32,
             bitflip_float32,
             float32_to_binary,
@@ -26,7 +26,7 @@ def test_basic_imports():
 
 def test_basic_bitflip_functionality():
     """Quick test that bitflip operations work."""
-    from seu_injection.bitops.float32 import bitflip_float32
+    from seu_injection.bitops import bitflip_float32
 
     # Simple bitflip test
     result = bitflip_float32(1.0, 0)
@@ -157,7 +157,7 @@ def test_performance_smoke():
     """Basic performance smoke test - ensure operations complete quickly."""
     import time
 
-    from seu_injection.bitops.float32 import bitflip_float32
+    from seu_injection.bitops import bitflip_float32
 
     # Test should complete quickly
     start_time = time.time()
