@@ -1,6 +1,6 @@
 # SEU Injection Framework Documentation
 
-**Version 1.1.10** - Documentation hub for the SEU Injection Framework.
+**Version 1.1.11** - Documentation hub for the SEU Injection Framework.
 
 ## 📚 Quick Access
 
@@ -23,8 +23,8 @@
 
 ## 🎯 Current Status
 
-✅ v1.1.9 on [PyPI](https://pypi.org/project/seu-injection-framework/)\
-🚀 94% test coverage, production-ready\
+✅ v1.1.10 on [PyPI](https://pypi.org/project/seu-injection-framework/)\
+🚀 98% test coverage, production-ready\
 📦 Available with extras: `analysis`, `vision`, `notebooks`, `docs`, `dev`, `all`
 
 ______________________________________________________________________

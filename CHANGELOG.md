@@ -5,7 +5,7 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.X.XX] - sometime
+## [1.1.11] - 2025-11-18
 
 - **ShipsNet experiments and notebook added**: see `examples/shipsnet/` for reproducible experiments and improved injection protocols/metrics
 - **Bitops refactor**: `src/bitops` split into `float32_legacy`, `float32` and `utils` python files

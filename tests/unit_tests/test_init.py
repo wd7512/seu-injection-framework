@@ -17,8 +17,9 @@ def test_dynamic_version_retrieval():
 def test_fallback_version():
     with patch("importlib.metadata.version", side_effect=Exception):
         import seu_injection.version
+        from seu_injection.version import FALLBACK_VERSION
 
         importlib.reload(seu_injection.version)
         from seu_injection.version import __version__
 
-        assert __version__ == "1.1.10", f"Expected fallback version '1.1.10', got {__version__}"
+        assert __version__ == FALLBACK_VERSION, f"Expected fallback version '{FALLBACK_VERSION}', got {__version__}"

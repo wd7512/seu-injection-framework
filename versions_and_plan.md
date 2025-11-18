@@ -8,7 +8,7 @@ We need to clean up old branches that may have some value in it. This is current
 
 - [x] `ai_refactor`
 - [ ] `Research/ViT`
-- [ ] `Research/shipsnet`
+- [x] `Research/shipsnet`
 - [ ] `Feature/forward_pass_states`
 
 ### v1.2.0
