@@ -4,12 +4,14 @@ This module contains high-performance implementations of bit-level manipulation 
 functions are designed for production use and prioritize speed and memory efficiency.
 """
 
+from typing import Union
+
 import numpy as np
 
 
 def bitflip_float32_optimized(
-    values: float | np.ndarray, bit_position: int, inplace: bool = False
-) -> float | np.ndarray:
+    values: Union[float, np.ndarray], bit_position: int, inplace: bool = False
+) -> Union[float, np.ndarray]:
     """High-performance bit flipping using direct memory manipulation and vectorization.
 
     Args:
@@ -60,7 +62,7 @@ def _bitflip_array_optimized(values: np.ndarray, bit_position: int, inplace: boo
     return work_array
 
 
-def bitflip_float32_fast(x: float | np.ndarray, bit_i: int | None = None, inplace: bool = False) -> float | np.ndarray:
+def bitflip_float32_fast(x: Union[float, np.ndarray], bit_i: Union[int, None] = None, inplace: bool = False) -> Union[float, np.ndarray]:
     """Intelligent bit flipping with automatic performance optimization and fallback handling.
 
     Args:

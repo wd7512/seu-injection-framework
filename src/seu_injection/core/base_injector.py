@@ -25,7 +25,7 @@ harsh environments.
 
 from abc import ABC, abstractmethod
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Union
 
 import numpy as np
 import torch
@@ -54,10 +54,10 @@ class BaseInjector(ABC):
         self,
         trained_model: torch.nn.Module,
         criterion: Callable[..., float],
-        device: str | torch.device | None = None,
-        x: torch.Tensor | np.ndarray | None = None,
-        y: torch.Tensor | np.ndarray | None = None,
-        data_loader: torch.utils.data.DataLoader | None = None,
+        device: Union[str, torch.device, None] = None,
+        x: Union[torch.Tensor, np.ndarray, None] = None,
+        y: Union[torch.Tensor, np.ndarray, None] = None,
+        data_loader: Union[torch.utils.data.DataLoader, None] = None,
     ) -> None:
         # TODO API COMPLEXITY: Constructor requires too much domain knowledge per improvement plans
         # ISSUES:
@@ -97,8 +97,8 @@ class BaseInjector(ABC):
         self.model.eval()
 
         # Initialize optional data attributes for type checking
-        self.X: torch.Tensor | None = None
-        self.y: torch.Tensor | None = None
+        self.X: Union[torch.Tensor, None] = None
+        self.y: Union[torch.Tensor, None] = None
 
         # Data setup - validate mutually exclusive options
         self.use_data_loader = False
@@ -139,7 +139,7 @@ class BaseInjector(ABC):
 
         self._layer_names = [name for name, _ in self.model.named_parameters()]
 
-    def run_injector(self, bit_i: int, layer_name: str | None = None, **kwargs) -> dict[str, list[Any]]:
+    def run_injector(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Run the fault injection process.
 
         Args:
@@ -163,7 +163,7 @@ class BaseInjector(ABC):
         return self._run_injector_impl(bit_i, layer_name, **kwargs)
 
     @abstractmethod
-    def _run_injector_impl(self, bit_i: int, layer_name: str | None, **kwargs) -> dict[str, list[Any]]: ...
+    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None], **kwargs) -> dict[str, list[Any]]: ...
 
     def _get_criterion_score(self) -> float:
         """Evaluate model performance using the configured criterion.

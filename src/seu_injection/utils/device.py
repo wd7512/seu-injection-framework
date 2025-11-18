@@ -4,7 +4,7 @@ This module provides helper functions for device detection, tensor operations,
 and other common utilities used throughout the SEU injection framework.
 """
 
-from typing import Any
+from typing import Any, Union
 
 import torch
 
@@ -17,7 +17,7 @@ import torch
 
 
 def detect_device(
-    preferred_device: str | torch.device | None = None,
+    preferred_device: Union[str, torch.device, None] = None,
 ) -> torch.device:
     """Detect the best available computing device.
 
@@ -42,9 +42,9 @@ def detect_device(
 
 
 def ensure_tensor(
-    data: torch.Tensor | Any,  # Any for numpy arrays or other array-like
+    data: Union[torch.Tensor, Any],  # Any for numpy arrays or other array-like
     dtype: torch.dtype = torch.float32,
-    device: torch.device | None = None,
+    device: Union[torch.device, None] = None,
 ) -> torch.Tensor:
     """Ensure input data is a PyTorch tensor with specified dtype and device.
 

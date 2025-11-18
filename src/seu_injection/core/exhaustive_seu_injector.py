@@ -4,7 +4,7 @@ This module provides the `ExhaustiveSEUInjector` class, which systematically fli
 robustness under exhaustive fault injection scenarios.
 """
 
-from typing import Any
+from typing import Any, Union
 
 import numpy as np
 import torch
@@ -32,7 +32,7 @@ class ExhaustiveSEUInjector(BaseInjector):
 
     """
 
-    def _run_injector_impl(self, bit_i: int, layer_name: str | None = None, **kwargs) -> dict[str, list[Any]]:
+    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Perform systematic SEU injection across model parameters.
 
         Flips a single bit at the specified position in every float32 parameter of the model (or a specific layer),

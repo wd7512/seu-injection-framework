@@ -4,12 +4,14 @@ This module contains educational and fallback implementations of bit-level manip
 These functions prioritize clarity and compatibility over performance and are not intended for production use.
 """
 
+from typing import Union
+
 import numpy as np
 
 from .utils import binary_to_float32, float32_to_binary
 
 
-def bitflip_float32(x: float | np.ndarray, bit_i: int | None = None) -> float | np.ndarray:
+def bitflip_float32(x: Union[float, np.ndarray], bit_i: Union[int, None] = None) -> Union[float, np.ndarray]:
     """Flip a specific bit in IEEE 754 float32 values using string-based manipulation.
 
     Args:

@@ -93,7 +93,7 @@ except Exception:  # pragma: no cover - fallback intentionally simple
 def classification_accuracy_loader(
     model: torch.nn.Module,
     data_loader: "torch.utils.data.DataLoader",  # keep runtime type but avoid union confusion
-    device: str | torch.device | None = None,
+    device: Union[str, torch.device, None] = None,
 ) -> float:
     """Compute classification accuracy using PyTorch DataLoader with optimized batch processing.
 
@@ -250,8 +250,8 @@ def classification_accuracy_loader(
 def classification_accuracy(
     model: torch.nn.Module,
     x_tensor: Union[torch.Tensor, "torch.utils.data.DataLoader"],
-    y_true: torch.Tensor | None = None,
-    device: str | torch.device | None = None,
+    y_true: Union[torch.Tensor, None] = None,
+    device: Union[str, torch.device, None] = None,
     batch_size: int = 64,
 ) -> float:
     """Calculate classification accuracy with intelligent input type detection and optimization.

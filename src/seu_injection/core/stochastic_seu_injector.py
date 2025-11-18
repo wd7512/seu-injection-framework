@@ -4,7 +4,7 @@ This module provides the `StochasticSEUInjector` class, which performs random bi
 statistical robustness under fault injection scenarios.
 """
 
-from typing import Any
+from typing import Any, Union
 
 import numpy as np
 import torch
@@ -32,7 +32,7 @@ class StochasticSEUInjector(BaseInjector):
 
     """
 
-    def _run_injector_impl(self, bit_i: int, layer_name: str | None = None, **kwargs) -> dict[str, list[Any]]:
+    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Randomly inject faults into model parameters using probability p.
 
         Args:
