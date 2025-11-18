@@ -1,16 +1,21 @@
-from typing import Any, Optional
+"""Stochastic SEU Injector Module.
+
+This module provides the `StochasticSEUInjector` class, which performs random bit flips in model parameters to evaluate
+statistical robustness under fault injection scenarios.
+"""
+
+from typing import Any, Union
 
 import numpy as np
 import torch
 from tqdm import tqdm
 
-from ..bitops.float32 import bitflip_float32_optimized
+from ..bitops import bitflip_float32_optimized
 from .base_injector import BaseInjector
 
 
 class StochasticSEUInjector(BaseInjector):
-    """
-    Stochastic SEU injector for PyTorch models.
+    """Stochastic SEU injector for PyTorch models.
 
     Randomly flips bits in float32 weights across all layers (or a specified layer),
     evaluating model performance after each injection.
@@ -24,13 +29,11 @@ class StochasticSEUInjector(BaseInjector):
         >>> injector = StochasticSEUInjector(model, criterion, x=data, y=labels)
         >>> results = injector.run_injector(bit_i=15, p=0.01)
         >>> print(len(results['criterion_score']))
+
     """
 
-    def _run_injector_impl(
-        self, bit_i: int, layer_name: Optional[str] = None, **kwargs
-    ) -> dict[str, list[Any]]:
-        """
-        Randomly inject faults into model parameters using probability p.
+    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
+        """Randomly inject faults into model parameters using probability p.
 
         Args:
             bit_i (int): Bit position to flip (0-31).
@@ -47,6 +50,7 @@ class StochasticSEUInjector(BaseInjector):
         Notes:
             - Efficient for large models and statistical analysis.
             - All injections are reversible; model is restored after each run.
+
         """
         p = kwargs.get("p", 0.0)
         if not (0.0 <= p <= 1.0):
@@ -90,14 +94,10 @@ class StochasticSEUInjector(BaseInjector):
                         continue
 
                     original_val = tensor_cpu[idx]
-                    seu_val = bitflip_float32_optimized(
-                        original_val, bit_i, inplace=False
-                    )  # <-- BOTTLENECK FIXED!
+                    seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)  # <-- BOTTLENECK FIXED!
 
                     # Inject fault, evaluate, restore
-                    tensor.data[idx] = torch.tensor(
-                        seu_val, device=self.device, dtype=tensor.dtype
-                    )
+                    tensor.data[idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
                     criterion_score = self._get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]  # Restore original value
 

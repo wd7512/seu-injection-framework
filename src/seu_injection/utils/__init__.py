@@ -1,5 +1,4 @@
-"""
-Utility functions and helpers for the SEU injection framework.
+"""Utility functions and helpers for the SEU injection framework.
 
 This module provides common utilities for device management, tensor operations,
 logging, and other supporting functionality.

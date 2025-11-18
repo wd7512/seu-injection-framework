@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Performance Validation Script
+"""Performance Validation Script
 
 This script validates the performance improvement achieved by switching
 from bitflip_float32 (slow) to bitflip_float32_optimized (fast).
@@ -10,7 +9,7 @@ import time
 
 import torch
 
-from seu_injection.bitops.float32 import bitflip_float32, bitflip_float32_optimized
+from seu_injection.bitops import bitflip_float32, bitflip_float32_optimized
 
 
 def benchmark_bitflip_functions():
@@ -55,9 +54,7 @@ def benchmark_bitflip_functions():
 
     print(f"   ResNet-18 full injection (old): {old_total / 60:.1f} minutes")
     print(f"   ResNet-18 full injection (new): {new_total / 60:.1f} minutes")
-    print(
-        f"   Time saved per full analysis: {(old_total - new_total) / 60:.1f} minutes"
-    )
+    print(f"   Time saved per full analysis: {(old_total - new_total) / 60:.1f} minutes")
 
     return speedup > 10  # Should be at least 10x faster
 

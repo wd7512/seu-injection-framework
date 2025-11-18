@@ -1,5 +1,4 @@
-"""
-SEU Injection Framework
+"""SEU Injection Framework
 ======================
 
 A comprehensive framework for Single Event Upset (SEU) injection in neural networks
@@ -34,19 +33,11 @@ For detailed examples, see the documentation at:
 https://github.com/wd7512/seu-injection-framework/blob/main/README.md
 """
 
-try:  # Prefer dynamic version from installed metadata
-    from importlib.metadata import version as _pkg_version
-
-    __version__ = _pkg_version("seu-injection-framework")
-except Exception:  # Fallback for editable/source checkouts prior to build
-    __version__ = "1.1.10"  # Latest stable PyPI release with working build pipeline
-__author__ = "William Dennis"
-__email__ = "wwdennis.home@gmail.com"
-
 # Core public API
-from .bitops.float32 import bitflip_float32
+from .bitops import bitflip_float32
 from .core import ExhaustiveSEUInjector, StochasticSEUInjector
 from .metrics.accuracy import classification_accuracy, classification_accuracy_loader
+from .version import __version__
 
 # Alias SEUInjector to ExhaustiveSEUInjector for convenience
 # DEPRECATION NOTE: SEUInjector will be removed in future releases

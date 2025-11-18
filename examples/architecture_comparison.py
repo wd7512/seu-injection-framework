@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Architecture Comparison Study
+"""Architecture Comparison Study
 
 # ✅ UPDATED: Fast architecture comparison with correct API
 # IMPROVEMENTS:
@@ -31,7 +30,6 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import torch
 import torch.nn as nn
 import torch.nn.functional as functional
@@ -45,13 +43,13 @@ class SimpleNN(nn.Module):
     """Fully connected neural network baseline."""
 
     def __init__(self, input_size=784, hidden_size=512, num_classes=10):
+        """Initialize the SimpleNN with layers and dropout."""
         super().__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
         self.fc3 = nn.Linear(hidden_size, num_classes)
         self.dropout = nn.Dropout(0.5)
 
-    def forward(self, x):
         x = x.view(x.size(0), -1)  # Flatten
         x = functional.relu(self.fc1(x))
         x = self.dropout(x)
@@ -145,9 +143,7 @@ class EfficientBlock(nn.Module):
     def __init__(self, in_channels, out_channels, stride=1):
         super().__init__()
         # Depthwise convolution
-        self.depthwise = nn.Conv2d(
-            in_channels, in_channels, 3, stride, 1, groups=in_channels
-        )
+        self.depthwise = nn.Conv2d(in_channels, in_channels, 3, stride, 1, groups=in_channels)
         self.bn1 = nn.BatchNorm2d(in_channels)
 
         # Pointwise convolution
@@ -188,7 +184,6 @@ class EfficientNet(nn.Module):
 
 def create_architectures():
     """Create all architectures for comparison."""
-
     architectures = {
         "SimpleNN": SimpleNN(input_size=784, hidden_size=512, num_classes=10),
         "CompactCNN": CompactCNN(num_classes=10),
@@ -206,7 +201,6 @@ def count_parameters(model):
 
 def analyze_model_complexity(architectures):
     """Analyze computational complexity of different architectures."""
-
     print("📊 Architecture Complexity Analysis")
     print("=" * 60)
     print(f"{'Architecture':<15} {'Parameters':<12} {'Memory (MB)':<12} {'FLOPs Est.'}")
@@ -241,8 +235,7 @@ def analyze_model_complexity(architectures):
 
 
 def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
-    """
-    Fast robustness analysis across all architectures using run_injector method.
+    """Fast robustness analysis across all architectures using run_injector method.
 
     Optimizations:
     - Use sampling instead of exhaustive injection
@@ -250,7 +243,6 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
     - Pre-train models for meaningful comparison
     - Use smaller sampling rates for speed
     """
-
     print("\n🔬 Fast Robustness Analysis (run_injector)")
     print("=" * 80)
 
@@ -296,9 +288,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
         for bit_pos in bit_positions:
             try:
                 # Target only one specific layer for speed
-                result = injector.run_injector(
-                    bit_i=bit_pos, p=0.001, layer_name=target_layer
-                )
+                result = injector.run_injector(bit_i=bit_pos, p=0.001, layer_name=target_layer)
 
                 if result["criterion_score"]:
                     baseline_acc = injector.baseline_score
@@ -321,9 +311,7 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
         for prob in injection_probabilities:
             try:
                 # Test mantissa bits with varying probabilities, target layer only
-                result = injector.run_injector(
-                    bit_i=15, p=prob, layer_name=target_layer
-                )
+                result = injector.run_injector(bit_i=15, p=prob, layer_name=target_layer)
 
                 if result["criterion_score"]:
                     baseline_acc = injector.baseline_score
@@ -349,7 +337,6 @@ def comprehensive_robustness_analysis(architectures, test_loader, device="cpu"):
 
 def create_comparison_visualizations(results, complexity_data, output_dir=None):
     """Create comprehensive comparison visualizations."""
-
     if output_dir is None:
         output_dir = Path(".")
     else:
@@ -358,9 +345,7 @@ def create_comparison_visualizations(results, complexity_data, output_dir=None):
 
     # 1. Robustness vs Complexity Scatter Plot
     fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
-    fig.suptitle(
-        "Neural Network Architecture Comparison: Robustness vs Complexity", fontsize=16
-    )
+    fig.suptitle("Neural Network Architecture Comparison: Robustness vs Complexity", fontsize=16)
 
     # Extract data for plotting
     arch_names = list(results.keys())
@@ -370,9 +355,7 @@ def create_comparison_visualizations(results, complexity_data, output_dir=None):
     # Average bit sensitivity (robustness metric)
     avg_bit_sensitivity = []
     for name in arch_names:
-        bit_vals = [
-            v for v in results[name]["bit_sensitivity"].values() if not np.isnan(v)
-        ]
+        bit_vals = [v for v in results[name]["bit_sensitivity"].values() if not np.isnan(v)]
         avg_bit_sensitivity.append(np.mean(bit_vals) if bit_vals else 0)
 
     # Plot 1: Robustness vs Parameters
@@ -402,9 +385,7 @@ def create_comparison_visualizations(results, complexity_data, output_dir=None):
     # Plot 2: Bit Position Sensitivity Comparison
     bit_positions = [0, 8, 15, 23, 31]
     for name in arch_names:
-        bit_data = [
-            results[name]["bit_sensitivity"].get(pos, 0) for pos in bit_positions
-        ]
+        bit_data = [results[name]["bit_sensitivity"].get(pos, 0) for pos in bit_positions]
         ax2.plot(bit_positions, bit_data, marker="o", label=name, linewidth=2)
 
     ax2.set_xlabel("Bit Position")
@@ -418,9 +399,7 @@ def create_comparison_visualizations(results, complexity_data, output_dir=None):
     prob_labels = ["0.1%", "0.5%"]
 
     for name in arch_names:
-        inj_data = [
-            results[name]["injection_robustness"].get(prob, 0) for prob in probabilities
-        ]
+        inj_data = [results[name]["injection_robustness"].get(prob, 0) for prob in probabilities]
         ax3.plot(prob_labels, inj_data, marker="s", label=name, linewidth=2)
 
     ax3.set_xlabel("Injection Probability")
@@ -479,11 +458,8 @@ def create_comparison_visualizations(results, complexity_data, output_dir=None):
     return robustness_scores
 
 
-def generate_comparative_report(
-    results, complexity_data, robustness_scores, output_dir=None
-):
+def generate_comparative_report(results, complexity_data, robustness_scores, output_dir=None):
     """Generate comprehensive comparison report."""
-
     if output_dir is None:
         output_dir = Path(".")
     else:
@@ -504,15 +480,9 @@ def generate_comparative_report(
     best_arch = min(robustness_scores.items(), key=lambda x: x[1])
     worst_arch = max(robustness_scores.items(), key=lambda x: x[1])
 
-    report.append(
-        f"• Most Robust Architecture: {best_arch[0]} (score: {best_arch[1]:.6f})"
-    )
-    report.append(
-        f"• Least Robust Architecture: {worst_arch[0]} (score: {worst_arch[1]:.6f})"
-    )
-    report.append(
-        f"• Robustness Improvement: {worst_arch[1] / best_arch[1]:.2f}x difference"
-    )
+    report.append(f"• Most Robust Architecture: {best_arch[0]} (score: {best_arch[1]:.6f})")
+    report.append(f"• Least Robust Architecture: {worst_arch[0]} (score: {worst_arch[1]:.6f})")
+    report.append(f"• Robustness Improvement: {worst_arch[1] / best_arch[1]:.2f}x difference")
 
     # Model complexity summary
     report.append("\n• Model Complexity Range:")
@@ -522,9 +492,7 @@ def generate_comparative_report(
 
     # Baseline performance
     baseline_range = [results[name]["baseline_accuracy"] for name in results]
-    report.append(
-        f"  - Baseline Accuracy: {min(baseline_range):.4f} to {max(baseline_range):.4f}"
-    )
+    report.append(f"  - Baseline Accuracy: {min(baseline_range):.4f} to {max(baseline_range):.4f}")
     report.append("")
 
     # Detailed Analysis
@@ -546,13 +514,9 @@ def generate_comparative_report(
         # Bit sensitivity analysis
         bit_sens = results[arch_name]["bit_sensitivity"]
         avg_bit = np.nanmean(list(bit_sens.values()))
-        most_vulnerable_bit = max(
-            bit_sens.items(), key=lambda x: x[1] if not np.isnan(x[1]) else 0
-        )
+        most_vulnerable_bit = max(bit_sens.items(), key=lambda x: x[1] if not np.isnan(x[1]) else 0)
         report.append(f"   • Average Bit Sensitivity: {avg_bit:.6f}")
-        report.append(
-            f"   • Most Vulnerable Bit: {most_vulnerable_bit[0]} ({most_vulnerable_bit[1]:.6f} drop)"
-        )
+        report.append(f"   • Most Vulnerable Bit: {most_vulnerable_bit[0]} ({most_vulnerable_bit[1]:.6f} drop)")
 
         # Injection robustness
         inj_rob = results[arch_name]["injection_robustness"]
@@ -591,9 +555,7 @@ def generate_comparative_report(
 
     report.append("\n• For HIGH-PERFORMANCE applications:")
     report.append(f"  - Recommended: {best_accurate} (highest baseline)")
-    accurate_robustness_rank = [arch for arch, _ in sorted_archs].index(
-        best_accurate
-    ) + 1
+    accurate_robustness_rank = [arch for arch, _ in sorted_archs].index(best_accurate) + 1
     report.append(f"  - Robustness Rank: #{accurate_robustness_rank}/4")
 
     # Protection strategies
@@ -626,9 +588,7 @@ def generate_comparative_report(
             f"  - {trend.capitalize()} correlation: larger models tend to be {'less' if param_robust_corr > 0 else 'more'} robust"
         )
     else:
-        report.append(
-            "  - Weak correlation: model size doesn't strongly predict robustness"
-        )
+        report.append("  - Weak correlation: model size doesn't strongly predict robustness")
 
     # Architecture-specific insights
     if "ResNet" in [name for name, _ in sorted_archs[:2]]:
@@ -653,7 +613,6 @@ def generate_comparative_report(
 
 def generate_test_data(num_samples=1000, image_size=28):
     """Generate synthetic test data for architecture comparison."""
-
     # Create MNIST-like data
     X = torch.randn(num_samples, 1, image_size, image_size)
 
@@ -679,7 +638,6 @@ def generate_test_data(num_samples=1000, image_size=28):
 
 def quick_train_model(model, train_loader, device, epochs=5):
     """Quickly train model to convergence for meaningful robustness comparison."""
-
     print(f"   🎯 Quick training ({epochs} epochs)...")
 
     model.to(device)
@@ -716,8 +674,7 @@ def quick_train_model(model, train_loader, device, epochs=5):
 
 
 def main():
-    """
-    Main pipeline for fast architecture comparison study.
+    """Main pipeline for fast architecture comparison study.
 
     Optimizations for speed:
     - Smaller datasets (200 train, 100 test)
@@ -725,7 +682,6 @@ def main():
     - Stochastic SEU injection only
     - Focus on most critical bit positions
     """
-
     print("🏗️  Fast Neural Network Architecture Robustness Comparison")
     print("Optimized evaluation for quick assessment")
     print("=" * 80)
@@ -768,9 +724,7 @@ def main():
     try:
         # Fast robustness analysis
         print("\n" + "=" * 80)
-        results = comprehensive_robustness_analysis(
-            trained_architectures, test_loader, device
-        )
+        results = comprehensive_robustness_analysis(trained_architectures, test_loader, device)
 
         # Create visualizations
         print("\n📊 Creating comparison visualizations...")
@@ -789,9 +743,7 @@ def main():
         print(f"🥈 Second: {sorted_archs[1][0]} (score: {sorted_archs[1][1]:.6f})")
         print(f"🥉 Third: {sorted_archs[2][0]} (score: {sorted_archs[2][1]:.6f})")
 
-        print(
-            f"\n📈 Robustness improvement range: {sorted_archs[-1][1] / sorted_archs[0][1]:.2f}x"
-        )
+        print(f"\n📈 Robustness improvement range: {sorted_archs[-1][1] / sorted_archs[0][1]:.2f}x")
 
         print("\nOutput files generated:")
         print("• architecture_comparison.png - Visualization plots")

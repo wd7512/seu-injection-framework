@@ -1,8 +1,4 @@
-"""
-Basic tests for utils module to improve coverage.
-"""
-
-import pytest
+"""Basic tests for utils module to improve coverage."""
 
 from seu_injection.utils.device import detect_device, ensure_tensor
 

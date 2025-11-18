@@ -1,29 +1,25 @@
 #!/usr/bin/env python3
-"""
-Pipeline validation for basic_cnn_robustness.py example.
+"""Pipeline validation for basic_cnn_robustness.py example.
 
 This script can be run directly in CI/CD to validate that the
 basic_cnn_robustness.py example works correctly. It uses minimal
 parameters for fast execution while still testing the complete pipeline.
 """
 
-import os
 import subprocess
 import sys
-import tempfile
-import time
 from pathlib import Path
 
 
 def run_example_with_timeout(timeout_seconds=300):
-    """
-    Run the basic_cnn_robustness.py example with a timeout.
+    """Run the basic_cnn_robustness.py example with a timeout.
 
     Args:
         timeout_seconds: Maximum time to allow the example to run
 
     Returns:
         bool: True if example completed successfully, False otherwise
+
     """
     examples_dir = Path(__file__).parent.parent.parent / "examples"
     example_path = examples_dir / "basic_cnn_robustness.py"

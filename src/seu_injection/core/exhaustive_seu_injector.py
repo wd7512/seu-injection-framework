@@ -1,16 +1,21 @@
-from typing import Any, Optional
+"""Exhaustive SEU Injector Module.
+
+This module provides the `ExhaustiveSEUInjector` class, which systematically flips bits in model parameters to evaluate
+robustness under exhaustive fault injection scenarios.
+"""
+
+from typing import Any, Union
 
 import numpy as np
 import torch
 from tqdm import tqdm
 
-from ..bitops.float32 import bitflip_float32_optimized
+from ..bitops import bitflip_float32_optimized
 from .base_injector import BaseInjector
 
 
 class ExhaustiveSEUInjector(BaseInjector):
-    """
-    Exhaustive SEU injector for PyTorch models.
+    """Exhaustive SEU injector for PyTorch models.
 
     Systematically flips each bit in float32 weights across all layers (or a specified layer),
     evaluating model performance after each injection.
@@ -24,13 +29,11 @@ class ExhaustiveSEUInjector(BaseInjector):
         >>> injector = ExhaustiveSEUInjector(model, criterion, x=data, y=labels)
         >>> results = injector.run_injector(bit_i=15)
         >>> print(len(results['criterion_score']))
+
     """
 
-    def _run_injector_impl(
-        self, bit_i: int, layer_name: Optional[str] = None, **kwargs
-    ) -> dict[str, list[Any]]:
-        """
-        Perform systematic SEU injection across model parameters.
+    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
+        """Perform systematic SEU injection across model parameters.
 
         Flips a single bit at the specified position in every float32 parameter of the model (or a specific layer),
         evaluates the model, and restores the original value.
@@ -49,6 +52,7 @@ class ExhaustiveSEUInjector(BaseInjector):
         Notes:
             - For large models, this is computationally expensive.
             - All injections are reversible; model is restored after each run.
+
         """
         results: dict[str, list[Any]] = {
             "tensor_location": [],
@@ -101,9 +105,7 @@ class ExhaustiveSEUInjector(BaseInjector):
                     )  # <-- PERFORMANCE BOTTLENECK FIXED!
 
                     # Inject fault, evaluate, restore
-                    tensor.data[idx] = torch.tensor(
-                        seu_val, device=self.device, dtype=tensor.dtype
-                    )
+                    tensor.data[idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
                     criterion_score = self._get_criterion_score()
                     tensor.data[idx] = original_tensor[idx]  # Restore original value
 

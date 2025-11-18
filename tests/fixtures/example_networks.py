@@ -1,6 +1,4 @@
-"""
-This code is entirely ai generated for quick testing
-"""
+"""This code is entirely ai generated for quick testing"""
 
 import torch
 import torch.nn as nn
@@ -13,9 +11,7 @@ from sklearn.preprocessing import StandardScaler
 def generate_moons_data(test_size=0.3, random_state=0):
     X, y = make_moons(n_samples=1000, noise=0.2, random_state=random_state)
     X = StandardScaler().fit_transform(X)
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=test_size, random_state=random_state
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
     X_train = torch.tensor(X_train, dtype=torch.float32)
     X_test = torch.tensor(X_test, dtype=torch.float32)
     y_train = torch.tensor(y_train, dtype=torch.float32).unsqueeze(1)
@@ -26,9 +22,7 @@ def generate_moons_data(test_size=0.3, random_state=0):
 class SimpleNN(nn.Module):
     def __init__(self):
         super().__init__()
-        self.net = nn.Sequential(
-            nn.Linear(2, 8), nn.ReLU(), nn.Linear(8, 1), nn.Sigmoid()
-        )
+        self.net = nn.Sequential(nn.Linear(2, 8), nn.ReLU(), nn.Linear(8, 1), nn.Sigmoid())
 
     def forward(self, x):
         return self.net(x)
@@ -83,11 +77,8 @@ def evaluate_model(model, x_test, y_test):
     return accuracy
 
 
-def get_example_network(
-    net_name="simple", test_size=0.3, random_state=0, train=False, epochs=300, lr=0.01
-):
-    """
-    Args:
+def get_example_network(net_name="simple", test_size=0.3, random_state=0, train=False, epochs=300, lr=0.01):
+    """Args:
         net_name (str): 'simple', 'cnn', 'rnn', or 'gnn'
         test_size (float)
         random_state (int)
@@ -103,6 +94,7 @@ def get_example_network(
 
     For GNN:
         returns model, data, labels, train_fn, eval_fn (no training done internally)
+
     """
     nets = {
         "nn": SimpleNN,
@@ -111,9 +103,7 @@ def get_example_network(
     }
 
     if net_name not in nets or nets[net_name] is None:
-        raise ValueError(
-            f"Network '{net_name}' not implemented or missing dependencies."
-        )
+        raise ValueError(f"Network '{net_name}' not implemented or missing dependencies.")
 
     else:
         X_train, X_test, y_train, y_test = generate_moons_data(test_size, random_state)

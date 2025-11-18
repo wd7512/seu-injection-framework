@@ -1,5 +1,4 @@
-"""
-Integration test for the basic_cnn_robustness.py example.
+"""Integration test for the basic_cnn_robustness.py example.
 
 This test ensures the complete example can run successfully without errors
 and produces expected outputs. It validates the entire pipeline from data
@@ -12,8 +11,6 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-
-import pytest
 
 
 class TestBasicCNNRobustnessExample:
