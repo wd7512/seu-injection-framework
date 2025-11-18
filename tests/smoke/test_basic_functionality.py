@@ -63,9 +63,7 @@ def test_basic_injector_creation():
     y = torch.randint(0, 2, (10, 1)).float()
 
     # Create injector - should not raise errors
-    injector = Injector(
-        trained_model=model, criterion=classification_accuracy, x=X, y=y
-    )
+    injector = Injector(trained_model=model, criterion=classification_accuracy, x=X, y=y)
 
     assert injector.model is not None
     assert injector.baseline_score is not None
@@ -117,9 +115,7 @@ def test_example_networks_import():
         assert get_example_network is not None
 
         # Quick test of network creation (without training)
-        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = (
-            get_example_network(net_name="nn", train=False)
-        )
+        model, X_train, X_test, y_train, y_test, train_fn, eval_fn = get_example_network(net_name="nn", train=False)
 
         assert model is not None
         assert X_train is not None
@@ -174,9 +170,7 @@ def test_performance_smoke():
     duration = end_time - start_time
 
     # Should complete in well under a second
-    assert duration < 1.0, (
-        f"Performance smoke test too slow: {duration}s for 100 operations"
-    )
+    assert duration < 1.0, f"Performance smoke test too slow: {duration}s for 100 operations"
 
 
 if __name__ == "__main__":

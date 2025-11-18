@@ -10,9 +10,7 @@ def test_dynamic_version_retrieval():
         importlib.reload(seu_injection.version)
         from seu_injection.version import __version__
 
-        assert __version__ == "2.0.0", (
-            f"Expected dynamic version '2.0.0', got {__version__}"
-        )
+        assert __version__ == "2.0.0", f"Expected dynamic version '2.0.0', got {__version__}"
 
 
 def test_fallback_version():
@@ -21,6 +19,4 @@ def test_fallback_version():
         importlib.reload(seu_injection.version)
         from seu_injection.version import __version__
 
-        assert __version__ == "1.1.10", (
-            f"Expected fallback version '1.1.10', got {__version__}"
-        )
+        assert __version__ == "1.1.10", f"Expected fallback version '1.1.10', got {__version__}"

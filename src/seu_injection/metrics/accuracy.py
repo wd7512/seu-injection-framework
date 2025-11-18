@@ -1,12 +1,11 @@
-"""
-Comprehensive accuracy metrics for neural network evaluation under fault injection.
+"""Comprehensive accuracy metrics for neural network evaluation under fault injection.
 
-This module provides a robust suite of classification accuracy calculation functions
-optimized for Single Event Upset (SEU) injection experiments. It supports multiple
-input formats (tensors, DataLoaders), automatic batch processing, device-aware
-computation, and handles both binary and multiclass classification scenarios.
+This module provides a robust suite of classification accuracy calculation functions optimized for Single Event Upset
+(SEU) injection experiments. It supports multiple input formats (tensors, DataLoaders), automatic batch processing,
+device-aware computation, and handles both binary and multiclass classification scenarios.
 
-The metrics are designed to work seamlessly with the Injector class for systematic fault tolerance analysis, providing consistent and reliable performance measurements across different model architectures and dataset configurations.
+The metrics are designed to work seamlessly with the Injector class for systematic fault tolerance analysis, providing
+consistent and reliable performance measurements across different model architectures and dataset configurations.
 
 Key Features:
     - Automatic input type detection (tensor vs DataLoader)
@@ -59,10 +58,10 @@ See Also:
     seu_injection.core.Injector: Systematic fault injection
     sklearn.metrics.accuracy_score: Underlying accuracy computation
     torch.utils.data.DataLoader: Batch data loading for large datasets
+
 """
 
-from collections.abc import Iterable
-from typing import Optional, Union
+from typing import Union
 
 import numpy as np
 import torch
@@ -86,8 +85,7 @@ except Exception:  # pragma: no cover - fallback intentionally simple
         y_pred_arr = np.asarray(y_pred)
         if y_true_arr.shape != y_pred_arr.shape:
             raise ValueError(
-                "Shape mismatch in fallback accuracy_score: "
-                f"y_true {y_true_arr.shape} vs y_pred {y_pred_arr.shape}"
+                f"Shape mismatch in fallback accuracy_score: y_true {y_true_arr.shape} vs y_pred {y_pred_arr.shape}"
             )
         return float(np.mean(y_true_arr == y_pred_arr))
 
@@ -95,10 +93,9 @@ except Exception:  # pragma: no cover - fallback intentionally simple
 def classification_accuracy_loader(
     model: torch.nn.Module,
     data_loader: "torch.utils.data.DataLoader",  # keep runtime type but avoid union confusion
-    device: Optional[Union[str, torch.device]] = None,
+    device: str | torch.device | None = None,
 ) -> float:
-    """
-    Compute classification accuracy using PyTorch DataLoader with optimized batch processing.
+    """Compute classification accuracy using PyTorch DataLoader with optimized batch processing.
 
     This function provides memory-efficient evaluation of model accuracy across large
     datasets by processing data in batches through a DataLoader. It handles device
@@ -226,6 +223,7 @@ def classification_accuracy_loader(
         multiclass_classification_accuracy: Core accuracy computation logic
         torch.utils.data.DataLoader: PyTorch batch data loading
         seu_injection.core.injector.Injector: Framework integration point
+
     """
     model.eval()
     if device:
@@ -252,12 +250,11 @@ def classification_accuracy_loader(
 def classification_accuracy(
     model: torch.nn.Module,
     x_tensor: Union[torch.Tensor, "torch.utils.data.DataLoader"],
-    y_true: Optional[torch.Tensor] = None,
-    device: Optional[Union[str, torch.device]] = None,
+    y_true: torch.Tensor | None = None,
+    device: str | torch.device | None = None,
     batch_size: int = 64,
 ) -> float:
-    """
-    Calculate classification accuracy with intelligent input type detection and optimization.
+    """Calculate classification accuracy with intelligent input type detection and optimization.
 
     This function serves as the primary entry point for classification accuracy evaluation
     in SEU injection experiments. It automatically detects input format (tensors vs
@@ -346,7 +343,6 @@ def classification_accuracy(
         >>>
         >>> # Baseline accuracy
         >>> baseline = injector.get_criterion_score()
-        >>> print(f"Baseline accuracy: {baseline:.3f}")
         >>>
         >>> # Fault injection analysis
         >>> results = injector.run_injector(bit_i=0, p=0.001)
@@ -388,6 +384,7 @@ def classification_accuracy(
         multiclass_classification_accuracy: Core accuracy computation logic
         seu_injection.core.Injector: Systematic fault injection
         sklearn.metrics.accuracy_score: Underlying accuracy computation standard
+
     """
     # Check if x_tensor is actually a DataLoader
     # DataLoader detection: Torch DataLoader has 'dataset' attribute; exclude plain tensors
@@ -401,8 +398,7 @@ def classification_accuracy(
             # EXAMPLES: SEUInputError, SEUDeviceError, SEUComputationError
             # PRIORITY: MEDIUM - affects user experience and debugging efficiency
             raise ValueError(
-                "When using DataLoader, do not specify y_true separately. "
-                "Labels should be included in the DataLoader."
+                "When using DataLoader, do not specify y_true separately. Labels should be included in the DataLoader."
             )
         return classification_accuracy_loader(model, x_tensor, device)
 
@@ -441,11 +437,8 @@ def classification_accuracy(
     return multiclass_classification_accuracy(y_true_all, y_pred_all)
 
 
-def multiclass_classification_accuracy(
-    y_true: np.ndarray, model_output: np.ndarray
-) -> float:
-    """
-    Compute classification accuracy with automatic binary/multiclass detection and robust prediction logic.
+def multiclass_classification_accuracy(y_true: np.ndarray, model_output: np.ndarray) -> float:
+    """Compute classification accuracy with automatic binary/multiclass detection and robust prediction logic.
 
     This function provides the core accuracy computation logic used throughout the SEU
     injection framework. It automatically determines the classification type based on
@@ -556,6 +549,7 @@ def multiclass_classification_accuracy(
         classification_accuracy_loader: DataLoader-specific evaluation
         sklearn.metrics.accuracy_score: Underlying accuracy computation
         numpy.argmax: Multiclass prediction logic implementation
+
     """
     if model_output.ndim == 1 or model_output.shape[1] == 1:
         # Binary classification case

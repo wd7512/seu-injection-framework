@@ -1,5 +1,4 @@
-"""
-Metrics for evaluating neural network performance under fault injection.
+"""Metrics for evaluating neural network performance under fault injection.
 
 This module provides comprehensive evaluation metrics for studying model
 robustness under Single Event Upset (SEU) conditions.

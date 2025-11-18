@@ -1,5 +1,4 @@
-"""
-Test suite for optimized bitflip operations.
+"""Test suite for optimized bitflip operations.
 
 This module tests the new optimized bitflip implementations to ensure
 compatibility with the original implementation.
@@ -49,9 +48,7 @@ class TestOptimizedBitflipOperations:
             original_result = bitflip_float32(test_array, bit_pos)
             optimized_result = bitflip_float32_optimized(test_array, bit_pos)
 
-            np.testing.assert_allclose(
-                original_result, optimized_result, rtol=1e-6, atol=1e-6
-            )
+            np.testing.assert_allclose(original_result, optimized_result, rtol=1e-6, atol=1e-6)
 
     def test_optimized_reversibility(self):
         """Test that optimized bitflip operations are reversible."""
@@ -85,9 +82,7 @@ class TestOptimizedBitflipOperations:
         assert result is test_array, "Inplace operation should return same array object"
 
         # Should have modified the original array
-        assert not np.array_equal(test_array, original_array), (
-            "Inplace operation should modify array"
-        )
+        assert not np.array_equal(test_array, original_array), "Inplace operation should modify array"
 
         # Check specific expected results (sign bit flip)
         expected = np.array([-1.0, -2.0, 1.0, 2.0], dtype=np.float32)
@@ -129,9 +124,7 @@ class TestOptimizedBitflipOperations:
                     # Should produce a valid result (even if NaN or inf)
                     assert isinstance(result, (float, np.floating))
                 except Exception as e:
-                    pytest.fail(
-                        f"Optimized bitflip failed for {value}, bit {bit_pos}: {e}"
-                    )
+                    pytest.fail(f"Optimized bitflip failed for {value}, bit {bit_pos}: {e}")
 
     def test_type_conversion_consistency(self):
         """Test that type conversions are handled consistently."""
@@ -149,16 +142,10 @@ class TestOptimizedBitflipOperations:
                 result = bitflip_float32_optimized(input_val, 0)
                 assert result is not None
                 # Check that we get appropriate output type
-                if np.isscalar(input_val) or (
-                    hasattr(input_val, "shape") and input_val.shape == ()
-                ):
-                    assert np.isscalar(result), (
-                        f"Expected scalar result for {type(input_val)}"
-                    )
+                if np.isscalar(input_val) or (hasattr(input_val, "shape") and input_val.shape == ()):
+                    assert np.isscalar(result), f"Expected scalar result for {type(input_val)}"
                 else:
-                    assert isinstance(result, np.ndarray), (
-                        f"Expected array result for {type(input_val)}"
-                    )
+                    assert isinstance(result, np.ndarray), f"Expected array result for {type(input_val)}"
             except Exception as e:
                 pytest.fail(f"Type conversion failed for {type(input_val)}: {e}")
 

@@ -1,11 +1,10 @@
-"""
-Utility functions for device management and common operations.
+"""Utility functions for device management and common operations.
 
 This module provides helper functions for device detection, tensor operations,
 and other common utilities used throughout the SEU injection framework.
 """
 
-from typing import Any, Optional, Union
+from typing import Any
 
 import torch
 
@@ -18,10 +17,9 @@ import torch
 
 
 def detect_device(
-    preferred_device: Optional[Union[str, torch.device]] = None,
+    preferred_device: str | torch.device | None = None,
 ) -> torch.device:
-    """
-    Detect the best available computing device.
+    """Detect the best available computing device.
 
     Args:
         preferred_device: Preferred device specification ('cpu', 'cuda', or torch.device)
@@ -32,6 +30,7 @@ def detect_device(
     Example:
         >>> device = detect_device()  # Auto-detect
         >>> device = detect_device('cuda')  # Force CUDA if available
+
     """
     if preferred_device is None:
         if torch.cuda.is_available():
@@ -43,12 +42,11 @@ def detect_device(
 
 
 def ensure_tensor(
-    data: Union[torch.Tensor, Any],  # Any for numpy arrays or other array-like
+    data: torch.Tensor | Any,  # Any for numpy arrays or other array-like
     dtype: torch.dtype = torch.float32,
-    device: Optional[torch.device] = None,
+    device: torch.device | None = None,
 ) -> torch.Tensor:
-    """
-    Ensure input data is a PyTorch tensor with specified dtype and device.
+    """Ensure input data is a PyTorch tensor with specified dtype and device.
 
     Args:
         data: Input data (tensor or numpy array)
@@ -57,6 +55,7 @@ def ensure_tensor(
 
     Returns:
         PyTorch tensor with specified properties
+
     """
     if isinstance(data, torch.Tensor):
         result = data.clone().detach()
@@ -72,8 +71,7 @@ def ensure_tensor(
 
 
 def get_model_info(model: torch.nn.Module) -> dict:
-    """
-    Extract comprehensive information about a PyTorch model.
+    """Extract comprehensive information about a PyTorch model.
 
     # TODO UNUSED FUNCTION: get_model_info() appears unused throughout codebase
     # STATUS: Function implemented but no references found in src/ or tests/
@@ -87,6 +85,7 @@ def get_model_info(model: torch.nn.Module) -> dict:
 
     Returns:
         Dictionary with model statistics and layer information
+
     """
     total_params = sum(p.numel() for p in model.parameters())
     trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)

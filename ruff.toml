@@ -1,0 +1,103 @@
+# ============================================================
+# GLOBAL SETTINGS — VERY RELAXED BASELINE
+# ============================================================
+
+# Long lines allowed (very relaxed). You can reduce this later.
+# Incrementally tighten to: 200 → 140 → 120.
+line-length = 120
+
+target-version = "py311"
+fix = true
+
+exclude = [
+    "__pycache__",
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "htmlcov",
+    "*.egg-info"
+]
+
+
+# ============================================================
+# GLOBAL LINT RULES — MINIMAL, PRACTICAL, NOT STRICT
+# ============================================================
+[lint]
+# Start with only essential hygiene:
+# - E/W: basic style (spacing, indentation, trivial correctness)
+# - I: import sorting
+# - UP: safe Python modernization rules
+#
+# INCREMENTALLY ADD LATER:
+# - F: unused imports, undefined variables → essential and low noise
+#   "D"  → full docstring rules (once docs are consistent)
+#   "C"  → complexity rules (once codebase stabilizes)
+#   "RUF" → Ruff-specific best practices
+# - N: naming (but noisy ones overridden in tests below)
+# ============================================================
+select = [
+    "E",
+    "W",
+    "I",
+    "UP",
+]
+
+# Only enforce missing docstrings in src (very light docstring rules)
+# INCREMENTALLY: Add "D2" and "D3" later to enforce formatting.
+extend-select = ["D1"]
+
+ignore = []
+
+
+# ============================================================
+# PER-FOLDER RELAXATIONS — TESTS HAVE ALMOST NO STRICTNESS
+# ============================================================
+[lint.per-file-ignores]
+
+# Tests: very relaxed to avoid noise from ML-style test patterns
+"tests/*" = [
+    "D",        # Disable ALL docstring rules
+    "N806",     # Allow uppercase X, Y, etc.
+    "E501",     # No line-length enforcement
+    "E741",     # Allow ambiguous names (e.g., l, O, I)
+    "N802",     # Allow non-lowercase function names in tests
+    "N803"      # Allow non-lowercase arguments in tests
+]
+
+"examples/*" = [
+    "D",        # Disable ALL docstring rules
+    "N806",     # Allow uppercase X, Y, etc.
+    "E501",     # No line-length enforcement
+    "E741",     # Allow ambiguous names (e.g., l, O, I)
+    "N802",     # Allow non-lowercase function names in tests
+    "N803"      # Allow non-lowercase arguments in tests
+]
+
+# ============================================================
+# INCREMENTAL IMPROVEMENT ROADMAP (Keep these comments!)
+# ============================================================
+#
+# 1. First tightening:
+#    - reduce line-length to 200
+#    - remove "E501" ignore from tests
+#
+# 2. Documentation phase:
+#    - add "D2" for docstring whitespace normalization
+#    - add "D3" for consistent quoting in docstrings
+#
+# 3. Naming phase:
+#    - remove N802/N803/N806 ignores in tests
+#    - introduce N8xx naming rules more broadly
+#
+# 4. Code quality phase:
+#    - enable "C" (complexity) and evaluate violations
+#    - enable "PL" (pylint-derived rules)
+#
+# 5. Production polish:
+#    - add "RUF" group for idiomatic modern Python
+#    - enable strict import rules (Tidy imports, remove unused side-effects)
+#
+# This approach keeps your linter helpful and quiet today,
+# while giving you a clear path toward full production rigor.
+# ============================================================

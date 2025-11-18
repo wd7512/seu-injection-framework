@@ -1,5 +1,4 @@
-"""
-SEU Injection Framework
+"""SEU Injection Framework
 ======================
 
 A comprehensive framework for Single Event Upset (SEU) injection in neural networks

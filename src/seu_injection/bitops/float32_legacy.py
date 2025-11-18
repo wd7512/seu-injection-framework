@@ -1,22 +1,16 @@
-"""
-Legacy implementations of IEEE 754 Float32 bit manipulation operations.
+"""Legacy implementations of IEEE 754 Float32 bit manipulation operations.
 
-This module contains educational and fallback implementations of bit-level manipulation functions for float32 values. These functions prioritize clarity and compatibility over performance and are not intended for production use.
+This module contains educational and fallback implementations of bit-level manipulation functions for float32 values.
+These functions prioritize clarity and compatibility over performance and are not intended for production use.
 """
-
-import struct
-from typing import Optional, Union
 
 import numpy as np
 
 from .utils import binary_to_float32, float32_to_binary
 
 
-def bitflip_float32(
-    x: Union[float, np.ndarray], bit_i: Optional[int] = None
-) -> Union[float, np.ndarray]:
-    """
-    Flip a specific bit in IEEE 754 float32 values using string-based manipulation.
+def bitflip_float32(x: float | np.ndarray, bit_i: int | None = None) -> float | np.ndarray:
+    """Flip a specific bit in IEEE 754 float32 values using string-based manipulation.
 
     Args:
         x (Union[float, np.ndarray]): Input float32 value or numpy array of values.
@@ -28,6 +22,7 @@ def bitflip_float32(
     Raises:
         ValueError: If bit_i is not in valid range [0, 31] when specified.
         TypeError: If input contains non-numeric values.
+
     """
     if bit_i is None:
         bit_i = np.random.randint(0, 32)

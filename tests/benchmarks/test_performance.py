@@ -1,5 +1,4 @@
-"""
-Performance benchmarks for SEU injection framework.
+"""Performance benchmarks for SEU injection framework.
 
 These tests validate that core operations meet performance requirements
 and don't regress over time. Based on testing/benchmark.py.
@@ -73,9 +72,7 @@ class TestPerformanceBenchmarks:
         avg_time = (end - start) / 10
 
         # Performance assertion: should complete in reasonable time
-        assert avg_time < 1.0, (
-            f"Model inference too slow: {avg_time:.4f}s per forward pass"
-        )
+        assert avg_time < 1.0, f"Model inference too slow: {avg_time:.4f}s per forward pass"
         result = run_inference()
 
         assert result is not None
@@ -144,9 +141,7 @@ class TestPerformanceBenchmarks:
 
         # GPU should be faster (or at least not significantly slower)
         # Allow GPU to be up to 2x slower for small models due to overhead
-        assert gpu_time < cpu_time * 2, (
-            f"GPU ({gpu_time:.4f}s) much slower than CPU ({cpu_time:.4f}s)"
-        )
+        assert gpu_time < cpu_time * 2, f"GPU ({gpu_time:.4f}s) much slower than CPU ({cpu_time:.4f}s)"
 
     def test_memory_usage_reasonable(self, model, device):
         """Test that memory usage stays within reasonable bounds."""
@@ -164,9 +159,7 @@ class TestPerformanceBenchmarks:
             memory_increase = current_memory - initial_memory
 
             # Memory increase should be reasonable (< 100MB for this small model)
-            assert memory_increase < 100 * 1024 * 1024, (
-                f"Memory usage too high: {memory_increase / 1024 / 1024:.1f}MB"
-            )
+            assert memory_increase < 100 * 1024 * 1024, f"Memory usage too high: {memory_increase / 1024 / 1024:.1f}MB"
 
     def test_framework_import_performance(self):
         """Test that framework imports are reasonably fast."""
@@ -175,9 +168,7 @@ class TestPerformanceBenchmarks:
             # Clear module cache to force re-import
             import sys
 
-            modules_to_clear = [
-                k for k in sys.modules.keys() if k.startswith("seu_injection")
-            ]
+            modules_to_clear = [k for k in sys.modules.keys() if k.startswith("seu_injection")]
             for module in modules_to_clear:
                 if module in sys.modules:
                     del sys.modules[module]

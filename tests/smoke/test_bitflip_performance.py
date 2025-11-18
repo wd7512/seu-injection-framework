@@ -1,7 +1,6 @@
 import time
 
 import numpy as np
-import pytest
 
 from seu_injection.bitops.float32 import bitflip_float32, bitflip_float32_optimized
 
@@ -85,15 +84,11 @@ class TestBitflipPerformance:
         memory_increase = memory_after - memory_before
 
         array_size = large_array.nbytes
-        assert memory_increase < 3 * array_size, (
-            f"Memory increase too large: {memory_increase} bytes"
-        )
+        assert memory_increase < 3 * array_size, f"Memory increase too large: {memory_increase} bytes"
 
         # Test inplace operation
         memory_before_inplace = process.memory_info().rss
         bitflip_float32_optimized(large_array, 16, inplace=True)
         memory_after_inplace = process.memory_info().rss
         inplace_increase = memory_after_inplace - memory_before_inplace
-        assert inplace_increase < array_size, (
-            f"Inplace memory increase too large: {inplace_increase} bytes"
-        )
+        assert inplace_increase < array_size, f"Inplace memory increase too large: {inplace_increase} bytes"

@@ -86,13 +86,9 @@ class TestBitflipOperations:
 
     def test_binary_to_float32_invalid_length(self):
         """Test binary_to_float32 with invalid length input."""
-        with pytest.raises(
-            ValueError, match="Binary string must be exactly 32 characters"
-        ):
+        with pytest.raises(ValueError, match="Binary string must be exactly 32 characters"):
             binary_to_float32("101010")
-        with pytest.raises(
-            ValueError, match="Binary string must be exactly 32 characters"
-        ):
+        with pytest.raises(ValueError, match="Binary string must be exactly 32 characters"):
             binary_to_float32("1" * 33)
 
     def test_bitflip_fast_invalid_bit_position(self):

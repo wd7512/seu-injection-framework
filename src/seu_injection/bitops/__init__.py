@@ -1,5 +1,4 @@
-"""
-Bit manipulation operations for SEU injection.
+"""Bit manipulation operations for SEU injection.
 
 This module provides efficient bit-level operations for different precision formats
 used in neural network fault tolerance research.

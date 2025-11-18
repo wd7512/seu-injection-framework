@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import numpy as np
 import pytest
 import torch
@@ -26,9 +24,7 @@ class TestInjector:
     #   - Stochastic injection reproducibility with different random seeds
     # PRIORITY: MEDIUM - Current 94% coverage good, but edge cases important for production
 
-    def test_injector_initialization_with_tensor_data(
-        self, simple_model, sample_data, device
-    ):
+    def test_injector_initialization_with_tensor_data(self, simple_model, sample_data, device):
         """Test Injector initialization with tensor data."""
         X, y = sample_data
 
@@ -119,9 +115,7 @@ class TestInjector:
         assert torch.is_tensor(injector.X)
         assert torch.is_tensor(injector.y)
 
-    def test_injector_initialization_with_dataloader(
-        self, simple_model, sample_data, device
-    ):
+    def test_injector_initialization_with_dataloader(self, simple_model, sample_data, device):
         """Test Injector initialization with DataLoader."""
         X, y = sample_data
 
@@ -149,9 +143,7 @@ class TestInjector:
         dataset = torch.utils.data.TensorDataset(X, y)
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=32)
 
-        with pytest.raises(
-            ValueError, match="Cannot pass both a dataloader and x and y values"
-        ):
+        with pytest.raises(ValueError, match="Cannot pass both a dataloader and x and y values"):
             ExhaustiveSEUInjector(
                 trained_model=simple_model,
                 criterion=classification_accuracy,
@@ -163,9 +155,7 @@ class TestInjector:
 
     def test_injector_missing_data(self, simple_model):
         """Test that Injector raises error when neither data_loader nor X/y are provided."""
-        with pytest.raises(
-            ValueError, match="Must provide either data_loader or at least one of X, y"
-        ):
+        with pytest.raises(ValueError, match="Must provide either data_loader or at least one of X, y"):
             ExhaustiveSEUInjector(
                 trained_model=simple_model,
                 criterion=classification_accuracy,
@@ -189,13 +179,9 @@ class TestInjector:
         score2 = injector._get_criterion_score()
 
         assert score1 == score2, "Criterion score should be consistent"
-        assert score1 == injector.baseline_score, (
-            "get_criterion_score should match baseline"
-        )
+        assert score1 == injector.baseline_score, "get_criterion_score should match baseline"
 
-    def test_get_criterion_score_with_dataloader(
-        self, simple_model, sample_data, device
-    ):
+    def test_get_criterion_score_with_dataloader(self, simple_model, sample_data, device):
         """Test get_criterion_score with DataLoader to cover the DataLoader branch."""
         X, y = sample_data
 
@@ -245,9 +231,7 @@ class TestInjector:
 
         # All lists should have the same length
         lengths = [len(results[key]) for key in expected_keys]
-        assert all(length == lengths[0] for length in lengths), (
-            "Result lists have different lengths"
-        )
+        assert all(length == lengths[0] for length in lengths), "Result lists have different lengths"
 
         # Should have some results (the simple model has parameters)
         assert len(results["tensor_location"]) > 0, "No SEU injection results found"
@@ -338,9 +322,7 @@ class TestInjector:
         # Also test with non-existent layer to ensure all layers are skipped
         # This MUST trigger the continue statement for ALL layers
         results_empty = injector.run_injector(bit_i=0, layer_name="nonexistent_layer")
-        assert len(results_empty["layer_name"]) == 0, (
-            "Should have no results for non-existent layer"
-        )
+        assert len(results_empty["layer_name"]) == 0, "Should have no results for non-existent layer"
 
         # Test with first layer to ensure other layers are skipped
         results_first = injector.run_injector(bit_i=0, layer_name="0.weight")
@@ -376,13 +358,9 @@ class TestInjector:
             assert key in results, f"Missing key {key} in results"
 
         # Should have some results, but likely fewer than exhaustive SEU
-        assert len(results["tensor_location"]) > 0, (
-            "No stochastic SEU injection results found"
-        )
+        assert len(results["tensor_location"]) > 0, "No stochastic SEU injection results found"
 
-    def test_run_stochastic_seu_probability_validation(
-        self, simple_model, sample_data, device
-    ):
+    def test_run_stochastic_seu_probability_validation(self, simple_model, sample_data, device):
         """Test probability validation in stochastic SEU."""
         X, y = sample_data
 
@@ -406,9 +384,7 @@ class TestInjector:
         with pytest.raises(ValueError):
             injector.run_injector(bit_i=0, p=1.1)
 
-    def test_stochastic_seu_probability_effects(
-        self, simple_model, sample_data, device
-    ):
+    def test_stochastic_seu_probability_effects(self, simple_model, sample_data, device):
         """Test that different probabilities affect the number of injections."""
         X, y = sample_data
 
@@ -464,9 +440,7 @@ class TestInjector:
                 msg=f"Parameter {name} was not restored after SEU injection",
             )
 
-    def test_run_stochastic_seu_layer_filtering(
-        self, simple_model, sample_data, device
-    ):
+    def test_run_stochastic_seu_layer_filtering(self, simple_model, sample_data, device):
         """Test stochastic SEU injection with layer filtering to trigger continue statement."""
         X, y = sample_data
 
@@ -487,9 +461,5 @@ class TestInjector:
         )
 
         # Also test with nonexistent layer to trigger continue for all layers
-        results_empty = injector.run_injector(
-            bit_i=0, p=1.0, layer_name="nonexistent_layer"
-        )
-        assert len(results_empty["layer_name"]) == 0, (
-            "Should have no results for nonexistent layer"
-        )
+        results_empty = injector.run_injector(bit_i=0, p=1.0, layer_name="nonexistent_layer")
+        assert len(results_empty["layer_name"]) == 0, "Should have no results for nonexistent layer"

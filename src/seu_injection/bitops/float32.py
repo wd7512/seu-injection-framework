@@ -1,21 +1,16 @@
-"""
-Optimized IEEE 754 Float32 bit manipulation operations.
+"""Optimized IEEE 754 Float32 bit manipulation operations.
 
-This module contains high-performance implementations of bit-level manipulation functions for float32 values. These functions are designed for production use and prioritize speed and memory efficiency.
+This module contains high-performance implementations of bit-level manipulation functions for float32 values. These
+functions are designed for production use and prioritize speed and memory efficiency.
 """
-
-from typing import Optional, Union
 
 import numpy as np
 
-from .utils import binary_to_float32, float32_to_binary
-
 
 def bitflip_float32_optimized(
-    values: Union[float, np.ndarray], bit_position: int, inplace: bool = False
-) -> Union[float, np.ndarray]:
-    """
-    High-performance bit flipping using direct memory manipulation and vectorization.
+    values: float | np.ndarray, bit_position: int, inplace: bool = False
+) -> float | np.ndarray:
+    """High-performance bit flipping using direct memory manipulation and vectorization.
 
     Args:
         values (Union[float, np.ndarray]): Input float32 value or numpy array.
@@ -24,6 +19,7 @@ def bitflip_float32_optimized(
 
     Returns:
         Union[float, np.ndarray]: Value(s) with specified bit flipped.
+
     """
     if not (0 <= bit_position <= 31):
         raise ValueError(f"Bit position must be in range [0, 31], got {bit_position}")
@@ -42,11 +38,8 @@ def bitflip_float32_optimized(
     return _bitflip_array_optimized(values_array, bit_position, inplace)
 
 
-def _bitflip_array_optimized(
-    values: np.ndarray, bit_position: int, inplace: bool
-) -> np.ndarray:
-    """
-    Internal optimized array bitflip using direct bit manipulation.
+def _bitflip_array_optimized(values: np.ndarray, bit_position: int, inplace: bool) -> np.ndarray:
+    """Internal optimized array bitflip using direct bit manipulation.
 
     Args:
         values: Input float32 array
@@ -55,6 +48,7 @@ def _bitflip_array_optimized(
 
     Returns:
         Array with specified bits flipped
+
     """
     if values.dtype != np.float32:
         values = values.astype(np.float32)
@@ -66,11 +60,8 @@ def _bitflip_array_optimized(
     return work_array
 
 
-def bitflip_float32_fast(
-    x: Union[float, np.ndarray], bit_i: Optional[int] = None, inplace: bool = False
-) -> Union[float, np.ndarray]:
-    """
-    Intelligent bit flipping with automatic performance optimization and fallback handling.
+def bitflip_float32_fast(x: float | np.ndarray, bit_i: int | None = None, inplace: bool = False) -> float | np.ndarray:
+    """Intelligent bit flipping with automatic performance optimization and fallback handling.
 
     Args:
         x (Union[float, np.ndarray]): Input float32 value or numpy array to manipulate.
@@ -79,6 +70,7 @@ def bitflip_float32_fast(
 
     Returns:
         Union[float, np.ndarray]: Value(s) with specified bit flipped.
+
     """
     if bit_i is None:
         bit_i = np.random.randint(0, 32)

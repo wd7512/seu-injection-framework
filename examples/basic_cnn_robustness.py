@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Basic CNN Robustness Analysis Example
+"""Basic CNN Robustness Analysis Example
 
 This example demonstrates basic SEU injection for analyzing CNN robustness
 to Single Event Upsets using the SEU Injection Framework.
@@ -61,9 +60,7 @@ def prepare_data():
     X = scaler.fit_transform(X)
 
     # Split data
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42, stratify=y
-    )
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42, stratify=y)
 
     # Convert to PyTorch tensors
     X_train = torch.tensor(X_train, dtype=torch.float32)
@@ -104,9 +101,7 @@ def run_baseline_analysis(model, x_test, y_test):
     print("=" * 50)
 
     # Initialize SEU injector - CORRECT API
-    injector = ExhaustiveSEUInjector(
-        trained_model=model, criterion=classification_accuracy, x=x_test, y=y_test
-    )
+    injector = ExhaustiveSEUInjector(trained_model=model, criterion=classification_accuracy, x=x_test, y=y_test)
 
     baseline_acc = injector.baseline_score
     print(f"Baseline Accuracy: {baseline_acc:.2%}")
@@ -169,9 +164,7 @@ def analyze_layer_vulnerability(injector):
             print(f"  Injections: {len(fault_scores)}")
 
     # Find most vulnerable layer
-    most_vulnerable = max(
-        layer_results.keys(), key=lambda x: layer_results[x]["accuracy_drop"]
-    )
+    most_vulnerable = max(layer_results.keys(), key=lambda x: layer_results[x]["accuracy_drop"])
 
     print(f"\nMost vulnerable layer: {most_vulnerable}")
     print(f"   Accuracy drop: {layer_results[most_vulnerable]['accuracy_drop']:.2%}")
@@ -228,9 +221,7 @@ def analyze_bit_position_sensitivity(injector):
                 "num_injections": len(fault_scores),
             }
 
-            print(
-                f"    Average accuracy: {avg_accuracy:.2%} (drop: {accuracy_drop:.2%})"
-            )
+            print(f"    Average accuracy: {avg_accuracy:.2%} (drop: {accuracy_drop:.2%})")
         else:
             print(f"    No injections sampled for bit {bit_pos}")
 
@@ -263,17 +254,13 @@ def create_visualizations(baseline_acc, layer_results, bit_results):
         drops = [bit_results[pos]["accuracy_drop"] * 100 for pos in positions]
         names = [bit_results[pos]["name"] for pos in positions]
 
-        colors = [
-            "red" if pos == 0 else "orange" if pos <= 8 else "blue" for pos in positions
-        ]
+        colors = ["red" if pos == 0 else "orange" if pos <= 8 else "blue" for pos in positions]
         ax2.bar(range(len(positions)), drops, color=colors, alpha=0.7)
         ax2.set_xlabel("Bit Position")
         ax2.set_ylabel("Average Accuracy Drop (%)")
         ax2.set_title("IEEE 754 Bit Position Vulnerability")
         ax2.set_xticks(range(len(positions)))
-        ax2.set_xticklabels(
-            [f"{pos}\n({names[i]})" for i, pos in enumerate(positions)], rotation=45
-        )
+        ax2.set_xticklabels([f"{pos}\n({names[i]})" for i, pos in enumerate(positions)], rotation=45)
         ax2.grid(True, alpha=0.3)
 
     plt.tight_layout()
