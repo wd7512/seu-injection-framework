@@ -52,8 +52,6 @@ def _bitflip_array_optimized(values: np.ndarray, bit_position: int, inplace: boo
         Array with specified bits flipped
 
     """
-    if values.dtype != np.float32:
-        values = values.astype(np.float32)
 
     work_array = values if inplace else values.copy()
     uint_view = work_array.view(np.uint32)
