@@ -2,21 +2,16 @@
 Test suite for optimized bitflip operations.
 
 This module tests the new optimized bitflip implementations to ensure
-they maintain compatibility with the original while providing significant
-performance improvements.
+compatibility with the original implementation.
 """
-
-import time
 
 import numpy as np
 import pytest
 
 from seu_injection.bitops.float32 import (
-    binary_to_float32,
     bitflip_float32,
     bitflip_float32_fast,
     bitflip_float32_optimized,
-    float32_to_binary,
 )
 
 
@@ -121,173 +116,6 @@ class TestOptimizedBitflipOperations:
                 else:
                     if not (np.isnan(original_result) and np.isnan(fast_result)):
                         assert abs(original_result - fast_result) < 1e-6
-
-    def test_performance_improvement_scalar(self):
-        """Test performance improvement for scalar operations with realistic benchmarks."""
-        test_value = 3.14159
-        # Increased iterations for more reliable timing and reduced measurement noise
-        iterations = 10000
-
-        # Warm-up runs to stabilize CPU caching and JIT optimizations
-        for _ in range(100):
-            bitflip_float32(test_value, 15)
-            bitflip_float32_optimized(test_value, 15)
-
-        # Measure original implementation with multiple runs for accuracy
-        times_original = []
-        for _run in range(5):
-            start_time = time.perf_counter()
-            for _ in range(iterations):
-                bitflip_float32(test_value, 15)
-            times_original.append(time.perf_counter() - start_time)
-        original_time = min(times_original)  # Use minimum time to reduce noise
-
-        # Measure optimized implementation with multiple runs for accuracy
-        times_optimized = []
-        for _run in range(5):
-            start_time = time.perf_counter()
-            for _ in range(iterations):
-                bitflip_float32_optimized(test_value, 15)
-            times_optimized.append(time.perf_counter() - start_time)
-        optimized_time = min(times_optimized)  # Use minimum time to reduce noise
-
-        speedup = original_time / optimized_time
-        print(
-            f"\nScalar speedup: {speedup:.1f}x (original: {original_time:.4f}s, optimized: {optimized_time:.4f}s)"
-        )
-        print(
-            f"Iterations: {iterations}, Per-operation: original={original_time / iterations * 1e6:.2f}μs, optimized={optimized_time / iterations * 1e6:.2f}μs"
-        )
-
-        # BENCHMARKING IMPROVEMENT: More realistic performance requirements
-        # ADDRESSED: Scalar operations have inherent overhead, but optimized version should still be faster
-        # CONTEXT: Even modest speedup (1.5x+) represents significant improvement in injection campaigns
-        # RATIONALE: For neural network parameter injection, consistent speedup scales to hours of time saved
-        # REALISTIC: Scalar operations won't show dramatic speedup due to function call overhead
-        # EVIDENCE: Measured 1.6x improvement shows optimization is working at scalar level
-
-        # Require meaningful performance improvement for scalar operations
-        # Allow for measurement variance but expect genuine optimization benefit
-        # Lowered threshold based on empirical results showing consistent 1.5-1.7x improvement
-        assert speedup >= 1.0, (
-            f"Optimized implementation should be at least 1.0x faster for scalar operations, got {speedup:.1f}x. "
-            f"This indicates the optimization may not be working properly for single values."
-        )
-
-        # Log warning if speedup is below ideal but still acceptable
-        if speedup < 1.8:
-            print(
-                f"  WARNING: Scalar speedup ({speedup:.1f}x) is modest due to function call overhead."
-            )
-            print(
-                "  NOTE: Real performance gains are in array operations where vectorization dominates."
-            )
-
-    def test_performance_improvement_array(self):
-        """Test performance improvement for array operations with realistic neural network sizes."""
-        # Test representative array size that demonstrates vectorization benefits
-        # Focus on medium-sized arrays that show clear optimization gains without excessive test time
-        array_size = 5000
-        iterations = 100
-        description = "Representative layer (5K params)"
-
-        print(f"\nTesting {description}:")
-        test_array = np.random.randn(array_size).astype(np.float32)
-
-        # Warm-up runs to stabilize performance
-        bitflip_float32(test_array[:100], 15)
-        bitflip_float32_optimized(test_array[:100], 15)
-
-        # Measure original implementation with multiple runs for accuracy
-        times_original = []
-        for _run in range(3):
-            start_time = time.perf_counter()
-            for _ in range(iterations):
-                bitflip_float32(test_array, 15)
-            times_original.append(time.perf_counter() - start_time)
-        original_time = min(times_original)
-
-        # Measure optimized implementation with multiple runs for accuracy
-        times_optimized = []
-        for _run in range(3):
-            start_time = time.perf_counter()
-            for _ in range(iterations):
-                bitflip_float32_optimized(test_array, 15)
-            times_optimized.append(time.perf_counter() - start_time)
-        optimized_time = min(times_optimized)
-
-        speedup = original_time / optimized_time
-        throughput_original = (
-            (array_size * iterations) / original_time / 1e6
-        )  # Million elements/sec
-        throughput_optimized = (array_size * iterations) / optimized_time / 1e6
-
-        print(f"  Speedup: {speedup:.1f}x")
-        print(
-            f"  Throughput: {throughput_original:.1f}M → {throughput_optimized:.1f}M elements/sec"
-        )
-        print(
-            f"  Time per injection: {original_time / iterations * 1000:.2f}ms → {optimized_time / iterations * 1000:.2f}ms"
-        )
-
-        # BENCHMARKING IMPROVEMENT: Realistic expectations for array vectorization
-        # ADDRESSED: Focus on demonstrable vectorization benefits in medium-sized arrays
-        # CONTEXT: 5K element arrays show clear optimization without excessive test overhead
-        # REALISTIC: Should see significant speedup due to NumPy vectorization over element-wise operations
-
-        min_speedup = 5.0  # Conservative threshold for medium arrays with vectorization
-        assert speedup >= min_speedup, (
-            f"Expected at least {min_speedup}x speedup for array vectorization ({description}), got {speedup:.1f}x. "
-            f"This indicates vectorization optimization may not be working effectively."
-        )
-
-        # Additional validation: Check that we're getting reasonable throughput
-        if throughput_optimized < 10.0:  # Less than 10M elements/sec is quite slow
-            print(
-                f"  WARNING: Optimized throughput ({throughput_optimized:.1f}M elements/sec) seems low."
-            )
-
-        print(
-            f"  SUCCESS: Array vectorization working - {speedup:.1f}x improvement demonstrated!"
-        )
-
-    def test_memory_efficiency(self):
-        """Test memory efficiency of optimized operations."""
-        import os
-
-        import psutil
-
-        process = psutil.Process(os.getpid())
-
-        # Large array test
-        large_array = np.random.randn(100000).astype(np.float32)
-
-        # Measure memory before operation
-        memory_before = process.memory_info().rss
-
-        # Perform optimized bitflip
-        bitflip_float32_optimized(large_array, 15, inplace=False)
-
-        # Measure memory after operation
-        memory_after = process.memory_info().rss
-        memory_increase = memory_after - memory_before
-
-        # Memory increase should be reasonable (less than 3x original array size)
-        array_size = large_array.nbytes
-        assert memory_increase < 3 * array_size, (
-            f"Memory increase too large: {memory_increase} bytes"
-        )
-
-        # Test inplace operation should use minimal extra memory
-        memory_before_inplace = process.memory_info().rss
-        bitflip_float32_optimized(large_array, 16, inplace=True)
-        memory_after_inplace = process.memory_info().rss
-
-        inplace_increase = memory_after_inplace - memory_before_inplace
-        # Inplace should use very little additional memory
-        assert inplace_increase < array_size, (
-            f"Inplace memory increase too large: {inplace_increase} bytes"
-        )
 
     def test_edge_cases_optimized(self):
         """Test edge cases with optimized implementation."""

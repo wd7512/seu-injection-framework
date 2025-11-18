@@ -465,7 +465,7 @@ def _bitflip_array_optimized(
 
 
 def bitflip_float32_fast(
-    x: Union[float, np.ndarray], bit_i: Optional[int] = None
+    x: Union[float, np.ndarray], bit_i: Optional[int] = None, inplace: bool = False
 ) -> Union[float, np.ndarray]:
     """
     Intelligent bit flipping with automatic performance optimization and fallback handling.
@@ -481,103 +481,11 @@ def bitflip_float32_fast(
 
     Args:
         x (Union[float, np.ndarray]): Input float32 value or numpy array to manipulate.
-            Supports scalars, lists, tuples, and numpy arrays of any shape. Non-float32
-            numeric types are automatically converted. Complex or non-numeric inputs
-            trigger fallback to string-based processing with appropriate error handling.
         bit_i (Optional[int]): Bit position to flip in IEEE 754 representation.
-            Range: [0, 31] where 0 is most significant bit (sign), 31 is least
-            significant bit (mantissa LSB). If None, randomly selects position using
-            numpy.random.randint(0, 32) for sampling fault injection scenarios.
+        inplace (bool): If True, modifies the input array in place (only for numpy arrays).
 
     Returns:
-        Union[float, np.ndarray]: Value(s) with specified bit flipped, maintaining
-            input type, shape, and precision. Return type matches input type exactly,
-            ensuring seamless integration into existing workflows.
-
-    Raises:
-        ValueError: If bit_i is specified and not in valid range [0, 31]. Ensures
-            all bit manipulations target valid IEEE 754 positions.
-        TypeError: If input contains non-numeric data that cannot be processed by
-            either implementation strategy after all fallback attempts.
-
-    Performance Strategy:
-        The function uses intelligent dispatch based on input characteristics:
-
-        Optimization Conditions:
-        - Scalars: Always use optimized struct-based manipulation
-        - NumPy arrays: Use vectorized optimized approach
-        - Small lists/tuples: Convert to numpy then optimize
-        - Large compatible arrays: Use in-place vectorized operations
-
-        Fallback Conditions:
-        - Mixed data types in arrays
-        - Non-standard numpy dtypes requiring conversion
-        - Custom array-like objects without numpy compatibility
-        - Any TypeError or ValueError in optimized path
-
-    Example:
-        >>> import numpy as np
-        >>>
-        >>> # Automatic optimization for different input types
-        >>> scalar_result = bitflip_float32_fast(1.0, 0)        # Optimized
-        >>> array_result = bitflip_float32_fast([1.0, 2.0], 0)  # Optimized
-        >>> numpy_result = bitflip_float32_fast(np.ones(1000), 0)  # Vectorized
-        >>>
-        >>> # Graceful fallback for edge cases
-        >>> mixed_result = bitflip_float32_fast([1.0, "2.0"], 0)  # String fallback
-        >>>
-        >>> # Random bit selection for sampling analysis
-        >>> np.random.seed(123)  # For reproducible experiments
-        >>> weights = np.random.randn(10000).astype(np.float32)
-        >>> corrupted = bitflip_float32_fast(weights)  # Random bit per element? No, same bit
-        >>>
-        >>> # Performance comparison across implementations
-        >>> large_data = np.random.randn(1000000).astype(np.float32)
-        >>>
-        >>> import time
-        >>> # Fast path (this function)
-        >>> start = time.time()
-        >>> result_fast = bitflip_float32_fast(large_data, 15)
-        >>> fast_time = time.time() - start
-        >>>
-        >>> # String-based path
-        >>> start = time.time()
-        >>> result_string = bitflip_float32(large_data, 15)
-        >>> string_time = time.time() - start
-        >>>
-        >>> print(f"Speed improvement: {string_time/fast_time:.1f}x")
-        >>> print(f"Results match: {np.allclose(result_fast, result_string)}")
-
-    Implementation Selection Logic:
-        1. Validate bit_i parameter and handle random selection
-        2. Detect input type and characteristics
-        3. For array-like inputs:
-           a. Attempt numpy conversion and vectorized optimization
-           b. Fall back to string-based element-wise processing on failure
-        4. For scalar inputs:
-           a. Attempt struct-based optimization
-           b. Fall back to string-based conversion on failure
-        5. Return results with original type preservation
-
-    Error Handling Philosophy:
-        This function prioritizes robustness over strict error reporting:
-        - Attempts multiple implementation strategies before failing
-        - Provides informative error messages when all strategies fail
-        - Preserves original exceptions from underlying implementations
-        - Ensures consistent behavior across different Python environments
-
-    Use Case Recommendations:
-        - Educational/Research: Use for all scenarios requiring bit manipulation
-        - Production Systems: Primary choice for fault injection pipelines
-        - Performance Critical: Benchmarking shows consistent 10-100x improvements
-        - Compatibility Critical: Handles edge cases other implementations cannot
-        - Stochastic Analysis: Built-in random bit selection for probabilistic studies
-
-    See Also:
-        bitflip_float32: Educational string-based reference implementation
-        bitflip_float32_optimized: Direct access to high-performance implementation
-        numpy.random.randint: Random bit position selection mechanism
-        struct: Underlying scalar optimization mechanism
+        Union[float, np.ndarray]: Value(s) with specified bit flipped.
     """
     # Handle random bit selection
     if bit_i is None:
@@ -590,22 +498,14 @@ def bitflip_float32_fast(
     # For arrays or array-like inputs
     if hasattr(x, "__iter__") and not isinstance(x, str):
         try:
-            # TODO VECTORIZATION OPPORTUNITY: This function should be the default in all injection loops
-            # PROBLEM: Previous injector classes still called slow bitflip_float32() instead of this optimized version
-            # IMPACT: Users get 10-100x speedup if they use this function, but critical paths don't
-            # SOLUTION: Make this the default import, deprecate string-based version for educational use
-
-            # Try optimized vectorized approach
-            return bitflip_float32_optimized(x, bit_i, inplace=False)
+            return bitflip_float32_optimized(x, bit_i, inplace=inplace)
         except (ValueError, TypeError):
-            # Fall back to original implementation for edge cases
             return _bitflip_original_array(x, bit_i)
     else:
         # For scalar values, use optimized approach
         try:
-            return bitflip_float32_optimized(x, bit_i, inplace=False)
+            return bitflip_float32_optimized(x, bit_i, inplace=inplace)
         except (ValueError, TypeError):
-            # Fall back to original implementation
             return _bitflip_original_scalar(x, bit_i)
 
 
