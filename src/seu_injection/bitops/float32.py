@@ -62,7 +62,9 @@ def _bitflip_array_optimized(values: np.ndarray, bit_position: int, inplace: boo
     return work_array
 
 
-def bitflip_float32_fast(x: Union[float, np.ndarray], bit_i: Union[int, None] = None, inplace: bool = False) -> Union[float, np.ndarray]:
+def bitflip_float32_fast(
+    x: Union[float, np.ndarray], bit_i: Union[int, None] = None, inplace: bool = False
+) -> Union[float, np.ndarray]:
     """Intelligent bit flipping with automatic performance optimization and fallback handling.
 
     Args:
