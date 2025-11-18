@@ -13,7 +13,7 @@
 ### Documentation
 
 - **API Reference**: See docstrings in `src/seu_injection/`
-- **Examples**: [`../examples/`](../examples/) - Research examples and notebook
+- **Examples**: [`../examples/`](../examples/) - Research examples, notebook, and new ShipsNet experiments
 - **Known Issues**: [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md) - Issue tracking
 
 ### Development

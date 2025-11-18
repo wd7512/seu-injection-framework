@@ -15,6 +15,8 @@ We need to clean up old branches that may have some value in it. This is current
 
 We also want to branch off at some point and start experimentation.
 
+Recent updates (v1.1.10) include reproducible ShipsNet experiments and improved injection protocols/metrics. These will inform future research and experimentation.
+
 It is likely that features will be made during this experimentation and we can merge them back into main. When this happens we can move to 1.2.0 as it is proof that the package can be used to perform research
 
 This move to v1.2.0 will also include testing on CUDA during experimentation. It would be useful to have a test that uses both CUDA and CPU and assess the performance.

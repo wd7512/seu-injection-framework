@@ -2,7 +2,7 @@
 
 Thank you for contributing to the SEU Injection Framework!
 
-## 🎯 Project Goals
+## Project Goals
 
 - Production-grade tools for systematic fault injection studies
 - Reproducible research with deterministic SEU injection

@@ -114,6 +114,9 @@ Full tutorial: [`docs/quickstart.md`](docs/quickstart.md).
 - Basic CNN robustness: [`examples/basic_cnn_robustness.py`](examples/basic_cnn_robustness.py)
 - Architecture comparison: [`examples/architecture_comparison.py`](examples/architecture_comparison.py)
 - Interactive notebook: [`examples/Example_Attack_Notebook.ipynb`](examples/Example_Attack_Notebook.ipynb)
+- ShipsNet experiments and notebook: [`examples/shipsnet/`](examples/shipsnet/) (see README in folder)
+
+Recent updates include reproducible ShipsNet experiments and improvements to injection protocols and metrics.
 
 ## Features
 

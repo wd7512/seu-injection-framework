@@ -387,7 +387,10 @@ Congratulations! 🎉 You've completed the quickstart tutorial. You now know how
 - 📖 [API Documentation](api/index.md) - Complete reference for all features
 - 📚 [Tutorials](tutorials/basic_usage.md) - Step-by-step guides for advanced topics
 - 🔬 [Example Notebooks](../Example_Attack_Notebook.ipynb) - Interactive Jupyter examples
-- 📊 [Research Examples](examples/notebooks/) - Real-world research applications
+- 📊 [Research Examples](examples/) - Real-world research applications
+  - 🛳️ ShipsNet experiments and notebook: [`examples/shipsnet/`](examples/shipsnet/) (see README in folder)
+
+Recent updates include reproducible ShipsNet experiments and improved injection protocols.
 
 **Advanced Topics:**
 

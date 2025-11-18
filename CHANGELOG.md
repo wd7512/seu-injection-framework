@@ -5,6 +5,10 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.X.XX] - sometime
+
+- **ShipsNet experiments and notebook added**: see `examples/shipsnet/` for reproducible experiments and improved injection protocols/metrics
+
 ## [1.1.10] - 2025-11-15
 
 - **injector.py file refactored**: replaced by `injector_base.py` abstractclass with two new python files inheriting from this
