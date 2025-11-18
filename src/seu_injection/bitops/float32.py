@@ -1,15 +1,7 @@
 """
 IEEE 754 Float32 bit manipulation operations for Single Event Upset (SEU) simulation.
 
-This module provides comprehensive bit-level manipulation functions for float32 values,
-enabling precise simulation of radiation-induced bit flips in neural network parameters.
-It supports both individual values and vectorized array operations with multiple
-implementation strategies optimized for different use cases.
-
-The module implements IEEE 754 single-precision floating-point bit manipulation with
-careful attention to performance characteristics. It provides both educational
-string-based implementations and production-optimized direct memory manipulation
-approaches, allowing users to choose based on their specific requirements.
+This module provides bit-level manipulation functions for float32 values, enabling simulation of radiation-induced bit flips in neural network parameters. It supports both individual values and vectorized array operations with multiple implementation strategies optimized for different use cases.
 
 Key Features:
     - IEEE 754 compliant bit manipulation
@@ -17,57 +9,18 @@ Key Features:
     - Multiple implementation strategies for different performance needs
     - Comprehensive bit position validation and error handling
     - Support for both deterministic and random bit selection
-    - Zero-copy operations for memory efficiency
-
-Performance Characteristics:
-    - String-based approach: O(n) with high constant factors, educational clarity
-    - Optimized approach: O(1) for scalars, O(n) for arrays with low constant factors
-    - Vectorized approach: Fully parallel array operations, 100x+ speedup for large arrays
-
-IEEE 754 Float32 Bit Layout:
-    Bit Position  | Range  | Component  | Description
-    --------------|--------|------------|------------------------------------------
-    0             | [0]    | Sign       | Sign bit (0=positive, 1=negative)
-    1-8           | [1-8]  | Exponent   | Biased exponent (bias=127)
-    9-31          | [9-31] | Mantissa   | Fractional part (23 bits)
 
 Typical Usage:
     >>> import numpy as np
     >>> from seu_injection.bitops.float32 import bitflip_float32_fast
-    >>>
-    >>> # Single value manipulation
     >>> original = 1.0
     >>> corrupted = bitflip_float32_fast(original, bit_i=0)  # Flip sign bit
-    >>> print(f"{original} -> {corrupted}")  # 1.0 -> -1.0
-    >>>
-    >>> # Array manipulation for batch processing
-    >>> weights = np.array([1.0, 2.0, 3.0], dtype=np.float32)
-    >>> corrupted_weights = bitflip_float32_fast(weights, bit_i=15)
-    >>> print(f"Original: {weights}")
-    >>> print(f"Corrupted: {corrupted_weights}")
-    >>>
-    >>> # Performance comparison
-    >>> large_array = np.random.randn(1000000).astype(np.float32)
-    >>> # Fast: bitflip_float32_optimized() - vectorized
-    >>> # Compatible: bitflip_float32() - string-based
-    >>> # Auto-select: bitflip_float32_fast() - best of both
-
-See Also:
-    struct: Python module for binary data manipulation
-    numpy: Numerical computing library for vectorized operations
-    IEEE 754: International standard for floating-point arithmetic
+    >>> print(f"{original} -> {corrupted}")
 """
 
 import struct
 from typing import Optional, Union
-
 import numpy as np
-
-# TODO CODE QUALITY: Import optimization needed - numpy imported but struct only used in specific functions
-# ISSUE: struct module imported globally but only used in 2 specific functions
-# IMPACT: Unnecessary global namespace pollution and import overhead
-# SOLUTION: Move struct imports to function level where needed
-# PRIORITY: LOW - cosmetic improvement, no functional impact
 
 
 def bitflip_float32(
@@ -76,127 +29,23 @@ def bitflip_float32(
     """
     Flip a specific bit in IEEE 754 float32 values using string-based manipulation.
 
-    # TODO PERFORMANCE CRITICAL: This function is the PRIMARY PERFORMANCE BOTTLENECK
-    # Current implementation uses O(32) string manipulation per bitflip:
-    # - float32_to_binary(): struct.pack/unpack + format() creates 32-char string
-    # - String indexing and character replacement
-    # - binary_to_float32(): int() parsing + struct.pack/unpack
-    # IMPACT: 100-500μs per scalar (should be ~3μs), 50ms-2s for 1K arrays (should be ~1ms)
-    # SOLUTION: Direct IEEE 754 bit manipulation using XOR operations on uint32 view
-    # PRIORITY: HIGH - Used in critical injection loops, affects all performance claims
-
-    This function performs Single Event Upset (SEU) simulation by flipping a specific
-    bit in the IEEE 754 float32 binary representation. It uses a string-based approach
-    for maximum clarity and educational value, making the bit manipulation process
-    explicit and debuggable.
-
-    This implementation prioritizes correctness and transparency over performance,
-    making it ideal for educational purposes, debugging, and small-scale analysis
-    where the bit manipulation process needs to be clearly understood.
-
     Args:
-        x (Union[float, np.ndarray]): Input float32 value or numpy array of values
-            to manipulate. Arrays are processed element-wise with consistent bit
-            position applied to all elements. Non-float32 inputs are converted
-            automatically with potential precision loss warnings.
+        x (Union[float, np.ndarray]): Input float32 value or numpy array of values.
         bit_i (Optional[int]): Bit position to flip in IEEE 754 representation.
-            Range: [0, 31] where 0 is most significant bit (sign), 31 is least
-            significant bit (mantissa LSB). If None, randomly selects position
-            using numpy.random.randint(0, 32) for sampling analysis.
 
     Returns:
-        Union[float, np.ndarray]: Value(s) with the specified bit flipped,
-            maintaining the same type and shape as input. Float32 precision
-            is preserved throughout the operation.
+        Union[float, np.ndarray]: Value(s) with the specified bit flipped.
 
     Raises:
         ValueError: If bit_i is not in valid range [0, 31] when specified.
-        TypeError: If input contains non-numeric values that cannot be
-            converted to float32 representation.
-
-    IEEE 754 Bit Impact Analysis:
-        Bit Position | Component | Typical Impact
-        -------------|-----------|------------------------------------------------
-        0            | Sign      | Changes sign: positive ↔ negative
-        1-8          | Exponent  | Dramatic magnitude changes: ×2^±127 possible
-        9-16         | Mantissa  | Moderate precision changes: ~0.1-1% typical
-        17-24        | Mantissa  | Small precision changes: ~0.01-0.1% typical
-        25-31        | Mantissa  | Minimal precision changes: <0.01% typical
-
-    Example:
-        >>> # Basic sign bit manipulation
-        >>> bitflip_float32(1.0, 0)  # Flip sign bit
-        -1.0
-        >>> bitflip_float32(-3.14159, 0)  # Flip sign bit back
-        3.14159
-        >>>
-        >>> # Exponent bit manipulation (dramatic changes)
-        >>> bitflip_float32(1.0, 1)  # Flip exponent MSB
-        2.0  # Doubles the value (exponent: 127 -> 255)
-        >>>
-        >>> # Mantissa bit manipulation (precision changes)
-        >>> original = 1.234567
-        >>> corrupted = bitflip_float32(original, 15)  # Mid-mantissa bit
-        >>> print(f"Change: {abs(corrupted - original):.8f}")
-        >>>
-        >>> # Array processing
-        >>> weights = np.array([1.0, 2.0, 3.0, 4.0], dtype=np.float32)
-        >>> corrupted = bitflip_float32(weights, 0)  # Flip signs
-        >>> print(f"Original: {weights}")
-        >>> print(f"Corrupted: {corrupted}")  # [-1.0, -2.0, -3.0, -4.0]
-        >>>
-        >>> # Random bit selection for sampling analysis
-        >>> np.random.seed(42)  # For reproducible results
-        >>> random_corrupted = bitflip_float32(1.0)  # Random bit position
-        >>> print(f"Random corruption: 1.0 -> {random_corrupted}")
-        >>>
-        >>> # Educational bit inspection
-        >>> from .float32 import float32_to_binary
-        >>> value = 1.0
-        >>> print(f"Original:  {float32_to_binary(value)}")
-        >>> flipped = bitflip_float32(value, 15)
-        >>> print(f"Flipped:   {float32_to_binary(flipped)}")
-
-    Performance:
-        This string-based implementation has O(n) complexity for n-element arrays
-        with relatively high constant factors due to string manipulation overhead:
-
-        - Single values: ~100-500μs depending on system
-        - 1K element array: ~50-200ms
-        - 10K element array: ~500ms-2s
-
-        For performance-critical applications with large arrays, consider using
-        bitflip_float32_optimized() or bitflip_float32_fast() which provide
-        10-100x speedup through direct memory manipulation.
-
-    Educational Value:
-        This implementation makes IEEE 754 bit manipulation explicit and traceable:
-        1. Converts float to 32-character binary string representation
-        2. Manipulates specific character position (bit flip)
-        3. Converts binary string back to float32 value
-
-        This process can be inspected at each step for debugging and learning.
-
-    See Also:
-        bitflip_float32_optimized: High-performance direct memory manipulation
-        bitflip_float32_fast: Automatic selection of optimal implementation
-        float32_to_binary: IEEE 754 to binary string conversion
-        binary_to_float32: Binary string to IEEE 754 conversion
+        TypeError: If input contains non-numeric values.
     """
-    # Validate bit position
     if bit_i is None:
         bit_i = np.random.randint(0, 32)
     elif not (0 <= bit_i <= 31):
         raise ValueError(f"Bit position must be between 0 and 31, got {bit_i}")
 
     if hasattr(x, "__iter__"):
-        # Handle arrays/iterables
-        # TODO PERFORMANCE: Array processing uses inefficient Python loops preventing vectorization
-        # Current: O(n) loop with 32 string operations per element = O(32n) complexity
-        # Each iteration: float32_to_binary() + list() + string manipulation + binary_to_float32()
-        # BOTTLENECK: No SIMD/vectorization, high Python overhead, memory allocations per element
-        # SOLUTION: Use numpy.ndarray.view(uint32) for zero-copy bit manipulation + vectorized XOR
-        # IMPACT: 50-2000x slower than possible, prevents scaling to large neural networks
         x_ = np.zeros_like(x, dtype=np.float32)
         for i, item in enumerate(x):
             string = list(float32_to_binary(item))
@@ -204,10 +53,6 @@ def bitflip_float32(
             x_[i] = binary_to_float32("".join(string))
         return x_
     else:
-        # Handle single values
-        # TODO PERFORMANCE: Scalar processing uses O(32) string manipulation per bit flip
-        # INEFFICIENCY: 3 function calls + string allocation/parsing for single XOR operation
-        # SOLUTION: Use struct.pack/unpack with direct bit manipulation (see bitflip_float32_optimized)
         string = list(float32_to_binary(x))
         string[bit_i] = "0" if string[bit_i] == "1" else "1"
         return binary_to_float32("".join(string))
@@ -218,18 +63,12 @@ def float32_to_binary(f: float) -> str:
     Convert a float32 value to its IEEE 754 binary representation.
 
     Args:
-        f: Float32 value to convert
+        f: Float32 value to convert.
 
     Returns:
-        32-character binary string representation
-
-    Example:
-        >>> float32_to_binary(1.0)
-        '00111111100000000000000000000000'
+        32-character binary string representation.
     """
-    # Pack float into 4 bytes, then unpack as a 32-bit integer
     [bits] = struct.unpack("!I", struct.pack("!f", f))
-    # Format the integer as a 32-bit binary string
     return f"{bits:032b}"
 
 
@@ -238,42 +77,27 @@ def binary_to_float32(binary_str: str) -> float:
     Convert a 32-bit binary string to a float32 value.
 
     Args:
-        binary_str: 32-character binary string
+        binary_str: 32-character binary string.
 
     Returns:
-        Corresponding float32 value
+        Corresponding float32 value.
 
     Raises:
-        ValueError: If binary_str is not exactly 32 characters
-
-    Example:
-        >>> binary_to_float32('00111111100000000000000000000000')
-        1.0
+        ValueError: If binary_str is not exactly 32 characters.
     """
     if len(binary_str) != 32:
         raise ValueError(
             f"Binary string must be exactly 32 characters, got {len(binary_str)}"
         )
-
-    # Convert binary string to a 32-bit integer
     bits = int(binary_str, 2)
-    # Pack the integer into bytes, then unpack as a float
-    # struct.unpack returns a tuple[Any, ...]; make the float explicit for mypy
     return float(struct.unpack("!f", struct.pack("!I", bits))[0])
 
 
-# TODO ARCHITECTURE: Multiple bitflip implementations create code duplication and maintenance burden
-# PROBLEM: 3 separate implementations (~500 lines) for same core functionality:
-#   1. bitflip_float32() - string-based, slow, "educational"
-#   2. bitflip_float32_optimized() - claims performance but has limitations
-#   3. bitflip_float32_fast() - "intelligent dispatch" but defaults to slow path
-# ISSUES:
-#   - Code duplication makes bug fixes require 3 updates
-#   - User confusion about which function to actually use
-#   - Performance claims inconsistent across implementations
-#   - Critical injection loops still use slowest implementation
-# SOLUTION: Single high-performance implementation with educational examples in docs
-# PRIORITY: MEDIUM - affects maintainability and user experience
+# TODO: Refactor redundant implementations of bit-flipping functions (bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast) to reduce code duplication and improve maintainability.
+# TODO: Move detailed documentation to an external file or module-level docstring to declutter the code.
+# TODO: Optimize imports by moving `struct` to function-level imports where it is used.
+# TODO: Separate educational and production-optimized code into different modules for clarity.
+# TODO: Track performance-related TODOs in an external issue tracker or a dedicated `TODO.md` file
 
 
 # Optimized version - O(1) bitflip implementation (Phase 3)
