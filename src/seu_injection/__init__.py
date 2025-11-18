@@ -39,10 +39,6 @@ from .core import ExhaustiveSEUInjector, StochasticSEUInjector
 from .metrics.accuracy import classification_accuracy, classification_accuracy_loader
 from .version import __version__
 
-# Alias SEUInjector to ExhaustiveSEUInjector for convenience
-# DEPRECATION NOTE: SEUInjector will be removed in future releases
-SEUInjector = ExhaustiveSEUInjector
-
 __all__ = [
     # Core classes
     "ExhaustiveSEUInjector",
