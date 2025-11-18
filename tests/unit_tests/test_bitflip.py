@@ -3,7 +3,13 @@ import struct
 import numpy as np
 import pytest
 
-from seu_injection.bitops import binary_to_float32, bitflip_float32, bitflip_float32_fast, float32_to_binary
+from seu_injection.bitops import (
+    binary_to_float32,
+    bitflip_float32,
+    bitflip_float32_fast,
+    bitflip_float32_optimized,
+    float32_to_binary,
+)
 
 
 class TestBitflipOperations:
@@ -128,6 +134,28 @@ class TestBitflipOperations:
         assert result.dtype == np.float32
         np.testing.assert_allclose(result, expected, rtol=1e-6)
 
+    def test_bitflip_fast_array_fallback(self):
+        """Test bitflip_float32_fast with arrays triggering fallback logic."""
+
+        class CustomArray:
+            def __iter__(self):
+                raise ValueError("Triggering fallback")
+
+        values = CustomArray()
+        with pytest.raises(ValueError, match="Triggering fallback"):
+            bitflip_float32_fast(values, 0)
+
+    def test_bitflip_fast_scalar_fallback(self):
+        """Test bitflip_float32_fast scalar fallback path."""
+
+        class CustomFloat(float):
+            def __float__(self):
+                raise ValueError("Triggering scalar fallback")
+
+        value = CustomFloat(1.0)
+        result = bitflip_float32_fast(value, 0)
+        assert isinstance(result, float)
+
     def test_comprehensive_binary_conversions(self):
         """Test edge cases in binary conversion functions."""
         test_values = [0.0, -0.0, 1.0, -1.0, float("inf"), float("-inf"), 0.5, -0.5]
@@ -200,3 +228,22 @@ class TestBitflipOperations:
 
         assert len(result) == len(values), "Array output length mismatch"
         assert (end_time - start_time) < 0.1, "Array bitflip operations are too slow"
+
+    def test_bitflip_array_non_float32(self):
+        """Test _bitflip_array_optimized with non-float32 array input."""
+        values = np.array([1.0, 2.0, 3.0], dtype=int)  # Non-float32 input
+        result = bitflip_float32_optimized(values, 0)
+        expected = np.array([-1.0, -2.0, -3.0], dtype=np.float32)
+        assert result.dtype == np.float32  # Ensure conversion to float32
+        np.testing.assert_allclose(result, expected, rtol=1e-6)
+
+    def test_bitflip_fast_scalar_fallback_logic(self):
+        """Test bitflip_float32_fast triggering _bitflip_original_scalar fallback."""
+
+        class CustomScalar:
+            def __float__(self):
+                raise ValueError("Triggering scalar fallback")
+
+        value = CustomScalar()
+        with pytest.raises(struct.error, match="required argument is not a float"):
+            bitflip_float32_fast(value, 0)
