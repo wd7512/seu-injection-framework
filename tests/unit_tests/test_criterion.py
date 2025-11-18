@@ -264,3 +264,18 @@ class TestCriterionFunctions:
         )
         assert isinstance(accuracy, (float, np.floating))
         assert 0.0 <= accuracy <= 1.0
+
+    def test_classification_accuracy_invalid_x_tensor(self, simple_model, device):
+        """Test that classification_accuracy raises TypeError for invalid x_tensor."""
+        invalid_x = [[1.0, 2.0], [3.0, 4.0]]  # Not a torch.Tensor
+        y = torch.tensor([1, 0], dtype=torch.float32, device=device)
+
+        with pytest.raises(TypeError, match="x_tensor must be a torch.Tensor"):
+            classification_accuracy(simple_model, invalid_x, y, device)
+
+    def test_classification_accuracy_missing_y_true(self, simple_model, device):
+        """Test that classification_accuracy raises ValueError when y_true is missing."""
+        X = torch.tensor([[1.0, 2.0], [3.0, 4.0]], dtype=torch.float32, device=device)
+
+        with pytest.raises(ValueError, match="y_true must be provided"):
+            classification_accuracy(simple_model, X, None, device)
