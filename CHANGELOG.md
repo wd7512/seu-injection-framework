@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.12] - sometime
 
-- **Removing unused core dependencies**: removed mdformat and scipy into dev 
+- **Removing unused core dependencies**: removed mdformat and scipy into dev
 
 ## [1.1.11] - 2025-11-18
 

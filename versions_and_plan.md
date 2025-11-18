@@ -2,7 +2,7 @@
 
 ### v1.1.XX
 
-Move many md files out of main and into a more development based branch. This will mean our future workflow stays clean on main and feature development can be performed on that branch. `dev` branch. Basically, we want a clear workflow and branch strategy. Having `main` and `dev` is good. And then `experimentation/...` off of `main`/`dev`?
+Move many md files out of main and into a more development based branch. This will mean our future workflow stays clean on main and feature development can be performed on that branch. `dev` branch. Basically, we want a clear workflow and branch strategy. Having `main` and `dev` is good. And then `experimentation/...` off of `main`/`dev`? *This is complete now*
 
 We need to clean up old branches that may have some value in it. This is currently
 
@@ -24,6 +24,8 @@ This move to v1.2.0 will also include testing on CUDA during experimentation. It
 ### v1.X.XX
 
 It would be nice to calculate the overhead caused by this simulation. We should calculate the average inference time of the model and compare this against the average injection time. If we know the overhead we can find ways to minimise it.
+
+- A fix could be to introduce a new layer which contains an additive factor with a mask to mimic bitflips quickly.
 
 ## Research Questions
 
