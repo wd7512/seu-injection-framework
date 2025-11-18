@@ -5,10 +5,10 @@ import pytest
 
 from seu_injection.bitops.float32 import (
     binary_to_float32,
-    bitflip_float32,
     bitflip_float32_fast,
     float32_to_binary,
 )
+from seu_injection.bitops.float32_legacy import bitflip_float32
 
 
 class TestBitflipOperations:
