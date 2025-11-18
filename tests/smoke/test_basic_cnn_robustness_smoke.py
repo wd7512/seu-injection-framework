@@ -1,5 +1,4 @@
-"""
-Smoke test for basic_cnn_robustness.py example.
+"""Smoke test for basic_cnn_robustness.py example.
 
 This test performs a quick validation to ensure the example can import
 and basic functions work without errors. It's designed for fast execution
@@ -7,9 +6,7 @@ in the smoke test suite.
 """
 
 import sys
-import tempfile
 from pathlib import Path
-from unittest.mock import patch
 
 import torch
 
@@ -46,12 +43,8 @@ def test_basic_cnn_robustness_functions_exist():
     ]
 
     for func_name in required_functions:
-        assert hasattr(basic_cnn_robustness, func_name), (
-            f"Missing function: {func_name}"
-        )
-        assert callable(getattr(basic_cnn_robustness, func_name)), (
-            f"Not callable: {func_name}"
-        )
+        assert hasattr(basic_cnn_robustness, func_name), f"Missing function: {func_name}"
+        assert callable(getattr(basic_cnn_robustness, func_name)), f"Not callable: {func_name}"
 
     print("SUCCESS: All required functions exist and are callable")
 
@@ -87,9 +80,7 @@ def test_basic_cnn_robustness_minimal_execution():
     assert isinstance(baseline_acc, float)
     print("SUCCESS: Baseline analysis setup works")
 
-    print(
-        "SUCCESS: SMOKE TEST PASSED: basic_cnn_robustness example basic functionality verified"
-    )
+    print("SUCCESS: SMOKE TEST PASSED: basic_cnn_robustness example basic functionality verified")
 
 
 def test_basic_cnn_robustness_seu_framework_integration():

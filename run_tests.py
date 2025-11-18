@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Test runner script for the SEU Injection Framework.
+"""Test runner script for the SEU Injection Framework.
 
 This script provides convenient commands to run different test suites:
 - Smoke tests: Quick validation of basic functionality
@@ -17,7 +16,6 @@ Usage:
 """
 
 import argparse
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -35,9 +33,7 @@ def run_command(cmd, description):
     print(f"{'=' * 60}")
 
     try:
-        result = subprocess.run(
-            cmd, check=True, capture_output=True, text=True, cwd=framework_root
-        )
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=framework_root)
         print(result.stdout)
         if result.stderr:
             print("STDERR:", result.stderr)
@@ -56,31 +52,27 @@ def run_command(cmd, description):
                 import re
 
                 coverage_match = re.search(r"TOTAL\s+\d+\s+\d+\s+(\d+)%", output_text)
-                actual_coverage = (
-                    coverage_match.group(1) if coverage_match else "unknown"
-                )
+                actual_coverage = coverage_match.group(1) if coverage_match else "unknown"
 
                 # Only show coverage warning if actually below threshold
                 required_coverage = 50  # From --cov-fail-under=50
                 if coverage_match and int(actual_coverage) < required_coverage:
                     print("\nCOVERAGE REQUIREMENT NOT MET!")
-                    print(
-                        f"Current coverage is {actual_coverage}%, required: {required_coverage}%"
-                    )
+                    print(f"Current coverage is {actual_coverage}%, required: {required_coverage}%")
                     print("To fix coverage issues:")
                     print(
-                        "   1. Run with verbose coverage: uv run pytest --cov=src/seu_injection --cov-report=term-missing -v"
+                        "   1. Run with verbose coverage: "
+                        "uv run pytest --cov=src/seu_injection --cov-report=term-missing -v"
                     )
                     print("   2. Check htmlcov/index.html for detailed coverage report")
                     print("   3. Add tests for uncovered code paths")
                     print("   4. Ensure all critical functions have test coverage")
                 else:
                     print(
-                        f"\nNote: Coverage is actually {actual_coverage}% which meets the {required_coverage}% requirement."
+                        f"\nNote: Coverage is actually {actual_coverage}% "
+                        f"which meets the {required_coverage}% requirement."
                     )
-                    print(
-                        "The test failure was likely due to other issues (see above)."
-                    )
+                    print("The test failure was likely due to other issues (see above).")
 
         return False
     except FileNotFoundError:
@@ -132,12 +124,7 @@ def run_example_tests():
     print("Running example validation tests...")
 
     # Run the basic CNN robustness example pipeline test
-    pipeline_test = (
-        framework_root
-        / "tests"
-        / "integration"
-        / "test_basic_cnn_robustness_pipeline.py"
-    )
+    pipeline_test = framework_root / "tests" / "integration" / "test_basic_cnn_robustness_pipeline.py"
     if pipeline_test.exists():
         cmd = ["uv", "run", "python", str(pipeline_test)]
         success = run_command(cmd, "Basic CNN Robustness Example Pipeline Test")
@@ -224,6 +211,14 @@ def check_dependencies():
 
 
 def main():
+    """Main entry point for running tests.
+
+    Parses command-line arguments to determine the type of tests to run (smoke, unit, integration, examples, or all).
+    Optionally skips dependency checks.
+
+    Returns:
+        int: Exit code (0 for success, 1 for failure).
+    """
     parser = argparse.ArgumentParser(
         description="Run tests for SEU Injection Framework",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -236,9 +231,7 @@ def main():
         help="Type of tests to run",
     )
 
-    parser.add_argument(
-        "--no-deps-check", action="store_true", help="Skip dependency checking"
-    )
+    parser.add_argument("--no-deps-check", action="store_true", help="Skip dependency checking")
 
     args = parser.parse_args()
 

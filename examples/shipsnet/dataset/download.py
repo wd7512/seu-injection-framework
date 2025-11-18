@@ -1,6 +1,4 @@
-"""
-Download the ShipsNet dataset and save it to the dataset folder.
-"""
+"""Download the ShipsNet dataset and save it to the dataset folder."""
 
 import os
 import shutil
@@ -9,8 +7,7 @@ import kagglehub
 
 
 def download_shipsnet_dataset():
-    """
-    Downloads the ShipsNet dataset and saves shipsnet.json to the current folder.
+    """Downloads the ShipsNet dataset and saves shipsnet.json to the current folder.
     Returns the path to the saved file, or None if not found.
     """
     # Download the latest version of the dataset

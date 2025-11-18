@@ -12,9 +12,7 @@ class CNN(nn.Module):
         self.conv3 = nn.Conv2d(16, 32, kernel_size=3, padding="same")
 
         self.pool = nn.MaxPool2d(kernel_size=2)
-        self.fc1 = nn.Linear(
-            5 * 5 * 32, 2
-        )  # Output layer with 2 neurons for binary classification
+        self.fc1 = nn.Linear(5 * 5 * 32, 2)  # Output layer with 2 neurons for binary classification
 
         self.act = act
         self.dropout = nn.Dropout(p=dropout_rate)

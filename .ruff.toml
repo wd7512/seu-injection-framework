@@ -1,0 +1,67 @@
+# ============================================================
+# GLOBAL SETTINGS — VERY RELAXED BASELINE
+# ============================================================
+
+line-length = 120
+target-version = "py311"
+fix = true
+
+exclude = [
+    "__pycache__",
+    ".git",
+    ".venv",
+    "build",
+    "dist",
+    "htmlcov",
+    "*.egg-info"
+]
+
+# ============================================================
+# FORMATTER SETTINGS — PREVENT PEP 604 REWRITES
+# ============================================================
+
+[format]
+preview = false   # <--- REQUIRED to stop Union → | conversion
+
+
+# ============================================================
+# GLOBAL LINT RULES — MINIMAL, PRACTICAL, NOT STRICT
+# ============================================================
+
+[lint]
+select = [
+    "E",
+    "W",
+    "I",
+    "UP",
+]
+extend-select = ["D1"]
+ignore = ["UP007"]
+
+
+# ============================================================
+# PER-FOLDER RELAXATIONS — TESTS HAVE ALMOST NO STRICTNESS
+# ============================================================
+
+[lint.per-file-ignores]
+"tests/*" = [
+    "D",
+    "N806",
+    "E501",
+    "E741",
+    "N802",
+    "N803",
+]
+
+"examples/*" = [
+    "D",
+    "N806",
+    "E501",
+    "E741",
+    "N802",
+    "N803",
+]
+
+# ============================================================
+# INCREMENTAL IMPROVEMENT ROADMAP (Keep these comments!)
+# ============================================================

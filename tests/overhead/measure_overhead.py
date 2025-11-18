@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Minimal overhead measurement for SEU injection operations."""
 
-import csv
 import json
 import time
 from datetime import datetime
@@ -83,9 +82,7 @@ def main():
 
     # Measure injection
     print("\nMeasuring SEU injection overhead...")
-    injector = StochasticSEUInjector(
-        trained_model=model, criterion=classification_accuracy, x=x_test, y=y_test
-    )
+    injector = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=x_test, y=y_test)
     injection_time, num_injections = measure_injection(injector)
     avg_injection_time = injection_time / num_injections if num_injections > 0 else 0
 
