@@ -66,7 +66,7 @@ pip install seu-injection-framework
 **Verify installation:**
 
 ```bash
-python -c "from seu_injection import SEUInjector; print('Ready')"
+python -c "from seu_injection import ExhaustiveSEUInjector; print('Ready')"
 ```
 
 Having issues? See [`docs/installation.md`](docs/installation.md).

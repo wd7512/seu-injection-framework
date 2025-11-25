@@ -6,23 +6,31 @@ This file lists only unique, actionable issues not covered in other documentatio
 
 ______________________________________________________________________
 
-### 1. Examples Directory - Pandas Import Performance
+### My known issues
+
+- Import time is long in the `Example_Attack_Notebook.ipynb` ~40s
+- Generally still have high overhead +1000%.
+- CUDA not tested yet
+
+### AI-Identified Issues
+
+#### 1. Examples Directory - Pandas Import Performance
 
 Some example scripts (e.g. `basic_cnn_robustness.py`) may hang during pandas import in certain Python environments. Use `uv run python` for faster startup. Does not affect framework usage as a library.
 
-### 2. Performance Optimization
+#### 2. Performance Optimization
 
 Some functions (e.g. `bitflip_float32`) are not fully vectorized. Optimized versions exist but further improvements are possible, especially for GPU workloads.
 
-### 3. Error Handling
+#### 3. Error Handling
 
 Exception types are not fully standardized. Custom exception classes are planned for future releases.
 
-### 4. Test Coverage
+#### 4. Test Coverage
 
 Some edge cases (NaN/Inf, multi-GPU, custom criterion) are not fully tested. Coverage is high (>90%) but not exhaustive.
 
-### 5. Unused Code
+#### 5. Unused Code
 
 Some utility functions (e.g. `get_model_info` in `device.py`) appear unused and may be removed in future cleanups.
 
