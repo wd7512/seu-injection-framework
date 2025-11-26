@@ -218,4 +218,4 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.ty.src]
-exclude = ["*legacy*"]
+exclude = ["**/*_legacy*.py"]
