@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   code_quality:
-    name: Lint / Type / Mdformat
+    name: Code Quality (Lint, Type, Markdown)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
         run: uv run mdformat .
 
   unit_minimal:
-    name: Unit (minimal matrix w/ coverage collection)
+    name: Unit Tests (Minimal Matrix, Coverage)
     if: ${{ !(github.ref == 'refs/heads/main') && !(github.ref == 'refs/heads/dev') && !((github.event_name == 'pull_request') && (github.base_ref == 'main' || github.base_ref == 'dev')) }}
     strategy:
       fail-fast: false
@@ -72,7 +72,7 @@ jobs:
         run: uv run pytest tests/unit_tests/ -v --cov=src/seu_injection --cov-report=term-missing
 
   dev_tests:
-    name: Dev branch smoke + unit (middle matrix)
+    name: Dev Branch: Smoke & Unit Tests
     if: ${{ github.ref == 'refs/heads/dev' || github.base_ref == 'dev' }}
     strategy:
       fail-fast: false
@@ -113,7 +113,7 @@ jobs:
           path: coverage.xml
 
   full_tests:
-    name: Full test suite (main branch)
+    name: Main Branch: Full Test Suite (Coverage Enforced)
     if: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
     strategy:
       fail-fast: false
