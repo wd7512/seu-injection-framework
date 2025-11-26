@@ -72,7 +72,7 @@ jobs:
         run: uv run pytest tests/unit_tests/ -v --cov=src/seu_injection --cov-report=term-missing
 
   dev_tests:
-    name: Dev Branch: Smoke & Unit Tests
+    name: Dev Branch (Smoke & Unit Tests)
     if: ${{ github.ref == 'refs/heads/dev' || github.base_ref == 'dev' }}
     strategy:
       fail-fast: false
@@ -113,7 +113,7 @@ jobs:
           path: coverage.xml
 
   full_tests:
-    name: Main Branch: Full Test Suite (Coverage Enforced)
+    name: Main Branch - (Full Test Suite, Coverage Enforced)
     if: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
     strategy:
       fail-fast: false
