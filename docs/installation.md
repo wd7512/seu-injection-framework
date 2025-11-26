@@ -129,7 +129,7 @@ pip install -e ".[dev]"
 
 - pytest, pytest-cov (testing)
 - ruff (linting)
-- mypy (type checking)
+- ty (type checking)
 - bandit (security)
 
 ### Notebook Installation

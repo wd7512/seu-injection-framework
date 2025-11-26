@@ -32,14 +32,14 @@ jobs:
       - name: Sync core dependencies
         run: uv sync --frozen
       
-      - name: Install dev & analysis extras (pytest, coverage, ruff, mypy, etc.)
+      - name: Install dev & analysis extras (pytest, coverage, ruff, ty, etc.)
         run: uv sync --extra dev --extra analysis --frozen
       
       - name: Lint (ruff)
         run: uv run ruff check src tests
       
-      - name: Type check (mypy)
-        run: uv run mypy src/seu_injection --ignore-missing-imports
+      - name: Type check (ty)
+        run: uv run ty src/seu_injection
       
       - name: All tests
         run: uv run python run_tests.py all

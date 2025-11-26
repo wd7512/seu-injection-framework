@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.12] - sometime
 
 - **Removing unused core dependencies**: removed mdformat and scipy into dev
+- **Replace mypy with ty**: ...
 
 ## [1.1.11] - 2025-11-18
 
@@ -259,7 +260,7 @@ ______________________________________________________________________
 ### Verification
 
 - Lint: `ruff check` reports no issues.
-- Types: `mypy src/seu_injection` returns success.
+- Types: `ty src/seu_injection` returns success.
 - Build: Wheel & sdist generated successfully.
 
 ### Advisory

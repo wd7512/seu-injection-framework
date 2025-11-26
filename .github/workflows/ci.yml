@@ -36,8 +36,8 @@ jobs:
         run: uv run ruff check src tests
       - name: Ruff format check
         run: uv run ruff format src tests --check
-      - name: Mypy
-        run: uv run mypy src/seu_injection --ignore-missing-imports
+      - name: Ty type check
+        run: uv run ty src/seu_injection
       - name: Markdown formatting
         run: uv run mdformat .
 
