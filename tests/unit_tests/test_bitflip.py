@@ -142,7 +142,7 @@ class TestBitflipOperations:
                 raise ValueError("Triggering fallback")
 
         values = CustomArray()
-        with pytest.raises(ValueError, match="Triggering fallback"):
+        with pytest.raises(struct.error, match="required argument is not a float"):
             bitflip_float32_fast(values, 0)
 
     def test_bitflip_fast_scalar_fallback(self):

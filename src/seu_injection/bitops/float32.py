@@ -80,17 +80,15 @@ def bitflip_float32_fast(
     if not (0 <= bit_i <= 31):
         raise ValueError(f"Bit position must be in range [0, 31], got {bit_i}")
 
-    if isinstance(x, np.ndarray):
-        try:
-            return bitflip_float32_optimized(x, bit_i, inplace=inplace)
-        except (ValueError, TypeError):
+    try:
+        return bitflip_float32_optimized(x, bit_i, inplace=inplace)
+
+    except (ValueError, TypeError):
+        if isinstance(x, np.ndarray):
             from .float32_legacy import _bitflip_original_array
 
             return _bitflip_original_array(x, bit_i)
-    else:  # if not numpy array
-        try:
-            return bitflip_float32_optimized(x, bit_i, inplace=inplace)
-        except (ValueError, TypeError):
+        else:  # if not numpy array
             from .float32_legacy import _bitflip_original_scalar
 
             return _bitflip_original_scalar(x, bit_i)
