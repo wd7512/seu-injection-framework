@@ -31,24 +31,10 @@ def bitflip_float32(x: Union[float, np.ndarray], bit_i: Union[int, None] = None)
     elif not (0 <= bit_i <= 31):
         raise ValueError(f"Bit position must be between 0 and 31, got {bit_i}")
 
-    if isinstance(x, np.ndarray):
-        # Flatten to 1D if needed, then iterate
-        if x.ndim == 0:
-            # Scalar ndarray
-            string = list(float32_to_binary(float(x)))
-            string[bit_i] = "0" if string[bit_i] == "1" else "1"
-            return binary_to_float32("".join(string))
-        else:
-            x_ = np.zeros_like(x, dtype=np.float32)
-            for i, item in enumerate(x.flat):
-                string = list(float32_to_binary(float(item)))
-                string[bit_i] = "0" if string[bit_i] == "1" else "1"
-                x_.flat[i] = binary_to_float32("".join(string))
-            return x_
-    elif isinstance(x, (list, tuple)):
+    if hasattr(x, "__iter__"):
         x_ = np.zeros_like(x, dtype=np.float32)
         for i, item in enumerate(x):
-            string = list(float32_to_binary(float(item)))
+            string = list(float32_to_binary(item))
             string[bit_i] = "0" if string[bit_i] == "1" else "1"
             x_[i] = binary_to_float32("".join(string))
         return x_

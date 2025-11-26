@@ -93,8 +93,4 @@ def bitflip_float32_fast(
         except (ValueError, TypeError):
             from .float32_legacy import _bitflip_original_scalar
 
-            # Ensure x is a float for legacy fallback
-            if isinstance(x, (int, float)):
-                return _bitflip_original_scalar(float(x), bit_i)
-            else:
-                raise TypeError(f"Expected a scalar float or int for _bitflip_original_scalar, got {type(x)}")
+            return _bitflip_original_scalar(x, bit_i)
