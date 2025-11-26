@@ -39,19 +39,11 @@ jobs:
       - name: Ty type check
         run: uv run ty check src/seu_injection
       - name: Markdown formatting
-        run: uv run mdformat $(git ls-files '*.md')
+        run: uv run mdformat .
 
   unit_minimal:
     name: Unit Tests (Minimal Matrix, Coverage)
-    # Only run on non-main/dev branches and PRs not targeting main/dev
-    if: ${{
-      !(github.ref == 'refs/heads/main') &&
-      !(github.ref == 'refs/heads/dev') &&
-      !(
-        (github.event_name == 'pull_request') &&
-        (github.base_ref == 'main' || github.base_ref == 'dev')
-      )
-    }}
+    if: ${{ !(github.ref == 'refs/heads/main') && !(github.ref == 'refs/heads/dev') && !((github.event_name == 'pull_request') && (github.base_ref == 'main' || github.base_ref == 'dev')) }}
     strategy:
       fail-fast: false
       matrix:
@@ -81,11 +73,7 @@ jobs:
 
   dev_tests:
     name: Dev Branch: Smoke & Unit Tests
-    # Run on dev branch or PRs targeting dev
-    if: ${{
-      (github.ref == 'refs/heads/dev') ||
-      (github.base_ref == 'dev')
-    }}
+    if: ${{ github.ref == 'refs/heads/dev' || github.base_ref == 'dev' }}
     strategy:
       fail-fast: false
       matrix:
@@ -126,11 +114,7 @@ jobs:
 
   full_tests:
     name: Main Branch: Full Test Suite (Coverage Enforced)
-    # Run on main branch or PRs targeting main
-    if: ${{
-      (github.ref == 'refs/heads/main') ||
-      (github.base_ref == 'main')
-    }}
+    if: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
     strategy:
       fail-fast: false
       matrix:
