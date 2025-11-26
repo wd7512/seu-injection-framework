@@ -55,7 +55,7 @@ uv run python run_tests.py all         # Full suite (116 tests)
 # Code quality:
 uv run ruff check                      # Linting
 uv run ruff format                     # Code formatting
-uv run mypy src/seu_injection         # Type checking
+uv run ty src/seu_injection            # Type checking
 ```
 
 ## 🧪 Quality Requirements
@@ -81,7 +81,7 @@ uv run ruff check src/ tests/
 uv run ruff format src/ tests/
 
 # Type checking
-uv run mypy src/seu_injection --ignore-missing-imports
+uv run ty src/seu_injection
 
 # Security analysis
 uv run bandit -r src/seu_injection -f txt
