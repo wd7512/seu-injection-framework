@@ -37,7 +37,7 @@ jobs:
       - name: Ruff format check
         run: uv run ruff format src tests --check
       - name: Ty type check
-        run: uv run ty src/seu_injection
+        run: uv run ty check src/seu_injection
       - name: Markdown formatting
         run: uv run mdformat .
 
