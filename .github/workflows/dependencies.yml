@@ -9,6 +9,8 @@ on:
 jobs:
   update-and-test:
     name: Update Dependencies and Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
