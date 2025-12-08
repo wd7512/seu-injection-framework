@@ -8,36 +8,13 @@ on:
 
 jobs:
   update-and-test:
-    name: Update Dependencies and Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    name: Update Dependencies and Test
     permissions:
       contents: read
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.10', '3.11', '3.12']
-    runs-on: ${{ matrix.os }}
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-
-    - name: Install uv
-      uses: astral-sh/setup-uv@v3
-      with:
-        version: latest
-
-    - name: Update dependencies
-      run: |
-        uv lock --upgrade
-        uv sync --extra dev
-
-    - name: Full test suite (enforced coverage 70%)
-      run: uv run python run_tests.py all
+    uses: ./.github/workflows/test-matrix.yml
+    with:
+      frozen-deps: false
+      update-deps: true
 
   create-pr:
     name: Create Pull Request
