@@ -7,7 +7,53 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-deps:
+  update-and-test:
+    name: Update Dependencies and Test (${{ matrix.os }}, Python ${{ matrix.python-version }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: latest
+
+    - name: Update dependencies
+      run: |
+        uv lock --upgrade
+        uv sync --extra dev
+
+    - name: Cache virtual env
+      uses: actions/cache@v4
+      with:
+        path: .venv
+        key: deps-full-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+        restore-keys: deps-full-${{ runner.os }}-
+
+    - name: Full test suite (enforced coverage 70%)
+      run: uv run python run_tests.py all
+
+    - name: Upload updated lock file
+      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
+      uses: actions/upload-artifact@v4
+      with:
+        name: updated-lock-file
+        path: uv.lock
+
+  create-pr:
+    name: Create Pull Request
+    needs: update-and-test
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -29,11 +75,6 @@ jobs:
         uv lock --upgrade
         uv sync --all-extras
 
-    - name: Run tests to verify updates
-      run: |
-        uv run python run_tests.py smoke
-        uv run python run_tests.py unit
-
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v5
       with:
@@ -43,9 +84,19 @@ jobs:
         body: |
           This is an automated pull request to update project dependencies.
           
-          Please review the changes and run the full test suite before merging.
+          ## Test Results
           
+          ✅ **Full test matrix completed successfully**
+          
+          All tests passed on the following configurations:
+          - **Operating Systems**: Ubuntu, Windows, macOS
+          - **Python Versions**: 3.10, 3.11, 3.12
+          - **Test Coverage**: 70% minimum enforced
+          
+          ### Changes
           - Dependencies updated via `uv lock --upgrade`
-          - Smoke and unit tests passed
+          - Full test suite (smoke, unit, integration) passed on all OS/Python combinations
+          
+          This PR is ready for review and merging.
         branch: deps/auto-update
         delete-branch: true
