@@ -44,13 +44,6 @@ jobs:
     - name: Full test suite (enforced coverage 70%)
       run: uv run python run_tests.py all
 
-    - name: Upload updated lock file
-      if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.11'
-      uses: actions/upload-artifact@v4
-      with:
-        name: updated-lock-file
-        path: uv.lock
-
   create-pr:
     name: Create Pull Request
     needs: update-and-test
