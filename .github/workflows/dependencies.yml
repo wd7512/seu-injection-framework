@@ -34,13 +34,6 @@ jobs:
         uv lock --upgrade
         uv sync --extra dev
 
-    - name: Cache virtual env
-      uses: actions/cache@v4
-      with:
-        path: .venv
-        key: deps-full-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-        restore-keys: deps-full-${{ runner.os }}-
-
     - name: Full test suite (enforced coverage 70%)
       run: uv run python run_tests.py all
 
