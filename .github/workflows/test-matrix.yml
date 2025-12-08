@@ -42,29 +42,29 @@ jobs:
       # Cache is only used for frozen dependencies (CI scenario)
       # Disabled for dependency updates to ensure testing with fresh dependencies
       - name: Cache virtual env
-        if: inputs.frozen-deps
+        if: inputs.frozen-deps == true
         uses: actions/cache@v4
         with:
           path: .venv
-          key: test-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: test-${{ runner.os }}-
+          key: test-matrix-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: test-matrix-${{ runner.os }}-
 
       # Dependency sync: Exactly one of these steps runs based on inputs
       # 1. Update mode: upgrade lock file and sync
       - name: Update dependencies
-        if: inputs.update-deps
+        if: inputs.update-deps == true
         run: |
           uv lock --upgrade
           uv sync --extra dev
 
       # 2. Frozen mode: sync from existing lock file (for CI)
       - name: Sync dev deps (frozen)
-        if: "!inputs.update-deps && inputs.frozen-deps"
+        if: inputs.update-deps == false && inputs.frozen-deps == true
         run: uv sync --extra dev --frozen
 
       # 3. Standard mode: sync from existing lock file without freeze
       - name: Sync dev deps (unfrozen)
-        if: "!inputs.update-deps && !inputs.frozen-deps"
+        if: inputs.update-deps == false && inputs.frozen-deps == false
         run: uv sync --extra dev
 
       - name: Full test suite (enforced coverage 70%)
