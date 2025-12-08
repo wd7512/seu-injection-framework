@@ -54,11 +54,11 @@ jobs:
           uv sync --extra dev
 
       - name: Sync dev deps (frozen)
-        if: inputs.frozen-deps && !inputs.update-deps
+        if: "!inputs.update-deps && inputs.frozen-deps"
         run: uv sync --extra dev --frozen
 
       - name: Sync dev deps (unfrozen)
-        if: "!inputs.frozen-deps && !inputs.update-deps"
+        if: "!inputs.update-deps && !inputs.frozen-deps"
         run: uv sync --extra dev
 
       - name: Full test suite (enforced coverage 70%)
