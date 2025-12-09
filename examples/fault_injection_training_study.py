@@ -421,14 +421,28 @@ def create_results_summary(baseline_results, fault_results):
     for bit_pos in sorted(baseline_results['bit_results'].keys()):
         baseline_drop = baseline_results['bit_results'][bit_pos]['accuracy_drop']
         fault_drop = fault_results['bit_results'][bit_pos]['accuracy_drop']
-        improvement = ((baseline_drop - fault_drop) / baseline_drop * 100) if baseline_drop > 0 else 0
+        
+        # Clean up numerical artifacts (values close to machine epsilon)
+        if abs(baseline_drop) < 1e-10:
+            baseline_drop = 0.0
+        if abs(fault_drop) < 1e-10:
+            fault_drop = 0.0
+        
+        # Calculate improvement
+        improvement = ((baseline_drop - fault_drop) / baseline_drop * 100) if baseline_drop > 0 else 0.0
+        
+        # Calculate robustness factor (use 'N/A' for infinite/undefined values)
+        if fault_drop > 0 and baseline_drop > 0:
+            robustness_factor = f"{baseline_drop / fault_drop:.2f}"
+        else:
+            robustness_factor = 'N/A'
         
         summary_data.append({
             'Bit Position': bit_pos,
             'Baseline Acc Drop (%)': baseline_drop * 100,
             'Fault-Aware Acc Drop (%)': fault_drop * 100,
             'Improvement (%)': improvement,
-            'Robustness Factor': baseline_drop / fault_drop if fault_drop > 0 else float('inf')
+            'Robustness Factor': robustness_factor
         })
     
     df = pd.DataFrame(summary_data)
@@ -529,8 +543,8 @@ def run_complete_experiment():
     fig2.savefig('robustness_comparison.png', dpi=300, bbox_inches='tight')
     print("✅ Saved: robustness_comparison.png")
     
-    # Save summary
-    summary_df.to_csv('robustness_results.csv', index=False)
+    # Save summary with proper formatting
+    summary_df.to_csv('robustness_results.csv', index=False, float_format='%.4f')
     print("✅ Saved: robustness_results.csv")
     
     print("\n" + "="*80)
