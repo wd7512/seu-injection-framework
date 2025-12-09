@@ -2,8 +2,6 @@ name: Sync Issues to Repo
 
 on:
   workflow_dispatch:  # Manual trigger for debugging
-  schedule:
-    - cron: "0 * * * *"  # Hourly
   issues:
     types: [opened, edited, reopened, closed, deleted]
   issue_comment:
