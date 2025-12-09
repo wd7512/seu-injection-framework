@@ -12,6 +12,9 @@ src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
 <a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">
 <b><br>Research Paper<br></b>
 </a>
+<a href="https://wd7512.github.io/robust-ml-in-harsh-environments-explained/">
+<b><br>Research Explainer<br></b>
+</a>
 
 </div>
 
