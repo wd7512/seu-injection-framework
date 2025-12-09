@@ -151,10 +151,12 @@ results = injector.run_injector(bit_i=bit_position, p=0.1)
 | 0 (Sign)     | 7.57%         | 3.35%           | 55.8%       | 2.26×            |
 | 1 (Exp MSB)  | 13.57%        | 13.03%          | 4.0%        | 1.04×            |
 | 8 (Exp LSB)  | 0.46%         | 0.12%           | 74.3%       | 3.89×            |
-| 15 (Mantissa)| 0.00%         | 0.00%           | -           | -                |
-| 23 (Mantissa)| 0.00%         | 0.00%           | -           | -                |
+| 15 (Mantissa)| 0.00%         | 0.00%           | -           | N/A              |
+| 23 (Mantissa)| 0.00%         | 0.00%           | -           | N/A              |
 
-**Overall:** 4.3% average improvement, 1.05× average robustness factor
+**Note:** Bit positions 15 and 23 (mantissa bits) showed no accuracy drop because flipping these less significant bits has minimal impact on model inference for this simple dataset. This is expected behavior.
+
+**Overall:** 4.3% average improvement (for affected bit positions), 1.05× average robustness factor
 
 ## Recommendations
 

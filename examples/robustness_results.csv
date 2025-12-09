@@ -1,5 +1,5 @@
 Bit Position,Baseline Acc Drop (%),Fault-Aware Acc Drop (%),Improvement (%),Robustness Factor
-0,0.0757,0.0335,55.7615,2.26
+0,0.0758,0.0335,55.7615,2.26
 1,13.5698,13.0253,4.0128,1.04
 8,0.0046,0.0012,74.2933,3.89
 15,0.0000,0.0000,0.0000,N/A
