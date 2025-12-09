@@ -506,7 +506,7 @@ class TestInjector:
         # Run with p=0 and run_at_least_one_injection=False
         results = injector.run_injector(bit_i=0, p=0, run_at_least_one_injection=False)
 
-        # With very low p and run_at_least_one_injection=False, we might have zero results
+        # With p=0 and run_at_least_one_injection=False, we should have zero results
         # This is expected behavior and should not crash
         assert isinstance(results, dict)
         assert "tensor_location" in results
