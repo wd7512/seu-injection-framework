@@ -110,7 +110,9 @@ jobs:
             for (const issue of realIssues) {
               validIssueNumbers.add(issue.number);
               
-              const issueDir = `${issuesDir}/${issue.number}`;
+              // Organize by state (open/closed)
+              const stateDir = `${issuesDir}/${issue.state}`;
+              const issueDir = `${stateDir}/${issue.number}`;
               const issueFile = `${issueDir}/issue.md`;
               
               // Write issue file
@@ -162,13 +164,30 @@ jobs:
 
             // Cleanup: remove directories for deleted issues
             if (fs.existsSync(issuesDir)) {
+              // Check both open and closed subdirectories
+              for (const state of ['open', 'closed']) {
+                const stateDir = `${issuesDir}/${state}`;
+                if (fs.existsSync(stateDir)) {
+                  for (const entry of fs.readdirSync(stateDir)) {
+                    const entryPath = `${stateDir}/${entry}`;
+                    const issueNum = parseInt(entry, 10);
+                    
+                    if (!isNaN(issueNum) && !validIssueNumbers.has(issueNum)) {
+                      fs.rmSync(entryPath, { recursive: true });
+                      console.log(`Deleted orphaned issue directory: ${entryPath}`);
+                    }
+                  }
+                }
+              }
+              
+              // Clean up old flat structure if any directories remain at root level
               for (const entry of fs.readdirSync(issuesDir)) {
                 const entryPath = `${issuesDir}/${entry}`;
                 const issueNum = parseInt(entry, 10);
                 
-                if (!isNaN(issueNum) && !validIssueNumbers.has(issueNum)) {
+                if (!isNaN(issueNum)) {
                   fs.rmSync(entryPath, { recursive: true });
-                  console.log(`Deleted orphaned issue directory: ${entryPath}`);
+                  console.log(`Deleted old flat structure issue directory: ${entryPath}`);
                 }
               }
             }
