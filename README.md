@@ -131,7 +131,7 @@ Recent updates include reproducible ShipsNet experiments and improvements to inj
 - Documentation: [`docs/`](docs/)
 - Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - Issues: [GitHub Issues](https://github.com/wd7512/seu-injection-framework/issues)
-- Contact: wwdennis.home@gmail.com
+- Contact: <wwdennis.home@gmail.com>
 
 ## Citation
 
@@ -143,7 +143,7 @@ If you use this framework in your research, please cite both the software and th
   title = {SEU Injection Framework},
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
-  version = {1.1.11}
+  version = {1.1.12}
 }
 
 @conference{icaart25,

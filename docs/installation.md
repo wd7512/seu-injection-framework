@@ -7,7 +7,7 @@ Comprehensive instructions for installing the SEU Injection Framework.
 **From PyPI (Recommended for users):**
 
 ```bash
-# Latest stable release (v1.1.10)
+# Latest stable release (v1.1.11)
 pip install seu-injection-framework
 
 # With analysis tools
@@ -315,11 +315,13 @@ If you encounter issues not covered here:
 
 1. **Check existing issues:** [GitHub Issues](https://github.com/wd7512/seu-injection-framework/issues)
 1. **Run diagnostics:**
+
    ```bash
    python -c "import sys; print(sys.version)"
    python -c "import torch; print(torch.__version__)"
    uv --version
    ```
+
 1. **Create a new issue:** Include your Python version, OS, and error messages
 
 ## Next Steps
