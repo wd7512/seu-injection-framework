@@ -118,6 +118,7 @@ class StochasticSEUInjector(BaseInjector):
                 # If run_at_least_one_injection is True and no injections occurred, perform one
                 if run_at_least_one_injection and layer_injection_count == 0 and tensor_cpu.size > 0:
                     # Select a random parameter from the layer
+                    # Note: tensor_cpu.size > 0 ensures all dimensions are > 0, so randint is safe
                     random_idx = tuple(np.random.randint(0, dim) for dim in tensor_cpu.shape)
                     original_val = tensor_cpu[random_idx]
                     seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)
