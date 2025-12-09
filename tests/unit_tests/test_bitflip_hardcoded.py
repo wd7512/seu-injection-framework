@@ -4,6 +4,13 @@ This module contains hardcoded test cases with specific input values and expecte
 outputs to verify that bitflips are being performed in the correct location and
 in the correct way. These tests provide strong guarantees about bitflip correctness
 by using predetermined values rather than probabilistic or reversibility tests.
+
+Bit Indexing Convention:
+This module uses MSB-first indexing where:
+- Bit 0 = Sign bit (leftmost bit)
+- Bits 1-8 = Exponent bits
+- Bits 9-31 = Mantissa bits (fraction)
+This matches the string representation used by the bitflip functions.
 """
 
 import numpy as np
@@ -17,7 +24,7 @@ class TestHardcodedBitflips:
 
     def test_sign_bit_flip_positive_to_negative(self):
         """Test that flipping bit 0 (sign bit) changes positive to negative."""
-        # Bit 0 is the sign bit in IEEE 754 float32
+        # Using MSB-first indexing: bit 0 is the sign bit (leftmost)
         # Flipping it should change the sign
         
         # Test with value 1.0 -> -1.0
@@ -106,14 +113,14 @@ class TestHardcodedBitflips:
 
     def test_exponent_bit_flip_known_value(self):
         """Test flipping specific exponent bits with known outcomes."""
-        # For value 1.0:
+        # For value 1.0 in MSB-first indexing:
         # IEEE 754: 0 01111111 00000000000000000000000
-        #           ^ sign
-        #             ^^^^^^^^ exponent (127 = bias)
-        #                     ^^^^^^^^^^^^^^^^^^^^^^^ mantissa
+        #           ^ bit 0 (sign)
+        #             ^^^^^^^^ bits 1-8 (exponent, value=127)
+        #                     ^^^^^^^^^^^^^^^^^^^^^^^ bits 9-31 (mantissa)
         
-        # Flipping bit 1 (MSB of exponent) changes exponent to 11111111
-        # which represents infinity in IEEE 754
+        # Flipping bit 1 (MSB of exponent at position 1) changes exponent from
+        # 01111111 to 11111111, which represents infinity in IEEE 754
         value = 1.0
         result = bitflip_float32(value, 1)
         
@@ -124,9 +131,9 @@ class TestHardcodedBitflips:
 
     def test_mantissa_lsb_flip_known_value(self):
         """Test flipping the least significant bit of mantissa."""
-        # For value 1.0:
+        # For value 1.0 in MSB-first indexing:
         # IEEE 754: 0 01111111 00000000000000000000000
-        # Bit 31 is the LSB of the mantissa
+        # Bit 31 is the LSB of the mantissa (rightmost bit)
         
         value = 1.0
         result = bitflip_float32(value, 31)
@@ -192,10 +199,7 @@ class TestHardcodedBitflips:
         
         for input_val, expected in test_cases:
             result = bitflip_float32(input_val, 0)
-            if expected >= 0:
-                assert abs(result - expected) < 1e-5, f"Failed for {input_val}: got {result}, expected {expected}"
-            else:
-                assert abs(result - expected) < 1e-5, f"Failed for {input_val}: got {result}, expected {expected}"
+            assert abs(result - expected) < 1e-5, f"Failed for {input_val}: got {result}, expected {expected}"
 
     def test_2d_array_partial_flip(self):
         """Test flipping specific elements in a 2D array."""
@@ -328,9 +332,11 @@ class TestHardcodedBitflips:
 
     def test_specific_bit_positions_on_one(self):
         """Test various bit positions on value 1.0 with known expected behaviors."""
-        # For 1.0: 0 01111111 00000000000000000000000
+        # For 1.0 in MSB-first indexing:
+        # Bit layout: 0 01111111 00000000000000000000000
+        #            ^ 0  ^1-8    ^9-31
         
-        # Bit 0 (sign): 1.0 -> -1.0
+        # Bit 0 (sign bit): 1.0 -> -1.0
         result = bitflip_float32(1.0, 0)
         assert result == -1.0
         
@@ -339,12 +345,13 @@ class TestHardcodedBitflips:
         assert np.isinf(result)
         assert result > 0
         
-        # Bit 9 (mantissa MSB): should give a value > 1.0
+        # Bit 9 (first bit of mantissa): should give a value > 1.0 but < 2.0
+        # This sets the implicit 1.0 + 0.5 in mantissa
         result = bitflip_float32(1.0, 9)
         assert result > 1.0
         assert result < 2.0
         
-        # Bit 31 (mantissa LSB): should give value very close to 1.0
+        # Bit 31 (mantissa LSB, rightmost bit): should give value very close to 1.0
         result = bitflip_float32(1.0, 31)
         assert result != 1.0
         assert abs(result - 1.0) < 0.0001
