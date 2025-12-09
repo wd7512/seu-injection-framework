@@ -115,37 +115,9 @@ jobs:
   full_tests:
     name: Main Branch - (Full Test Suite, Coverage Enforced)
     if: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.10','3.11','3.12']
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-      - name: Install uv
-        uses: astral-sh/setup-uv@v3
-        with:
-          version: latest
-      - name: Cache virtual env
-        uses: actions/cache@v4
-        with:
-          path: .venv
-          key: full-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: full-${{ runner.os }}-
-      - name: Sync dev deps
-        run: uv sync --extra dev --frozen
-      - name: Full test suite (enforced coverage 70%)
-        run: uv run python run_tests.py all
-      - name: Upload HTML coverage (python 3.11 ubuntu only)
-        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-html
-          path: htmlcov
+    uses: ./.github/workflows/test-matrix.yml
+    with:
+      frozen-deps: true
+      update-deps: false
 
   # Summary / gating stage can be added here if needed to aggregate statuses.
