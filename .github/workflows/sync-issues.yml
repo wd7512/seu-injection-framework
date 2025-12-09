@@ -8,6 +8,8 @@ on:
     types: [opened, edited, reopened, closed, deleted]
   issue_comment:
     types: [created, edited, deleted]
+  pull_request: # TESTING: Allow PR testing
+
 
 permissions:
   contents: write
@@ -17,7 +19,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     # TESTING: Allow sync_issues branch. Revert to main-only before merging.
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sync_issues' || github.event_name == 'issues' || github.event_name == 'issue_comment'
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sync_issues' || github.event_name == 'issues' || github.event_name == 'issue_comment' || github.event_name == 'pull_request'
 
     steps:
       - name: Checkout repo
