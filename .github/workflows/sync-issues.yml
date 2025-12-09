@@ -8,8 +8,6 @@ on:
     types: [opened, edited, reopened, closed, deleted]
   issue_comment:
     types: [created, edited, deleted]
-  pull_request: # TESTING: Allow PR testing
-
 
 permissions:
   contents: write
@@ -18,14 +16,14 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    # TESTING: Allow sync_issues branch. Revert to main-only before merging.
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/sync_issues' || github.event_name == 'issues' || github.event_name == 'issue_comment' || github.event_name == 'pull_request'
+    # Only run on main branch for scheduled/dispatch, always for issue events
+    if: github.ref == 'refs/heads/main' || github.event_name == 'issues' || github.event_name == 'issue_comment'
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.ref }}  # TESTING: Use current branch. Revert to 'main' before merging.
+          ref: main  # Always sync to main branch
 
       - name: Sync issues and comments to markdown
         uses: actions/github-script@v7
@@ -182,4 +180,4 @@ jobs:
         with:
           commit_message: "chore: sync issues → markdown"
           file_pattern: "issues/**"
-          # TESTING: Removed branch restriction. Add 'branch: main' before merging.
+          branch: main
