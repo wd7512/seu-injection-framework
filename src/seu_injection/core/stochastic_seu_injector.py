@@ -83,24 +83,28 @@ class StochasticSEUInjector(BaseInjector):
                 # ✅ PERFORMANCE: Now uses optimized bitflip function (major improvement)
                 # IMPROVEMENT: Stochastic sampling now uses bitflip_float32_optimized()
                 # PERFORMANCE GAIN: ~30x faster per operation (100μs → 3μs per bitflip)
-                # FUTURE OPPORTUNITY: Could still vectorize by creating boolean mask and applying bitflips in parallel
-                # APPROACH: mask = np.random.random(tensor.shape) < p; tensor[mask] = vectorized_bitflip(tensor[mask])
-                # CURRENT: O(p*n*1) optimized operations, POSSIBLE: O(1) vectorized + O(p*n) selection
+                # NEW: Mask-based approach for better performance and cleaner logic
 
-                # Track if we've performed at least one injection for this layer
-                layer_injection_count = 0
+                # Build a boolean mask for stochastic selection
+                injection_mask = np.random.random(tensor_cpu.shape) < p
 
-                # Iterate through parameters with stochastic sampling
-                for idx in tqdm(
-                    np.ndindex(tensor_cpu.shape),
+                # Check if at least one injection will occur
+                if run_at_least_one_injection and not injection_mask.any() and tensor_cpu.size > 0:
+                    # If no injections selected and we need at least one, pick one randomly
+                    random_idx = tuple(np.random.randint(0, dim) for dim in tensor_cpu.shape)
+                    injection_mask[random_idx] = True
+
+                # Get indices where injections should occur
+                injection_indices = np.argwhere(injection_mask)
+
+                # Perform injections for selected indices
+                for idx_array in tqdm(
+                    injection_indices,
                     desc=f"Stochastic injection into {current_layer_name}",
                 ):
-                    # Skip this parameter with probability (1-p)
-                    if np.random.uniform(0, 1) > p:
-                        continue
-
+                    idx = tuple(idx_array)
                     original_val = tensor_cpu[idx]
-                    seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)  # <-- BOTTLENECK FIXED!
+                    seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)
 
                     # Inject fault, evaluate, restore
                     tensor.data[idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
@@ -109,27 +113,6 @@ class StochasticSEUInjector(BaseInjector):
 
                     # Record results
                     results["tensor_location"].append(idx)
-                    results["criterion_score"].append(criterion_score)
-                    results["layer_name"].append(current_layer_name)
-                    results["value_before"].append(original_val)
-                    results["value_after"].append(seu_val)
-                    layer_injection_count += 1
-
-                # If run_at_least_one_injection is True and no injections occurred, perform one
-                if run_at_least_one_injection and layer_injection_count == 0 and tensor_cpu.size > 0:
-                    # Select a random parameter from the layer
-                    # Note: tensor_cpu.size > 0 ensures all dimensions are > 0, so randint is safe
-                    random_idx = tuple(np.random.randint(0, dim) for dim in tensor_cpu.shape)
-                    original_val = tensor_cpu[random_idx]
-                    seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)
-
-                    # Inject fault, evaluate, restore
-                    tensor.data[random_idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
-                    criterion_score = self._get_criterion_score()
-                    tensor.data[random_idx] = original_tensor[random_idx]  # Restore original value
-
-                    # Record results
-                    results["tensor_location"].append(random_idx)
                     results["criterion_score"].append(criterion_score)
                     results["layer_name"].append(current_layer_name)
                     results["value_before"].append(original_val)

@@ -476,8 +476,8 @@ class TestInjector:
             y=y,
         )
 
-        # Run with very low probability (should still get at least one injection per layer by default)
-        results = injector.run_injector(bit_i=0, p=0.0001)
+        # Run with p=0 to force run_at_least_one_injection behavior
+        results = injector.run_injector(bit_i=0, p=0)
 
         # Should have at least one result per layer
         layer_names = [name for name, _ in simple_model.named_parameters()]
@@ -503,8 +503,8 @@ class TestInjector:
         # Set seed for reproducibility
         np.random.seed(42)
 
-        # Run with very low probability and run_at_least_one_injection=False
-        results = injector.run_injector(bit_i=0, p=0.0001, run_at_least_one_injection=False)
+        # Run with p=0 and run_at_least_one_injection=False
+        results = injector.run_injector(bit_i=0, p=0, run_at_least_one_injection=False)
 
         # With very low p and run_at_least_one_injection=False, we might have zero results
         # This is expected behavior and should not crash
@@ -524,9 +524,9 @@ class TestInjector:
             y=y,
         )
 
-        # Target a specific layer with very low probability
+        # Target a specific layer with p=0 to force run_at_least_one_injection
         target_layer = "0.weight"
-        results = injector.run_injector(bit_i=0, p=0.0001, layer_name=target_layer)
+        results = injector.run_injector(bit_i=0, p=0, layer_name=target_layer)
 
         # Should have at least one result from the targeted layer
         assert len(results["layer_name"]) >= 1, "Should have at least one injection in targeted layer"
