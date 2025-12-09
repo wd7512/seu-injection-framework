@@ -2,8 +2,6 @@ name: Sync Issues to Repo
 
 on:
   workflow_dispatch:  # Manual trigger for debugging
-  schedule:
-    - cron: "0 * * * *"  # Hourly
   issues:
     types: [opened, edited, reopened, closed, deleted]
   issue_comment:
@@ -16,8 +14,7 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    # Only run on dev branch for scheduled/dispatch, always for issue events
-    if: github.ref == 'refs/heads/dev' || github.event_name == 'issues' || github.event_name == 'issue_comment'
+    # Run on any valid trigger (branch check is handled by checkout step forcing 'dev')
 
     steps:
       - name: Checkout repo
@@ -114,6 +111,14 @@ jobs:
               const stateDir = `${issuesDir}/${issue.state}`;
               const issueDir = `${stateDir}/${issue.number}`;
               const issueFile = `${issueDir}/issue.md`;
+
+              // Cleanup: Ensure it doesn't exist in the OTHER state directory
+              const otherState = issue.state === 'open' ? 'closed' : 'open';
+              const oldDir = `${issuesDir}/${otherState}/${issue.number}`;
+              if (fs.existsSync(oldDir)) {
+                fs.rmSync(oldDir, { recursive: true });
+                console.log(`Moved issue ${issue.number} from ${otherState} to ${issue.state}`);
+              }
               
               // Write issue file
               const issueContent = formatIssue(issue);

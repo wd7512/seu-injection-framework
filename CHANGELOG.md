@@ -5,10 +5,15 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.12] - sometime
+## [1.1.13] - sometime
+
+## [1.1.12] - 2025-12-09
 
 - **Removing unused core dependencies**: removed mdformat and scipy into dev
-- **Replace mypy with ty**: ...
+- **Replace mypy with ty**: ty is faster and more accurate
+- **Remove unused dependencies**: removed unused dependencies
+- **Fix stochastic injector bug**: added mask-based implementation to stochastic injector. Solved issue #48.
+- **Added issues folder**: issues are now tracked in the `issues` folder by the .github/workflows/sync-issues.yml workflow. This should help agentic development as a reference point for issues.
 
 ## [1.1.11] - 2025-11-18
 
@@ -202,8 +207,8 @@ For installation instructions and usage examples, see:
 
 ## Support
 
-- **Documentation**: https://github.com/wd7512/seu-injection-framework
-- **Issues**: https://github.com/wd7512/seu-injection-framework/issues
+- **Documentation**: <https://github.com/wd7512/seu-injection-framework>
+- **Issues**: <https://github.com/wd7512/seu-injection-framework/issues>
 - **Research Questions**: Use issue template for research discussions
 - **Contributions**: See CONTRIBUTING.md for development workflow
 
@@ -330,9 +335,11 @@ ______________________________________________________________________
 ### Notes
 
 - If upgrading from 1.0.0 and you rely on scikit-learn/pandas/matplotlib functionality, install with an appropriate extra, e.g.:
+
   ```bash
   pip install "seu-injection-framework[analysis]"
   ```
+
 - Core API surface remains backward compatible; no breaking changes introduced.
 
 ### Citation Update
