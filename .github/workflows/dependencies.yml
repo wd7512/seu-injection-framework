@@ -16,6 +16,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
+        ref: dev
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install UV
@@ -48,4 +49,5 @@ jobs:
           - Dependencies updated via `uv lock --upgrade`
           - Smoke and unit tests passed
         branch: deps/auto-update
+        base: dev
         delete-branch: true
