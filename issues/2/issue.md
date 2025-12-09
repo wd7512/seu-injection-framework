@@ -8,9 +8,9 @@ https://docs.pytorch.org/tutorials/intermediate/torch_compile_tutorial.html#demo
 
 | Field | Value |
 |-------|-------|
-| **State** | open |
+| **State** | closed |
 | **Created** | 2025-06-08T10:49:02Z |
-| **Updated** | 2025-06-08T10:49:02Z |
+| **Updated** | 2025-12-09T08:35:20Z |
 | **Labels** | enhancement |
 | **Author** | @wd7512 |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/2 |
