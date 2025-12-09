@@ -1,0 +1,183 @@
+name: Sync Issues to Repo
+
+on:
+  workflow_dispatch:  # Manual trigger for debugging
+  schedule:
+    - cron: "0 * * * *"  # Hourly
+  issues:
+    types: [opened, edited, reopened, closed, deleted]
+  issue_comment:
+    types: [created, edited, deleted]
+
+permissions:
+  contents: write
+  issues: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    # Only run on dev branch for scheduled/dispatch, always for issue events
+    if: github.ref == 'refs/heads/dev' || github.event_name == 'issues' || github.event_name == 'issue_comment'
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          ref: dev  # Always sync to dev branch
+
+      - name: Sync issues and comments to markdown
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const issuesDir = './issues';
+
+            // Helper: ensure directory exists
+            function ensureDir(dir) {
+              if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+              }
+            }
+
+            // Helper: write file only if content changed
+            function writeIfChanged(filePath, content) {
+              ensureDir(path.dirname(filePath));
+              if (fs.existsSync(filePath)) {
+                const existing = fs.readFileSync(filePath, 'utf8');
+                if (existing === content) {
+                  return false;  // No change
+                }
+              }
+              fs.writeFileSync(filePath, content);
+              return true;  // Changed
+            }
+
+            // Helper: format issue as markdown
+            function formatIssue(issue) {
+              return `# Issue #${issue.number}: ${issue.title}
+
+            ${issue.body || "_No description provided._"}
+
+            ---
+
+            | Field | Value |
+            |-------|-------|
+            | **State** | ${issue.state} |
+            | **Created** | ${issue.created_at} |
+            | **Updated** | ${issue.updated_at} |
+            | **Labels** | ${issue.labels.map(l => l.name).join(", ") || "_none_"} |
+            | **Author** | @${issue.user.login} |
+            | **URL** | ${issue.html_url} |
+            `;
+            }
+
+            // Helper: format comment as markdown
+            function formatComment(comment, index) {
+              return `# Comment ${String(index + 1).padStart(3, '0')}
+
+            **Author:** @${comment.user.login}
+            **Created:** ${comment.created_at}
+            **Updated:** ${comment.updated_at}
+
+            ---
+
+            ${comment.body || "_Empty comment._"}
+            `;
+            }
+
+            // Fetch all issues
+            console.log('Fetching issues...');
+            const issues = await github.paginate(
+              github.rest.issues.listForRepo,
+              { 
+                owner: context.repo.owner, 
+                repo: context.repo.repo, 
+                state: 'all',
+                per_page: 100
+              }
+            );
+
+            // Filter out pull requests (GitHub API returns PRs as issues)
+            const realIssues = issues.filter(issue => !issue.pull_request);
+            console.log(`Found ${realIssues.length} issues (excluding PRs)`);
+
+            // Track valid issue numbers for cleanup
+            const validIssueNumbers = new Set();
+
+            // Process each issue
+            for (const issue of realIssues) {
+              validIssueNumbers.add(issue.number);
+              
+              const issueDir = `${issuesDir}/${issue.number}`;
+              const issueFile = `${issueDir}/issue.md`;
+              
+              // Write issue file
+              const issueContent = formatIssue(issue);
+              writeIfChanged(issueFile, issueContent);
+
+              // Fetch and write comments
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                {
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issue.number,
+                  per_page: 100
+                }
+              );
+
+              const commentsDir = `${issueDir}/comments`;
+              
+              if (comments.length > 0) {
+                ensureDir(commentsDir);
+                
+                // Track valid comment files
+                const validCommentFiles = new Set();
+                
+                for (let i = 0; i < comments.length; i++) {
+                  const commentFile = `${commentsDir}/${String(i + 1).padStart(3, '0')}.md`;
+                  validCommentFiles.add(path.basename(commentFile));
+                  writeIfChanged(commentFile, formatComment(comments[i], i));
+                }
+
+                // Clean up orphaned comment files
+                if (fs.existsSync(commentsDir)) {
+                  for (const file of fs.readdirSync(commentsDir)) {
+                    if (!validCommentFiles.has(file)) {
+                      fs.unlinkSync(`${commentsDir}/${file}`);
+                      console.log(`Deleted orphaned comment: ${commentsDir}/${file}`);
+                    }
+                  }
+                }
+              } else {
+                // No comments - remove comments directory if it exists
+                if (fs.existsSync(commentsDir)) {
+                  fs.rmSync(commentsDir, { recursive: true });
+                  console.log(`Removed empty comments dir: ${commentsDir}`);
+                }
+              }
+            }
+
+            // Cleanup: remove directories for deleted issues
+            if (fs.existsSync(issuesDir)) {
+              for (const entry of fs.readdirSync(issuesDir)) {
+                const entryPath = `${issuesDir}/${entry}`;
+                const issueNum = parseInt(entry, 10);
+                
+                if (!isNaN(issueNum) && !validIssueNumbers.has(issueNum)) {
+                  fs.rmSync(entryPath, { recursive: true });
+                  console.log(`Deleted orphaned issue directory: ${entryPath}`);
+                }
+              }
+            }
+
+            console.log('Sync complete!');
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: sync issues → markdown"
+          file_pattern: "issues/**"
+          branch: dev
