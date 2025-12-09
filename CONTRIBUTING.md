@@ -55,7 +55,7 @@ uv run python run_tests.py all         # Full suite (116 tests)
 # Code quality:
 uv run ruff check                      # Linting
 uv run ruff format                     # Code formatting
-uv run ty src/seu_injection            # Type checking
+uv run ty check src/seu_injection      # Type checking
 ```
 
 ## 🧪 Quality Requirements
@@ -81,7 +81,7 @@ uv run ruff check src/ tests/
 uv run ruff format src/ tests/
 
 # Type checking
-uv run ty src/seu_injection
+uv run ty check src/seu_injection
 
 # Security analysis
 uv run bandit -r src/seu_injection -f txt
@@ -227,7 +227,7 @@ Targets:
 
 ## 🛡️ Security
 
-Report security vulnerabilities to wwdennis.home@gmail.com (not public issues). Response within 48 hours.
+Report security vulnerabilities to <wwdennis.home@gmail.com> (not public issues). Response within 48 hours.
 
 ## 🤝 Community
 
@@ -250,7 +250,7 @@ Treat all community members with respect. Use GitHub Issues for bug reports, fea
 
 - Documentation: README.md and docs/
 - Issues: GitHub issues
-- Email: wwdennis.home@gmail.com
+- Email: <wwdennis.home@gmail.com>
 
 Response times: 48 hours for bugs, 1 week for features/PRs.
 
