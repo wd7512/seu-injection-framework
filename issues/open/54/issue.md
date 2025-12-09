@@ -1,8 +1,10 @@
-# Issue #31: [FEATURE] Add Mitigating Techniques
+# Issue #54: [FEATURE] Add research explainer to readme
 
 ### Feature Summary
 
-Start with adding transfer learning from ReLU to RWG
+Add a link to this alongside the research paper link in the readme
+
+https://wd7512.github.io/robust-ml-in-harsh-environments-explained/
 
 ### Feature Category
 
@@ -10,11 +12,11 @@ Core SEU Injection (new injection methods)
 
 ### Problem Statement
 
-We want to implement mitigating techniques from current and future research for easy implementation
+n/a
 
 ### Proposed Solution
 
-Add a new folder into src, at `src/mitigation` since is it not part of the injection framework
+_No response_
 
 ### Proposed API (if applicable)
 
@@ -59,8 +61,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-11-23T11:25:27Z |
-| **Updated** | 2025-11-23T11:25:27Z |
+| **Created** | 2025-12-09T22:26:52Z |
+| **Updated** | 2025-12-09T22:26:52Z |
 | **Labels** | enhancement |
-| **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/31 |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/54 |
