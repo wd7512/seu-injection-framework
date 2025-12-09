@@ -16,14 +16,14 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    # Only run on main branch for scheduled/dispatch, always for issue events
-    if: github.ref == 'refs/heads/main' || github.event_name == 'issues' || github.event_name == 'issue_comment'
+    # Only run on dev branch for scheduled/dispatch, always for issue events
+    if: github.ref == 'refs/heads/dev' || github.event_name == 'issues' || github.event_name == 'issue_comment'
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: main  # Always sync to main branch
+          ref: dev  # Always sync to dev branch
 
       - name: Sync issues and comments to markdown
         uses: actions/github-script@v7
@@ -180,4 +180,4 @@ jobs:
         with:
           commit_message: "chore: sync issues → markdown"
           file_pattern: "issues/**"
-          branch: main
+          branch: dev
