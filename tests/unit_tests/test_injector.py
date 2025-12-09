@@ -463,3 +463,73 @@ class TestInjector:
         # Also test with nonexistent layer to trigger continue for all layers
         results_empty = injector.run_injector(bit_i=0, p=1.0, layer_name="nonexistent_layer")
         assert len(results_empty["layer_name"]) == 0, "Should have no results for nonexistent layer"
+
+    def test_run_at_least_one_injection_default(self, simple_model, sample_data, device):
+        """Test that run_at_least_one_injection defaults to True and ensures at least one injection per layer."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Run with very low probability (should still get at least one injection per layer by default)
+        results = injector.run_injector(bit_i=0, p=0.0001)
+
+        # Should have at least one result per layer
+        layer_names = [name for name, _ in simple_model.named_parameters()]
+        unique_layers = set(results["layer_name"])
+
+        # With run_at_least_one_injection=True (default), we should have results for all layers
+        assert len(unique_layers) == len(layer_names), (
+            f"Expected at least one injection per layer. Got {len(unique_layers)} layers, expected {len(layer_names)}"
+        )
+
+    def test_run_at_least_one_injection_false(self, simple_model, sample_data, device):
+        """Test that run_at_least_one_injection=False allows zero injections with low probability."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Set seed for reproducibility
+        np.random.seed(42)
+
+        # Run with very low probability and run_at_least_one_injection=False
+        results = injector.run_injector(bit_i=0, p=0.0001, run_at_least_one_injection=False)
+
+        # With very low p and run_at_least_one_injection=False, we might have zero results
+        # This is expected behavior and should not crash
+        assert isinstance(results, dict)
+        assert "tensor_location" in results
+        assert "criterion_score" in results
+
+    def test_run_at_least_one_injection_specific_layer(self, simple_model, sample_data, device):
+        """Test that run_at_least_one_injection works correctly with layer targeting."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Target a specific layer with very low probability
+        target_layer = "0.weight"
+        results = injector.run_injector(bit_i=0, p=0.0001, layer_name=target_layer)
+
+        # Should have at least one result from the targeted layer
+        assert len(results["layer_name"]) >= 1, "Should have at least one injection in targeted layer"
+        assert all(layer == target_layer for layer in results["layer_name"]), (
+            f"All results should be from {target_layer}, got: {set(results['layer_name'])}"
+        )
