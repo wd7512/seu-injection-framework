@@ -39,7 +39,7 @@ jobs:
         run: uv run ruff check src tests
       
       - name: Type check (ty)
-        run: uv run ty src/seu_injection
+        run: uv run ty check src/seu_injection
       
       - name: All tests
         run: uv run python run_tests.py all

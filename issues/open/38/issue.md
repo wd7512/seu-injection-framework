@@ -2,7 +2,7 @@
 
 ### Bug Description
 
-The existing update deps workflow only does partial testing. This does not ensure that updating the dependencies wont break part of the codebase. 
+The existing update deps workflow only does partial testing. This does not ensure that updating the dependencies wont break part of the codebase.
 
 ### Steps to Reproduce
 
@@ -12,7 +12,7 @@ Run the workflow.
 
 ### Expected Behavior
 
-Run the full matrix of tests before making a pr into main and document that they all pass. 
+Run the full matrix of tests before making a pr into main and document that they all pass.
 
 ### Error Message
 
@@ -57,13 +57,13 @@ _No response_
 - [x] I have included all relevant version information
 - [x] I have tested with the latest version
 
----
+______________________________________________________________________
 
-| Field | Value |
-|-------|-------|
-| **State** | open |
-| **Created** | 2025-12-08T23:14:08Z |
-| **Updated** | 2025-12-08T23:14:52Z |
-| **Labels** | bug |
-| **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/38 |
+| Field       | Value                                                       |
+| ----------- | ----------------------------------------------------------- |
+| **State**   | open                                                        |
+| **Created** | 2025-12-08T23:14:08Z                                        |
+| **Updated** | 2025-12-08T23:14:52Z                                        |
+| **Labels**  | bug                                                         |
+| **Author**  | @wd7512                                                     |
+| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/38 |
