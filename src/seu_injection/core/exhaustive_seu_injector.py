@@ -10,7 +10,6 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from ..bitops import bitflip_float32_optimized
 from .base_injector import BaseInjector
 
 
@@ -31,6 +30,21 @@ class ExhaustiveSEUInjector(BaseInjector):
         >>> print(len(results['criterion_score']))
 
     """
+
+    def _get_injection_indices(self, tensor_shape: tuple, **kwargs) -> np.ndarray:
+        """Get all indices for exhaustive injection.
+
+        Args:
+            tensor_shape: Shape of the tensor to inject into.
+            **kwargs: Unused for exhaustive strategy.
+
+        Returns:
+            np.ndarray: All possible indices in the tensor.
+
+        """
+        # Generate all indices exhaustively
+        all_indices = list(np.ndindex(tensor_shape))
+        return np.array([idx for idx in all_indices], dtype=object)
 
     def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Perform systematic SEU injection across model parameters.
@@ -54,66 +68,38 @@ class ExhaustiveSEUInjector(BaseInjector):
             - All injections are reversible; model is restored after each run.
 
         """
-        results: dict[str, list[Any]] = {
-            "tensor_location": [],
-            "criterion_score": [],
-            "layer_name": [],
-            "value_before": [],
-            "value_after": [],
-        }
+        results = self._initialize_results()
 
         with torch.no_grad():  # Disable gradient tracking for efficiency
             # Iterate through each layer of the neural network
-            for current_layer_name, tensor in self.model.named_parameters():
-                # Skip layer if specific layer requested and this isn't it
-                if layer_name and layer_name != current_layer_name:
-                    continue
-
+            for current_layer_name, tensor in self._iterate_layers(layer_name):
                 print(f"Testing Layer: {current_layer_name}")
 
-                # TODO PERFORMANCE: Unnecessary CPU tensor conversion creates memory bottleneck
-                # PROBLEM: Converting GPU tensors to CPU numpy arrays for bit manipulation
-                # INEFFICIENCIES:
-                #   - GPU→CPU memory transfer latency (can be 100s of μs per transfer)
-                #   - CPU numpy processing instead of GPU-accelerated operations
-                #   - Memory duplication (original tensor + CPU copy)
-                # BETTER APPROACH: Keep tensors on GPU, use torch tensor operations for bit manipulation
-                # IMPACT: Additional overhead on top of already slow bitflip operations
+                # Prepare tensor for injection
+                original_tensor, tensor_cpu = self._prepare_tensor_for_injection(tensor)
 
-                # Store original tensor values for restoration
-                original_tensor = tensor.data.clone()
-                tensor_cpu = original_tensor.cpu().numpy()  # <-- MEMORY INEFFICIENCY
+                # Get indices for injection (exhaustive strategy)
+                injection_indices = self._get_injection_indices(tensor_cpu.shape, **kwargs)
 
-                # ✅ PERFORMANCE CRITICAL FIXED: Replaced slow bitflip_float32() with optimized version
-                # IMPROVEMENT: Now uses bitflip_float32_optimized() in performance-critical injection loop
-                # NEW PERFORMANCE:
-                #   - ResNet-18 (11M params): ~1-2 minutes per bit position (30x faster!)
-                #   - ResNet-50 (25M params): ~3-5 minutes per bit position (20x faster!)
-                #   - Each iteration: O(1) bit operation instead of O(32) string manipulation
-                # CALCULATIONS: 11M params × 3μs per bitflip = ~30 seconds of pure bit operations
-                #              Add model evaluation overhead = 1-2 minutes total
-                # FUTURE: Could still vectorize entire tensor at once for even better performance
-
-                # Iterate through every parameter in the tensor
+                # Perform injections for all indices
                 for idx in tqdm(
-                    np.ndindex(tensor_cpu.shape),
+                    injection_indices,
                     desc=f"Injecting into {current_layer_name}",
                 ):
-                    original_val = tensor_cpu[idx]
-                    seu_val = bitflip_float32_optimized(
-                        original_val, bit_i, inplace=False
-                    )  # <-- PERFORMANCE BOTTLENECK FIXED!
+                    # Convert to tuple if needed
+                    if not isinstance(idx, tuple):
+                        idx = tuple(idx)
 
-                    # Inject fault, evaluate, restore
-                    tensor.data[idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
-                    criterion_score = self._get_criterion_score()
-                    tensor.data[idx] = original_tensor[idx]  # Restore original value
+                    original_val = tensor_cpu[idx]
+
+                    # Inject fault, evaluate, and restore
+                    criterion_score, seu_val = self._inject_and_evaluate(
+                        tensor, idx, original_tensor, original_val, bit_i
+                    )
 
                     # Record results
-                    results["tensor_location"].append(idx)
-                    results["criterion_score"].append(criterion_score)
-                    results["layer_name"].append(current_layer_name)
-                    results["value_before"].append(original_val)
-                    results["value_after"].append(seu_val)
+                    self._record_injection_result(
+                        results, idx, criterion_score, current_layer_name, original_val, seu_val
+                    )
 
         return results
