@@ -576,7 +576,9 @@ class TestInjector:
         # Test iterating all layers
         all_layers = list(injector._iterate_layers(None))
         assert len(all_layers) > 0
-        assert all(isinstance(name, str) and isinstance(param, torch.nn.Parameter) for name, param in all_layers)
+        for name, param in all_layers:
+            assert isinstance(name, str), f"Layer name should be string, got {type(name)}"
+            assert isinstance(param, torch.nn.Parameter), f"Layer param should be torch.nn.Parameter, got {type(param)}"
 
         # Test filtering by specific layer
         target_layer = all_layers[0][0]
@@ -705,19 +707,25 @@ class TestInjector:
         )
 
         # Test with p=0.5 and a reasonable shape
-        np.random.seed(42)
-        tensor_shape = (10, 10)
-        indices = injector._get_injection_indices(tensor_shape, p=0.5)
+        # Use a controlled RNG to avoid global state effects
+        original_state = np.random.get_state()
+        try:
+            np.random.seed(42)
+            tensor_shape = (10, 10)
+            indices = injector._get_injection_indices(tensor_shape, p=0.5)
 
-        # Should get roughly 50% of indices (but exact count varies with randomness)
-        assert len(indices) > 0
-        assert len(indices) < 100  # Should not be all indices
-        assert isinstance(indices, np.ndarray)
+            # Should get roughly 50% of indices (but exact count varies with randomness)
+            assert len(indices) > 0
+            assert len(indices) < 100  # Should not be all indices
+            assert isinstance(indices, np.ndarray)
 
-        # Test with p=0 and run_at_least_one_injection=True
-        indices_min = injector._get_injection_indices(tensor_shape, p=0.0, run_at_least_one_injection=True)
-        assert len(indices_min) == 1  # Should have exactly one
+            # Test with p=0 and run_at_least_one_injection=True
+            indices_min = injector._get_injection_indices(tensor_shape, p=0.0, run_at_least_one_injection=True)
+            assert len(indices_min) == 1  # Should have exactly one
 
-        # Test error handling for invalid p
-        with pytest.raises(ValueError, match="Probability p must be in"):
-            injector._get_injection_indices(tensor_shape, p=1.5)
+            # Test error handling for invalid p
+            with pytest.raises(ValueError, match="Probability p must be in"):
+                injector._get_injection_indices(tensor_shape, p=1.5)
+        finally:
+            # Restore the original random state
+            np.random.set_state(original_state)

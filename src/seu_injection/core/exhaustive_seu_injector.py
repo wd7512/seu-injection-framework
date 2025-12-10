@@ -44,7 +44,7 @@ class ExhaustiveSEUInjector(BaseInjector):
         """
         # Generate all indices exhaustively
         all_indices = list(np.ndindex(tensor_shape))
-        return np.array([idx for idx in all_indices], dtype=object)
+        return np.array(all_indices, dtype=object)
 
     def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Perform systematic SEU injection across model parameters.
@@ -86,9 +86,8 @@ class ExhaustiveSEUInjector(BaseInjector):
                     injection_indices,
                     desc=f"Injecting into {current_layer_name}",
                 ):
-                    # Convert to tuple if needed
-                    if not isinstance(idx, tuple):
-                        idx = tuple(idx)
+                    # Ensure idx is a tuple for consistent indexing
+                    idx = tuple(idx) if not isinstance(idx, tuple) else idx
 
                     original_val = tensor_cpu[idx]
 
