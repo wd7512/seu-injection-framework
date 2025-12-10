@@ -27,6 +27,7 @@ uv run python examples/basic_cnn_robustness.py
 - [Example_Attack_Notebook.ipynb](Example_Attack_Notebook.ipynb): Interactive research notebook with comprehensive fault injection analysis and visualization tools.
 - [basic_cnn_robustness.py](basic_cnn_robustness.py): Single-architecture vulnerability analysis using systematic bit-flip injection across network layers. Useful for space mission deployment assessment.
 - [architecture_comparison.py](architecture_comparison.py): Comparative robustness evaluation using standardized fault injection protocol across multiple architectures. Useful for architecture selection in critical systems.
+- [fault_injection_training/](fault_injection_training/): Research study demonstrating how training with fault injection improves model robustness by up to 74%. Includes both Python script and interactive notebook with complete experimental methodology.
 - [shipsnet/](shipsnet/): Experiments re-creating the methodology from the 2025 paper, [A Framework for Developing Robust Machine Learning Models in Harsh Environments: A Review of CNN Design Choices](https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars/). These focus on fault injection and robustness analysis for the ShipsNet dataset. See the README in this folder for details and updates.
 
 ## Experimental Protocol
