@@ -8,7 +8,7 @@ This page provides links to complete, runnable examples demonstrating various us
 
 A complete example showing how to evaluate a CNN's robustness to SEU:
 
-**Location**: [`examples/basic_cnn_robustness.py`](https://github.com/wd7512/seu-injection-framework/blob/main/examples/basic_cnn_robustness.py)
+**Location**: [View on GitHub](https://github.com/wd7512/seu-injection-framework/blob/main/examples/basic_cnn_robustness.py)
 
 This example demonstrates:
 - Training a simple CNN on MNIST
@@ -34,7 +34,7 @@ This example shows:
 
 An interactive Jupyter notebook with step-by-step SEU injection:
 
-**Location**: [`examples/Example_Attack_Notebook.ipynb`](https://github.com/wd7512/seu-injection-framework/blob/main/examples/Example_Attack_Notebook.ipynb)
+**Location**: [View on GitHub](https://github.com/wd7512/seu-injection-framework/blob/main/examples/Example_Attack_Notebook.ipynb)
 
 Features:
 - Interactive exploration of injection parameters
@@ -46,7 +46,7 @@ Features:
 
 A complete research-grade example using the ShipsNet dataset:
 
-**Location**: [`examples/shipsnet/`](https://github.com/wd7512/seu-injection-framework/tree/main/examples/shipsnet)
+**Location**: [View on GitHub](https://github.com/wd7512/seu-injection-framework/tree/main/examples/shipsnet)
 
 This comprehensive example includes:
 - Dataset download and preprocessing
@@ -162,5 +162,5 @@ See [Contributing Guide](../contributing.md) for details.
 
 - [Basic Usage Guide](basic_usage.md) - Core concepts and simple patterns
 - [Advanced Features](advanced_features.md) - Advanced techniques and optimization
-- [API Reference](../api/core.rst) - Complete API documentation
+- [API Reference on GitHub](https://github.com/wd7512/seu-injection-framework/blob/main/docs/source/api/core.rst) - Complete API documentation
 - [Research Paper](https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars) - Academic background

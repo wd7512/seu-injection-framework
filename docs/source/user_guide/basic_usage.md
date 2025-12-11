@@ -90,4 +90,4 @@ injector = ExhaustiveSEUInjector(
 
 - See [Advanced Features](advanced_features.md) for stochastic injection and filtering
 - Check out [Examples](examples.md) for real-world use cases
-- Refer to the [API Reference](../api/core.rst) for detailed documentation
+- Refer to the [API Reference on GitHub](https://github.com/wd7512/seu-injection-framework/blob/main/docs/source/api/core.rst) for detailed documentation
