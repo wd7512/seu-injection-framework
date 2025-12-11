@@ -1,16 +1,16 @@
-# Issue #16: [FEATURE] run_injection function is too large
+# Issue #60: [FEATURE] Create Docs/Wiki
 
 ### Feature Summary
 
-This function should be broken down into smaller functions
+use https://www.sphinx-doc.org/en/master/?
 
 ### Feature Category
 
-API Enhancement
+Core SEU Injection (new injection methods)
 
 ### Problem Statement
 
-Make the development easier
+need docs
 
 ### Proposed Solution
 
@@ -59,8 +59,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-11-15T23:49:55Z |
-| **Updated** | 2025-12-10T09:17:02Z |
+| **Created** | 2025-12-11T14:28:06Z |
+| **Updated** | 2025-12-11T14:28:06Z |
 | **Labels** | enhancement |
 | **Author** | @Will-D-AER |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/16 |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/60 |
