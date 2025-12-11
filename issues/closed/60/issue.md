@@ -17,12 +17,12 @@ The project lacks comprehensive, accessible, and versioned documentation. This m
 ## Proposed Solution
 
 1. Add Sphinx as a documentation dependency.
-1. Initialize a `docs/` directory with Sphinx quickstart.
-1. Configure Sphinx for autodoc and API reference generation from `src/seu_injection`.
-1. Add basic usage, installation, and contribution guides.
-1. Integrate Sphinx build into CI (optional, stretch goal).
-1. Document how to build and contribute to docs in `CONTRIBUTING.md`.
-1. Publish the generated Sphinx HTML documentation to GitHub Pages (github.io) using either the `gh-pages` branch or the `/docs` folder, and configure repository settings accordingly.
+2. Initialize a `docs/` directory with Sphinx quickstart.
+3. Configure Sphinx for autodoc and API reference generation from `src/seu_injection`.
+4. Add basic usage, installation, and contribution guides.
+5. Integrate Sphinx build into CI (optional, stretch goal).
+6. Document how to build and contribute to docs in `CONTRIBUTING.md`.
+7. Publish the generated Sphinx HTML documentation to GitHub Pages (github.io) using either the `gh-pages` branch or the `/docs` folder, and configure repository settings accordingly.
 
 ## Acceptance Criteria
 
@@ -73,24 +73,25 @@ For GitHub Pages, see Sphinx's [official guide](https://www.sphinx-doc.org/en/ma
 - [x] I have considered the impact on existing users
 - [x] I have thought about backward compatibility
 
-______________________________________________________________________
+---
 
-| Field       | Value                                                       |
-| ----------- | ----------------------------------------------------------- |
-| **State**   | open                                                        |
-| **Created** | 2025-12-11T14:28:06Z                                        |
-| **Updated** | 2025-12-11T14:28:06Z                                        |
-| **Labels**  | enhancement                                                 |
-| **Author**  | @Will-D-AER                                                 |
-| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/60 |
+| Field | Value |
+|-------|-------|
+| **State** | open |
+| **Created** | 2025-12-11T14:28:06Z |
+| **Updated** | 2025-12-11T14:28:06Z |
+| **Labels** | enhancement |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/60 |
 
-______________________________________________________________________
 
-| Field       | Value                                                       |
-| ----------- | ----------------------------------------------------------- |
-| **State**   | closed                                                      |
-| **Created** | 2025-12-11T14:28:06Z                                        |
-| **Updated** | 2025-12-11T16:39:52Z                                        |
-| **Labels**  | enhancement                                                 |
-| **Author**  | @Will-D-AER                                                 |
-| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/60 |
+---
+
+| Field | Value |
+|-------|-------|
+| **State** | closed |
+| **Created** | 2025-12-11T14:28:06Z |
+| **Updated** | 2025-12-11T16:39:52Z |
+| **Labels** | enhancement |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/60 |

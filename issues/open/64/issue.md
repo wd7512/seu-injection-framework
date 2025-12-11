@@ -1,20 +1,20 @@
-# Issue #44: [RESEARCH] How does training with fault injection improve robustness
+# Issue #64: [RESEARCH] How does training with flood levels improve robustness
 
 ### Question Category
 
-Model Architecture
+Methodology (SEU injection strategies)
 
 ### Research Question
 
-How does training with fault injection improve robustness?
+Floor levels are used to stop a model training at an earlier loss level (flood level). This is useful when it is known that a loss of 0 is infeasible or an overtrained model. How this impacts robustness is unknown
 
 ### Research Domain
 
-None
+Academic Research
 
 ### Model Architecture
 
-None
+Multiple Architectures
 
 ### Research Context
 
@@ -35,7 +35,7 @@ _No response_
 - [ ] Single Event Upset (SEU) physics
 - [ ] Radiation effects in electronics
 - [x] Neural network robustness
-- [x] Fault injection methodologies
+- [ ] Fault injection methodologies
 - [ ] Statistical significance testing
 - [ ] Performance optimization
 - [ ] Model comparison studies
@@ -72,8 +72,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-12-09T08:46:06Z |
-| **Updated** | 2025-12-09T23:24:24Z |
+| **Created** | 2025-12-11T16:55:03Z |
+| **Updated** | 2025-12-11T16:55:03Z |
 | **Labels** | question |
-| **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/44 |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/64 |
