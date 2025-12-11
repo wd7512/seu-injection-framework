@@ -22,9 +22,11 @@ The project lacks comprehensive, accessible, and versioned documentation. This m
 4. Add basic usage, installation, and contribution guides.
 5. Integrate Sphinx build into CI (optional, stretch goal).
 6. Document how to build and contribute to docs in `CONTRIBUTING.md`.
+7. Publish the generated Sphinx HTML documentation to GitHub Pages (github.io) using either the `gh-pages` branch or the `/docs` folder, and configure repository settings accordingly.
 
 ## Acceptance Criteria
 
+- [ ] Documentation is published and accessible via GitHub Pages (github.io). **(Key requirement)**
 - [ ] Sphinx is listed as a dev dependency.
 - [ ] `docs/` contains a working Sphinx project.
 - [ ] API reference is generated from code docstrings.
@@ -62,6 +64,8 @@ Improves usability and adoption; enables easier onboarding and referencing for r
 
 Consider using Sphinx extensions like `autodoc`, `napoleon`, and `sphinx_rtd_theme` for better API and docstring support.
 
+For GitHub Pages, see Sphinx's [official guide](https://www.sphinx-doc.org/en/master/usage/deployment/githubpages.html) or use tools like `sphinx-ghp-import` for deployment.
+
 ## Pre-submission Checklist
 
 - [x] I have searched existing issues for similar requests
@@ -87,7 +91,7 @@ Consider using Sphinx extensions like `autodoc`, `napoleon`, and `sphinx_rtd_the
 |-------|-------|
 | **State** | open |
 | **Created** | 2025-12-11T14:28:06Z |
-| **Updated** | 2025-12-11T14:33:19Z |
+| **Updated** | 2025-12-11T14:35:08Z |
 | **Labels** | enhancement |
 | **Author** | @Will-D-AER |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/60 |
