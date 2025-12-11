@@ -319,9 +319,9 @@ If you encounter issues not covered here:
 After successful installation:
 
 1. **Quick Start:** Follow the [Quickstart Tutorial](quickstart.md)
-1. **API Documentation:** Review the [API Reference](api/index.md)
-1. **Examples:** Explore [Example Scripts](examples/)
-1. **Research:** Check out [Research Notebooks](examples/notebooks/)
+1. **API Documentation:** Review the [API Reference](index.rst)
+1. **Examples:** Explore [Example Scripts](https://github.com/wd7512/seu-injection-framework/tree/main/examples)
+1. **Research:** Check out [Research Notebooks](https://github.com/wd7512/seu-injection-framework/tree/main/examples)
 
 ## System Requirements
 

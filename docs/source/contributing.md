@@ -93,10 +93,12 @@ The framework uses an embedded TODO system throughout the codebase to track impr
 
 ### TODO Format Standards
 
-````python
+```python
 # TODO CATEGORY: Brief description of issue
 # ISSUE: Detailed explanation of problem
 # IMPACT: Effect on users or performance
+```
+
 ## 📊 TODO System
 
 The framework uses embedded TODOs to track improvements. See `docs/KNOWN_ISSUES.md` for details.
@@ -106,7 +108,7 @@ Format:
 ```python
 # TODO CATEGORY: Brief description
 # PRIORITY: HIGH/MEDIUM/LOW
-````
+```
 
 ## 🔄 Development Workflow
 
