@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.1.13] - sometime
 
+- **Added documentation using sphinx**: when a push is made to main docs should be update to https://wd7512.github.io/seu-injection-framework/
+
 ## [1.1.12] - 2025-12-09
 
 - **Removing unused core dependencies**: removed mdformat and scipy into dev

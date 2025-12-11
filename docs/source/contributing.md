@@ -93,10 +93,12 @@ The framework uses an embedded TODO system throughout the codebase to track impr
 
 ### TODO Format Standards
 
-````python
+```python
 # TODO CATEGORY: Brief description of issue
 # ISSUE: Detailed explanation of problem
 # IMPACT: Effect on users or performance
+```
+
 ## 📊 TODO System
 
 The framework uses embedded TODOs to track improvements. See `docs/KNOWN_ISSUES.md` for details.
@@ -106,7 +108,7 @@ Format:
 ```python
 # TODO CATEGORY: Brief description
 # PRIORITY: HIGH/MEDIUM/LOW
-````
+```
 
 ## 🔄 Development Workflow
 
@@ -245,71 +247,6 @@ Treat all community members with respect. Use GitHub Issues for bug reports, fea
 - **README.md** - Project overview
 - **docs/** - Documentation and tutorials
 - **dev_docs/AI_AGENT_GUIDE.md** - For AI agents
-
-## 📖 Building Documentation
-
-The project uses [Sphinx](https://www.sphinx-doc.org/) for documentation. The documentation is automatically built and published to [GitHub Pages](https://wd7512.github.io/seu-injection-framework/) on every push to the main branch.
-
-### Building Locally
-
-To build the documentation locally:
-
-```bash
-# Install documentation dependencies
-pip install "seu-injection-framework[docs]"
-
-# Or install Sphinx dependencies directly
-pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints myst-parser
-
-# Build the documentation
-cd docs
-make html
-
-# View the documentation
-# Open docs/build/html/index.html in your browser
-```
-
-The built HTML documentation will be in `docs/build/html/`.
-
-### Documentation Structure
-
-- `docs/source/` - Documentation source files (RST and Markdown)
-- `docs/source/conf.py` - Sphinx configuration
-- `docs/source/api/` - API reference documentation (auto-generated from docstrings)
-- `docs/source/user_guide/` - User guides and tutorials
-
-### Contributing to Documentation
-
-When contributing documentation:
-
-1. **API Documentation**: Add docstrings to your code following Google or NumPy style
-1. **User Guides**: Add or update Markdown files in `docs/source/user_guide/`
-1. **Build Locally**: Always build and review documentation before submitting
-1. **Check for Warnings**: Address any Sphinx warnings in your build output
-
-Example docstring format:
-
-```python
-def my_function(param1, param2):
-    """Brief description of function.
-
-    Longer description with more details about what the function does,
-    its behavior, and any important notes.
-
-    Args:
-        param1: Description of first parameter
-        param2: Description of second parameter
-
-    Returns:
-        Description of return value
-
-    Example:
-        >>> result = my_function(1, 2)
-        >>> print(result)
-        3
-    """
-    return param1 + param2
-```
 
 ## 📞 Support
 

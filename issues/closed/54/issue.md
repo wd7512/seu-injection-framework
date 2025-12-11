@@ -1,16 +1,18 @@
-# Issue #16: [FEATURE] run_injection function is too large
+# Issue #54: [FEATURE] Add research explainer to readme
 
 ### Feature Summary
 
-This function should be broken down into smaller functions
+Add a link to this alongside the research paper link in the readme
+
+https://wd7512.github.io/robust-ml-in-harsh-environments-explained/
 
 ### Feature Category
 
-API Enhancement
+Core SEU Injection (new injection methods)
 
 ### Problem Statement
 
-Make the development easier
+n/a
 
 ### Proposed Solution
 
@@ -58,9 +60,9 @@ ______________________________________________________________________
 
 | Field       | Value                                                       |
 | ----------- | ----------------------------------------------------------- |
-| **State**   | open                                                        |
-| **Created** | 2025-11-15T23:49:55Z                                        |
-| **Updated** | 2025-12-10T09:17:02Z                                        |
+| **State**   | closed                                                      |
+| **Created** | 2025-12-09T22:26:52Z                                        |
+| **Updated** | 2025-12-10T09:01:04Z                                        |
 | **Labels**  | enhancement                                                 |
 | **Author**  | @Will-D-AER                                                 |
-| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/16 |
+| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/54 |
