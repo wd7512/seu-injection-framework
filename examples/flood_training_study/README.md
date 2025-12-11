@@ -28,13 +28,17 @@ Our experimental results demonstrate that flood level training provides:
 # Install dependencies
 pip install -e ".[analysis]"
 
-# Run the experiment
+# Run comprehensive experiments (recommended)
 cd examples/flood_training_study
-python experiment.py
+python comprehensive_experiment.py
 
-# View results
-# - flood_training_seu_robustness.png (generated visualization)
-# - Terminal output with detailed metrics
+# Results saved to:
+# - comprehensive_results.json (all experimental data)
+# - Terminal output with analysis
+
+# Or run original single-dataset experiment
+python experiment.py
+# - flood_training_seu_robustness.png (visualization)
 ```
 
 ## Research Paper Structure
@@ -44,50 +48,66 @@ This study follows a structured research paper format. Navigate through the sect
 ### 📄 Main Paper
 
 1. **[Introduction](01_introduction.md)** - Background on SEUs, flood level training, and motivation
-2. **[Literature Review](02_literature_review.md)** - Related work on regularization, loss landscapes, and fault tolerance
-3. **[Methodology](03_methodology.md)** - Experimental design, architectures, training protocol, and SEU injection
-4. **[Results](04_results.md)** - Simulation results with tables, figures, and statistical analysis
-5. **[Discussion](05_discussion.md)** - Analysis of mechanisms, optimal configurations, and limitations
-6. **[Conclusion](06_conclusion.md)** - Summary of findings, implications, and future research directions
+2. **[Literature Review](02_literature_review.md)** - Related work (Dennis & Pope 2025, Ishida 2020, verified references only)
+3. **[Methodology](03_methodology.md)** - **NEW**: 3 datasets, multiple flood levels, with/without dropout, 15% sampling
+4. **[Results](04_results.md)** - Initial findings (being updated with comprehensive data)
+5. **[Discussion](05_discussion.md)** - **REVISED**: Cautious analysis, open to null results, alternative explanations
+6. **[Conclusion](06_conclusion.md)** - Summary and future directions
 
 ### 🔧 Supplementary Materials
 
-- **[Implementation Guide](implementation_guide.md)** - Practical PyTorch code, integration examples, and deployment checklist
-- **[References](references.md)** - Complete bibliography and citations
+- **[Implementation Guide](implementation_guide.md)** - Practical PyTorch code and deployment guidance
+- **[References](references.md)** - Complete bibliography
 
-### 💻 Code
+### 💻 Code & Data
 
-- **[experiment.py](experiment.py)** - Complete runnable experiment comparing standard vs flood training with SEU injection
+- **[comprehensive_experiment.py](comprehensive_experiment.py)** - **NEW**: Full experimental suite (3 datasets × 6 flood levels × 2 dropout configs)
+- **[experiment.py](experiment.py)** - Original single-dataset experiment
+- **comprehensive_results.json** - Will contain all experimental data (public release)
 
 ## Executive Summary
 
 ### Problem
 
-Neural networks deployed in harsh radiation environments (space missions, nuclear facilities, particle accelerators) are vulnerable to Single Event Upsets (SEUs)—bit flips in memory caused by ionizing particles. These bit flips can cause catastrophic model failures.
+Neural networks deployed in harsh radiation environments are vulnerable to Single Event Upsets (SEUs)—bit flips in memory caused by ionizing particles.
 
-### Solution
+### Research Question
 
-**Flood level training** is a simple regularization technique that maintains a minimum loss threshold during training:
+**Does flood level training improve SEU robustness?**
 
+Flood level training (Ishida et al., 2020) is a regularization technique:
 ```python
 L_flood = |L(θ) - b| + b
 ```
+Where `b` is the flood level. It prevents models from achieving zero training loss.
 
-Where `b` is the flood level (typically 0.08-0.15). This prevents overfitting and encourages flatter loss landscapes.
+### Initial Findings (Moons Dataset)
 
-### Results
+Preliminary experiment suggested modest improvement:
 
-Our controlled experiment on a binary classification task shows:
-
-| Metric | Standard | Flood | Improvement |
-|--------|----------|-------|-------------|
+| Metric | Standard | Flood (b=0.08) | Change |
+|--------|----------|----------------|--------|
 | Baseline Accuracy | 91.25% | 90.75% | -0.5% |
-| Mean Acc Under SEU | 88.85% | 88.59% | +0.3 pp |
-| Mean Accuracy Drop | 2.40% | 2.16% | **-9.7%** |
-| Critical Fault Rate | 8.3% | 7.7% | **-7.5%** |
-| Sign Bit Robustness | 84.70% | 85.55% | **+1.0%** |
+| Mean Accuracy Drop | 2.40% | 2.16% | -9.7% |
+| Critical Fault Rate | 8.3% | 7.7% | -7.5% |
 
-**Key Insight**: Flood training sacrifices 0.5% baseline accuracy but reduces SEU vulnerability by 9.7%, providing a 19.5× return on investment.
+**Important Caveats:**
+- Single dataset only (moons)
+- Flood level (0.08) was below standard training loss (0.042)
+- Mechanism unclear
+- Requires validation on multiple datasets
+
+### Comprehensive Study Design
+
+**Now testing:**
+- **3 datasets**: moons, circles, blobs
+- **6 flood levels**: [0.0, 0.05, 0.10, 0.15, 0.20, 0.30]
+- **2 dropout configs**: with (0.2) and without
+- **Higher sampling**: 15% (was 5%)
+
+**Total**: 36 experimental configurations
+
+**Approach**: Empirical validation, open to null results
 
 ### Implementation
 
