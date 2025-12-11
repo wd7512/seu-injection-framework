@@ -89,9 +89,9 @@ For GitHub Pages, see Sphinx's [official guide](https://www.sphinx-doc.org/en/ma
 
 | Field | Value |
 |-------|-------|
-| **State** | open |
+| **State** | closed |
 | **Created** | 2025-12-11T14:28:06Z |
-| **Updated** | 2025-12-11T14:36:24Z |
+| **Updated** | 2025-12-11T16:39:52Z |
 | **Labels** | enhancement |
 | **Author** | @Will-D-AER |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/60 |
