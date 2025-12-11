@@ -17,6 +17,7 @@ Author: SEU Injection Framework Research Team
 Date: December 2025
 """
 
+import csv
 import json
 import matplotlib
 matplotlib.use("Agg")
@@ -299,12 +300,25 @@ def run_comprehensive_experiment():
                       f"Val Loss: {val_losses[-1]:.4f}")
                 print(f"    SEU Drop: {mean_drop:.3f}, CFR: {mean_cfr:.3f}")
     
-    # Save results
+    # Save results as JSON
     with open('comprehensive_results.json', 'w') as f:
         json.dump(all_results, f, indent=2)
     
+    # Save results as CSV
+    csv_headers = ['dataset', 'dropout', 'flood_level', 'baseline_accuracy', 
+                   'final_train_loss', 'final_val_loss', 'mean_accuracy_drop', 
+                   'mean_critical_fault_rate']
+    with open('comprehensive_results.csv', 'w', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=csv_headers)
+        writer.writeheader()
+        for result in all_results:
+            row = {k: result[k] for k in csv_headers}
+            writer.writerow(row)
+    
     print(f"\n{'='*80}")
-    print("Results saved to comprehensive_results.json")
+    print("Results saved to:")
+    print("  - comprehensive_results.json")
+    print("  - comprehensive_results.csv")
     print(f"{'='*80}")
     
     return all_results
