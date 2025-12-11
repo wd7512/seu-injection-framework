@@ -38,14 +38,6 @@ Quick Links
 
 .. toctree::
    :maxdepth: 2
-   :caption: User Guide
-
-   user_guide/basic_usage
-   user_guide/advanced_features
-   user_guide/examples
-
-.. toctree::
-   :maxdepth: 2
    :caption: API Reference
    
    api/core

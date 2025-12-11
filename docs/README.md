@@ -42,14 +42,10 @@ docs/
 ├── source/              # Documentation source files
 │   ├── conf.py         # Sphinx configuration
 │   ├── index.rst       # Main documentation index
-│   ├── api/            # API reference documentation
+│   ├── api/            # API reference documentation (auto-generated from docstrings)
 │   │   ├── core.rst    # Core injector classes
 │   │   ├── bitops.rst  # Bit operation functions
 │   │   └── metrics.rst # Evaluation metrics
-│   ├── user_guide/     # User guides and tutorials
-│   │   ├── basic_usage.md
-│   │   ├── advanced_features.md
-│   │   └── examples.md
 │   ├── installation.md
 │   ├── quickstart.md
 │   ├── contributing.md
@@ -90,15 +86,6 @@ def my_function(param1, param2):
     """
     pass
 ```
-
-### User Guides
-
-User guides are written in Markdown and located in `source/user_guide/`:
-
-1. Create or edit `.md` files in `source/user_guide/`
-2. Add the file to the appropriate `toctree` in `source/index.rst`
-3. Build and preview locally
-4. Submit a pull request
 
 ### Adding New Pages
 
