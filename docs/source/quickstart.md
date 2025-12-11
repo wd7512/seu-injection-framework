@@ -106,5 +106,5 @@ Congratulations! 🎉 You've completed the quickstart tutorial. You now know how
 
 ### Continue Learning
 
-- [Example Notebook](../examples/Example_Attack_Notebook.ipynb)
-- [ShipsNet Experiments](../examples/shipsnet/)
+- [Example Notebook on GitHub](https://github.com/wd7512/seu-injection-framework/blob/main/examples/Example_Attack_Notebook.ipynb)
+- [ShipsNet Experiments on GitHub](https://github.com/wd7512/seu-injection-framework/tree/main/examples/shipsnet/)
