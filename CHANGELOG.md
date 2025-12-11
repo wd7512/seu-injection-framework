@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [1.1.13] - sometime
+- **Added documentation using sphinx**: when a push is made to main docs should be update to https://wd7512.github.io/seu-injection-framework/
+
 
 ## [1.1.12] - 2025-12-09
 
