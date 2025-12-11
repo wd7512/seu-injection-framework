@@ -24,11 +24,13 @@ harsh environments.
 """
 
 from abc import ABC, abstractmethod
-from collections.abc import Callable
+from collections.abc import Callable, Generator
 from typing import Any, Union
 
 import numpy as np
 import torch
+
+from ..bitops import bitflip_float32_optimized
 
 
 class BaseInjector(ABC):
@@ -176,3 +178,128 @@ class BaseInjector(ABC):
             return float(self.criterion(self.model, self.data_loader, device=self.device))
         else:
             return float(self.criterion(self.model, self.X, self.y, device=self.device))
+
+    def _iterate_layers(self, layer_name: Union[str, None]) -> Generator[tuple[str, torch.nn.Parameter], None, None]:
+        """Iterate through model layers, optionally filtering by name.
+
+        Args:
+            layer_name: Name of specific layer to target (None for all layers).
+
+        Yields:
+            tuple: (layer_name, parameter_tensor) pairs.
+
+        """
+        for current_layer_name, tensor in self.model.named_parameters():
+            # Skip layer if specific layer requested and this isn't it
+            if layer_name and layer_name != current_layer_name:
+                continue
+            yield current_layer_name, tensor
+
+    def _prepare_tensor_for_injection(self, tensor: torch.nn.Parameter) -> tuple[torch.Tensor, np.ndarray]:
+        """Prepare a tensor for injection by cloning and converting to numpy.
+
+        Args:
+            tensor: The parameter tensor to prepare.
+
+        Returns:
+            tuple: (original_tensor, tensor_cpu) where original_tensor is a clone
+                   and tensor_cpu is a numpy array on CPU.
+
+        """
+        original_tensor = tensor.data.clone()
+        tensor_cpu = original_tensor.cpu().numpy()
+        return original_tensor, tensor_cpu
+
+    def _inject_and_evaluate(
+        self,
+        tensor: torch.nn.Parameter,
+        idx: tuple,
+        original_tensor: torch.Tensor,
+        original_val: float,
+        bit_i: int,
+    ) -> tuple[float, float]:
+        """Inject a fault at a specific location, evaluate, and restore.
+
+        Args:
+            tensor: The parameter tensor to inject into.
+            idx: The index location for injection.
+            original_tensor: The original tensor values for restoration.
+            original_val: The original value at the injection location.
+            bit_i: The bit position to flip (0-31).
+
+        Returns:
+            tuple: (criterion_score, seu_val) where criterion_score is the model
+                   performance after injection and seu_val is the injected value.
+
+        """
+        # Perform bitflip
+        seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)
+
+        # Inject fault
+        tensor.data[idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
+
+        # Evaluate model
+        criterion_score = self._get_criterion_score()
+
+        # Restore original value
+        tensor.data[idx] = original_tensor[idx]
+
+        return criterion_score, seu_val
+
+    def _record_injection_result(
+        self,
+        results: dict[str, list[Any]],
+        idx: tuple,
+        criterion_score: float,
+        layer_name: str,
+        original_val: float,
+        seu_val: float,
+    ) -> None:
+        """Record the results of a single injection.
+
+        Args:
+            results: The results dictionary to update.
+            idx: The index location of the injection.
+            criterion_score: The model performance score after injection.
+            layer_name: The name of the layer that was injected.
+            original_val: The original parameter value.
+            seu_val: The value after injection.
+
+        """
+        results["tensor_location"].append(idx)
+        results["criterion_score"].append(criterion_score)
+        results["layer_name"].append(layer_name)
+        results["value_before"].append(original_val)
+        results["value_after"].append(seu_val)
+
+    def _initialize_results(self) -> dict[str, list[Any]]:
+        """Initialize the results dictionary structure.
+
+        Returns:
+            dict: Empty results dictionary with required keys.
+
+        """
+        return {
+            "tensor_location": [],
+            "criterion_score": [],
+            "layer_name": [],
+            "value_before": [],
+            "value_after": [],
+        }
+
+    @abstractmethod
+    def _get_injection_indices(self, tensor_shape: tuple, **kwargs) -> np.ndarray:
+        """Get the indices where injections should be performed.
+
+        This method defines the injection strategy (exhaustive vs. stochastic).
+
+        Args:
+            tensor_shape: The shape of the tensor to inject into.
+            **kwargs: Additional strategy-specific parameters.
+
+        Returns:
+            np.ndarray: Array of indices where injections should occur.
+                       Shape: (N, len(tensor_shape)) where N is the number of injections.
+
+        """
+        ...
