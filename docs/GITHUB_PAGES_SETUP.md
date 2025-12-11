@@ -71,15 +71,14 @@ The documentation workflow (`.github/workflows/docs.yml`) does the following:
 
 To test the exact same build process locally:
 
-```bash
-# Install dependencies
-pip install sphinx sphinx-rtd-theme sphinx-autodoc-typehints myst-parser
-pip install torch numpy tqdm --index-url https://download.pytorch.org/whl/cpu
+```powershell
+# Sync documentation dependencies using uv
+uv sync --group docs
 
 # Build docs
 cd docs
-make clean
-make html
+uv run make clean
+uv run make html
 
 # View locally
 python -m http.server 8000 --directory build/html
