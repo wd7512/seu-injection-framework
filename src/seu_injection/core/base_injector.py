@@ -179,9 +179,7 @@ class BaseInjector(ABC):
         else:
             return float(self.criterion(self.model, self.X, self.y, device=self.device))
 
-    def _iterate_layers(
-        self, layer_name: Union[str, None]
-    ) -> Generator[tuple[str, torch.nn.Parameter], None, None]:
+    def _iterate_layers(self, layer_name: Union[str, None]) -> Generator[tuple[str, torch.nn.Parameter], None, None]:
         """Iterate through model layers, optionally filtering by name.
 
         Args:
