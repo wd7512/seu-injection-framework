@@ -283,9 +283,9 @@ The built HTML documentation will be in `docs/build/html/`.
 When contributing documentation:
 
 1. **API Documentation**: Add docstrings to your code following Google or NumPy style
-2. **User Guides**: Add or update Markdown files in `docs/source/user_guide/`
-3. **Build Locally**: Always build and review documentation before submitting
-4. **Check for Warnings**: Address any Sphinx warnings in your build output
+1. **User Guides**: Add or update Markdown files in `docs/source/user_guide/`
+1. **Build Locally**: Always build and review documentation before submitting
+1. **Check for Warnings**: Address any Sphinx warnings in your build output
 
 Example docstring format:
 

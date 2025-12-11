@@ -10,7 +10,7 @@ src="https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-bl
 src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
 <br>
 <b><br>
-<a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">Research Paper</a> | 
+<a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">Research Paper</a> |
 <a href="https://wd7512.github.io/robust-ml-in-harsh-environments-explained/">Interactive Explainer</a>
 <br></b>
 

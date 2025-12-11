@@ -62,9 +62,9 @@ docs/
 API documentation is automatically generated from docstrings in the source code. To improve API docs:
 
 1. Add or update docstrings in `src/seu_injection/`
-2. Follow Google or NumPy docstring style
-3. Include examples in docstrings
-4. Rebuild docs to see changes
+1. Follow Google or NumPy docstring style
+1. Include examples in docstrings
+1. Rebuild docs to see changes
 
 Example:
 
@@ -90,8 +90,8 @@ def my_function(param1, param2):
 ### Adding New Pages
 
 1. Create a new `.rst` or `.md` file in `source/`
-2. Add it to a `toctree` directive in `index.rst` or another parent page
-3. Build to verify
+1. Add it to a `toctree` directive in `index.rst` or another parent page
+1. Build to verify
 
 ## 🚀 Deployment
 
@@ -102,10 +102,11 @@ Documentation is automatically built and deployed to GitHub Pages via GitHub Act
 - **URL**: https://wd7512.github.io/seu-injection-framework/
 
 The workflow:
+
 1. Checks out the repository
-2. Installs Sphinx and dependencies
-3. Builds HTML documentation
-4. Deploys to GitHub Pages
+1. Installs Sphinx and dependencies
+1. Builds HTML documentation
+1. Deploys to GitHub Pages
 
 ## 🛠️ Sphinx Configuration
 
