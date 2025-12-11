@@ -33,31 +33,41 @@ torch.backends.cudnn.deterministic = True
 
 Code is available in [`experiment.py`](experiment.py).
 
-## 3.2 Dataset and Task
+## 3.2 Datasets and Tasks
 
-### Dataset: Moons (Synthetic Binary Classification)
+### Multiple Datasets for Robustness
 
-We use scikit-learn's `make_moons` dataset:
+To avoid dataset-specific conclusions, we test on **three synthetic binary classification tasks**:
 
-**Characteristics:**
-- **Samples**: 2000 total
-  - Training: 1200 (60%)
-  - Validation: 400 (20%)
-  - Test: 400 (20%)
-- **Features**: 2D (x, y coordinates)
-- **Classes**: 2 (binary classification)
-- **Noise**: 0.3 (moderate noise level)
-- **Preprocessing**: Standardization (zero mean, unit variance)
+**1. Moons Dataset** (`make_moons`)
+- **Characteristics**: Two interleaving half-circles
+- **Samples**: 2000 (1200 train, 400 val, 400 test)
+- **Noise**: 0.3
+- **Challenge**: Non-linear decision boundary
 
-**Rationale for Choice:**
-- **Controlled complexity**: Simple enough for focused analysis, complex enough to require generalization
-- **Fast iteration**: Quick training enables multiple experimental runs
-- **Clear decision boundary**: Easy to visualize and interpret
-- **Standard benchmark**: Widely used for demonstrating ML concepts
+**2. Circles Dataset** (`make_circles`)
+- **Characteristics**: Concentric circles
+- **Samples**: 2000 (1200 train, 400 val, 400 test)
+- **Noise**: 0.3
+- **Challenge**: Radially symmetric, requires non-linear separation
+
+**3. Blobs Dataset** (`make_blobs`)
+- **Characteristics**: Gaussian clusters
+- **Samples**: 2000 (1200 train, 400 val, 400 test)
+- **Cluster std**: 1.5
+- **Challenge**: Simpler, more separable
+
+**Rationale for Multiple Datasets:**
+- Test generalizability across different data distributions
+- Avoid overfitting conclusions to a single dataset
+- Varied difficulty levels (blobs < moons < circles)
+
+**Preprocessing**: StandardScaler (zero mean, unit variance) applied to all datasets
 
 **Limitations:**
-- Results may not generalize to high-dimensional tasks (images, NLP)
-- Real-world deployments use larger models and datasets
+- All datasets are 2D synthetic binary classification
+- Real-world tasks are higher-dimensional and more complex
+- Results should be validated on realistic datasets (CIFAR-10, etc.)
 
 ### Task Formulation
 
@@ -98,32 +108,37 @@ model = nn.Sequential(
 
 ## 3.4 Training Protocol
 
-### Standard Training
+### Experimental Configurations
 
-**Optimizer**: Adam (lr=0.01)  
-**Loss**: Binary Cross-Entropy (BCE)  
-**Epochs**: 100  
-**Batch Size**: Full batch (1200 samples)  
+We test **multiple configurations** to understand the interaction between flooding and other factors:
 
+**Flood Levels Tested**: [0.0, 0.05, 0.10, 0.15, 0.20, 0.30]
+- 0.0 = Standard training (no flooding)
+- Range chosen to span typical validation losses
+- Tests whether higher flood levels provide additional benefits
+
+**Dropout Configurations**:
+- **With dropout (0.2)**: Standard regularization baseline
+- **Without dropout**: Tests flooding in isolation
+
+**Rationale for Range**:
+- Previous work (Ishida 2020) suggested b=0.08-0.12
+- Our initial experiments showed training losses of 0.04-0.20
+- We test flood levels **above** observed training losses to ensure flooding is actually active
+
+### Training Implementation
+
+**Base Training**:
 ```python
 criterion = nn.BCELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
-
-for epoch in range(100):
-    optimizer.zero_grad()
-    outputs = model(x_train)
-    loss = criterion(outputs, y_train)
-    loss.backward()
-    optimizer.step()
+epochs = 100
 ```
 
-### Flood Training
-
-**Modification**: Wrap BCE with FloodingLoss
-
+**Flood Training**:
 ```python
 class FloodingLoss(nn.Module):
-    def __init__(self, base_loss, flood_level=0.08):
+    def __init__(self, base_loss, flood_level):
         super().__init__()
         self.base_loss = base_loss
         self.flood_level = flood_level
@@ -132,25 +147,18 @@ class FloodingLoss(nn.Module):
         loss = self.base_loss(predictions, targets)
         return torch.abs(loss - self.flood_level) + self.flood_level
 
-criterion = FloodingLoss(nn.BCELoss(), flood_level=0.08)
-# Rest is identical to standard training
+criterion = FloodingLoss(nn.BCELoss(), flood_level=b)
 ```
 
-**Flood Level Selection**: `b=0.08`
-- Chosen based on literature (Ishida et al., 2020)
-- Approximately 1.5-2× validation loss plateau
-- Balances regularization and accuracy
+### Monitoring
 
-### Training Dynamics
-
-Both models are trained for 100 epochs. We monitor:
-- Training loss (with and without flooding)
-- Validation loss (always without flooding, for fair comparison)
+For each configuration, we track:
+- Final training loss
+- Final validation loss  
+- Baseline test accuracy
 - Training time
 
-**Expected Behavior:**
-- Standard: Training loss → 0, possible overfitting
-- Flood: Training loss → 0.08 (flood level), prevents overfitting
+**Key Question**: Does flooding actually affect training dynamics, or is the flood level irrelevant?
 
 ## 3.5 SEU Injection Protocol
 
@@ -183,10 +191,11 @@ injector = StochasticSEUInjector(
 results = injector.run_injector(bit_i=bit_position, p=0.05)
 ```
 
-**Sampling Rate**: 5% (p=0.05)
-- Injects ~115 bit flips (2305 parameters × 0.05)
-- Balances coverage and computational cost
-- Sufficient for statistical significance
+**Sampling Rate**: 15% (p=0.15)
+- Injects ~345 bit flips (2305 parameters × 0.15)
+- Higher than typical studies (5-10%) for better statistical power
+- Increased based on reviewer feedback to improve confidence
+- Computational cost is acceptable (~5 min per configuration)
 
 ### Tested Bit Positions
 

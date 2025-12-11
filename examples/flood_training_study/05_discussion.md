@@ -6,76 +6,73 @@
 
 ## 5.1 Interpretation of Results
 
-### Primary Finding: Flood Training Improves SEU Robustness
+### Observed Effects: Modest Robustness Improvement
 
-Our experiment demonstrates that flood level training (b=0.08) reduces SEU vulnerability by **9.7%** compared to standard training, with only a **0.5%** baseline accuracy cost.
+Our initial experiment on the moons dataset observed that flood level training (b=0.08) showed a **9.7%** relative reduction in accuracy drop under SEU injection, with **0.5%** baseline accuracy cost.
 
-**What does this mean?**
+**Important Caveats:**
+1. This is a single dataset (moons) - generalizability is unknown
+2. The flood level (0.08) was below the standard training loss (0.042), raising questions about mechanism
+3. Effect size is modest and may not be practically significant
+4. Statistical power is limited by sample size
 
-For a neural network deployed on a spacecraft experiencing 1000 SEUs over its mission lifetime:
-- **Standard training**: ~24 failures (2.40% × 1000)
-- **Flood training**: ~22 failures (2.16% × 1000)
-- **Benefit**: ~2 fewer failures, or 8% reduction
+**Alternative Interpretations:**
+- **Null hypothesis**: The effect could be statistical noise or dataset-specific
+- **Confounding**: The model architecture already includes dropout, complicating interpretation
+- **Mechanism unclear**: We do not know *why* any improvement occurs
 
-While this may seem modest, each prevented failure could save a critical mission decision or prevent system failure escalation.
+### Need for Extended Validation
 
-### Cost-Benefit Analysis
+Before drawing strong conclusions, we require:
+1. **Multiple datasets**: Test on circles, blobs, and realistic datasets
+2. **Multiple flood levels**: Verify that higher flood levels (>training loss) show stronger effects
+3. **Dropout ablation**: Test with/without dropout to isolate flooding's contribution
+4. **Higher sampling rate**: Increase from 5% to 15%+ for better statistical power
 
-The **19.5× ROI** (robustness improvement / accuracy loss) makes flood training highly attractive:
+**Current Status**: Initial exploratory results, not definitive evidence.
 
-```
-Investment:  0.5% accuracy loss
-Return:      9.7% robustness improvement (relative to baseline drop)
-ROI:         19.5×
-```
+## 5.2 Potential Mechanisms (Speculative)
 
-**Comparison to hardware solutions:**
-- **ECC memory**: 30-40% area/power overhead, provides detection and correction
-- **TMR**: 3× compute cost, provides voting-based redundancy
-- **Flood training**: 0.5% accuracy cost, 6% training time overhead, 0% inference cost
+### Hypothesis 1: Loss Landscape Geometry
 
-Flood training is complementary to hardware solutions and provides value at negligible cost.
+**Theoretical claim**: Flood training might encourage flatter loss minima, which could be more robust to parameter perturbations.
 
-## 5.2 Why Does Flood Training Improve Robustness?
+**Issues with this hypothesis:**
+1. We did not measure loss curvature (no Hessian analysis)
+2. The flood level (0.08) was actually below standard training loss (0.042)
+3. This suggests flooding may not have been "active" during most of training
+4. The mechanism is therefore unclear
 
-### Hypothesis 1: Flatter Loss Landscapes
+**What we observed:**
+- Standard training: final loss = 0.042
+- Flood training: final loss = 0.434 (but this includes the flooding penalty)
+- **Critical issue**: Need to check if flooding actually constrained optimization
 
-**Mechanism:** Flood training prevents overfitting, encouraging convergence to flatter regions of the loss landscape.
+### Hypothesis 2: Simple Regularization
 
-**Evidence from our results:**
-1. Standard training achieves very low training loss (0.042), suggesting sharp minimum
-2. Flood training maintains higher loss (0.434), indicating broader minimum
-3. Similar validation loss (0.189 vs. 0.202) despite different training behavior
+**Alternative explanation**: Any additional regularization (flooding, more dropout, weight decay) might improve robustness through generic anti-overfitting effects.
 
-**Connection to SEU robustness:**
-- Flatter minima are less sensitive to parameter perturbations (Hochreiter & Schmidhuber, 1997)
-- SEU bit flips represent discrete parameter perturbations
-- Therefore, flatter landscapes → better SEU tolerance
+**Test needed**: Compare flooding to:
+- Higher dropout rates (0.3, 0.4, 0.5)
+- L2 weight decay
+- Early stopping
 
-**Limitation:** We did not directly measure loss curvature (Hessian eigenvalues). This is inferred from loss dynamics.
+**Prediction**: If flooding is just "another regularizer," these should show similar effects.
 
-### Hypothesis 2: Parameter Distribution Effects
+### Hypothesis 3: Statistical Noise
 
-**Mechanism:** Flood training may encourage more uniform, smaller-magnitude weight distributions.
+**Null hypothesis**: The 9.7% improvement could be:
+- Random variation
+- Dataset-specific artifact
+- Result of confounding factors (model initialization, training dynamics)
 
-**Expected behavior:**
-- Smaller weights → less impact from exponent bit flips
-- More uniform distribution → fewer extreme outliers sensitive to sign flips
-- Reduced dynamic range → lower sensitivity to magnitude changes
+**Required validation:**
+- Multiple random seeds
+- Multiple datasets
+- Higher sampling rates for SEU injection
+- Proper statistical testing (t-tests, confidence intervals)
 
-**Evidence:** While we observe better sign bit robustness (+1.0%), we did not analyze weight distributions directly.
-
-**Future work:** Compute weight histograms and analyze correlation with robustness.
-
-### Hypothesis 3: Implicit Regularization Beyond Dropout
-
-Our model already includes 20% dropout, which forces the network to be redundant. Flood training adds **additional regularization** that:
-
-1. Prevents memorization that dropout alone might not catch
-2. Encourages even more robust features by maintaining loss threshold
-3. Complements dropout's neuron-level redundancy with loss-level regularization
-
-**Synergy:** Dropout + Flooding > Dropout alone
+**Current evidence**: Insufficient to reject null hypothesis
 
 ## 5.3 Bit Position Specificity
 
