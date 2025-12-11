@@ -14,16 +14,16 @@ pip install seu-injection-framework
 pip install "seu-injection-framework[analysis]"
 
 # Verify
-python -c "from seu_injection import ExhaustiveSEUInjector; print('\u2705 Success!')"
+python -c "from seu_injection import ExhaustiveSEUInjector; print('Success!')"
 ```
 
-**Development Setup:**
+**Development Setup (Recommended):**
 
 ```bash
-# Install UV
-curl -LsSf https://astral.sh/uv/install.sh | sh  # Unix/macOS
-# or
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
+# Install UV (Unix/macOS)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install UV (Windows)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 # Clone and install
 git clone https://github.com/wd7512/seu-injection-framework.git
@@ -41,9 +41,10 @@ uv run python run_tests.py smoke
 Fast dependency resolution and reproducible builds:
 
 ```bash
-# Install UV
-curl -LsSf https://astral.sh/uv/install.sh | sh  # Unix/macOS
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
+# Install UV (Unix/macOS)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install UV (Windows)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
 # Clone and install
 git clone https://github.com/wd7512/seu-injection-framework.git
@@ -100,9 +101,6 @@ Minimal installation with only essential dependencies:
 ```bash
 # UV
 uv sync
-
-# pip
-pip install -e .
 ```
 
 **Includes:**
@@ -120,9 +118,6 @@ Includes testing, linting, and development tools:
 ```bash
 # UV
 uv sync --group dev
-
-# pip
-pip install -e ".[dev]"
 ```
 
 **Additional tools:**
@@ -139,9 +134,6 @@ For Jupyter notebook support:
 ```bash
 # UV
 uv sync --group notebooks
-
-# pip
-pip install -e ".[notebooks]"
 ```
 
 **Includes:**
@@ -157,9 +149,6 @@ All features including extras:
 ```bash
 # UV (recommended)
 uv sync --all-extras
-
-# pip
-pip install -e ".[dev,notebooks,extras]"
 ```
 
 ## Platform-Specific
@@ -399,13 +388,17 @@ To remove the framework:
 # If installed with pip
 pip uninstall seu-injection-framework
 
-# Remove virtual environment
-rm -rf .venv  # Unix/macOS
-rmdir /s .venv  # Windows
+# Remove virtual environment (Unix/macOS)
+rm -rf .venv
+# Remove virtual environment (Windows)
+rmdir /s .venv
 
-# Remove cloned repository
+# Remove cloned repository (Unix/macOS)
 cd ..
 rm -rf seu-injection-framework
+# Remove cloned repository (Windows)
+cd ..
+rmdir /s seu-injection-framework
 ```
 
 ______________________________________________________________________
