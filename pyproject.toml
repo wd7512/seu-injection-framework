@@ -94,9 +94,10 @@ notebooks = [
 
 # Documentation toolchain (optional)
 docs = [
-    "mkdocs>=1.5.0",
-    "mkdocs-material>=9.0.0",
-    "mkdocstrings[python]>=0.24.0",
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=2.0.0",
+    "sphinx-autodoc-typehints>=1.25.0",
+    "myst-parser>=2.0.0",
 ]
 
 # Examples
@@ -111,7 +112,7 @@ all = [
 
 [project.urls]
 "Homepage" = "https://github.com/wd7512/seu-injection-framework"
-"Documentation" = "https://github.com/wd7512/seu-injection-framework/blob/main/README.md"
+"Documentation" = "https://wd7512.github.io/seu-injection-framework/"
 "Repository" = "https://github.com/wd7512/seu-injection-framework"
 "Bug Tracker" = "https://github.com/wd7512/seu-injection-framework/issues"
 "Changelog" = "https://github.com/wd7512/seu-injection-framework/blob/main/CHANGELOG.md"
