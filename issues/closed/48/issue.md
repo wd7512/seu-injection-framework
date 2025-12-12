@@ -4,7 +4,8 @@
 
 FAILED tests/integration/test_workflows.py::TestSEUInjectionWorkflows::test_robustness_analysis_pipeline - AssertionError: Should have at least some analysis results
 assert 0 > 0
- +  where 0 = len({})
+
+- where 0 = len({})
 
 ### Steps to Reproduce
 
@@ -61,13 +62,13 @@ _No response_
 - [x] I have included all relevant version information
 - [x] I have tested with the latest version
 
----
+______________________________________________________________________
 
-| Field | Value |
-|-------|-------|
-| **State** | closed |
-| **Created** | 2025-12-09T13:33:46Z |
-| **Updated** | 2025-12-09T14:29:10Z |
-| **Labels** | bug |
-| **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/48 |
+| Field       | Value                                                       |
+| ----------- | ----------------------------------------------------------- |
+| **State**   | closed                                                      |
+| **Created** | 2025-12-09T13:33:46Z                                        |
+| **Updated** | 2025-12-09T14:29:10Z                                        |
+| **Labels**  | bug                                                         |
+| **Author**  | @wd7512                                                     |
+| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/48 |

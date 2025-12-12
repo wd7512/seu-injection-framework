@@ -57,13 +57,13 @@ _No response_
 - [x] I have included all relevant version information
 - [x] I have tested with the latest version
 
----
+______________________________________________________________________
 
-| Field | Value |
-|-------|-------|
-| **State** | open |
-| **Created** | 2025-12-11T23:20:48Z |
-| **Updated** | 2025-12-11T23:20:48Z |
-| **Labels** | bug |
-| **Author** | @Will-D-AER |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/66 |
+| Field       | Value                                                       |
+| ----------- | ----------------------------------------------------------- |
+| **State**   | open                                                        |
+| **Created** | 2025-12-11T23:20:48Z                                        |
+| **Updated** | 2025-12-11T23:20:48Z                                        |
+| **Labels**  | bug                                                         |
+| **Author**  | @Will-D-AER                                                 |
+| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/66 |

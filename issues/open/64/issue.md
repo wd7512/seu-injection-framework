@@ -67,13 +67,13 @@ _No response_
 - [x] I have provided sufficient context about my research
 - [x] I am open to community discussion and feedback
 
----
+______________________________________________________________________
 
-| Field | Value |
-|-------|-------|
-| **State** | open |
-| **Created** | 2025-12-11T16:55:03Z |
-| **Updated** | 2025-12-11T17:00:23Z |
-| **Labels** | question |
-| **Author** | @Will-D-AER |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/64 |
+| Field       | Value                                                       |
+| ----------- | ----------------------------------------------------------- |
+| **State**   | open                                                        |
+| **Created** | 2025-12-11T16:55:03Z                                        |
+| **Updated** | 2025-12-11T17:00:23Z                                        |
+| **Labels**  | question                                                    |
+| **Author**  | @Will-D-AER                                                 |
+| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/64 |
