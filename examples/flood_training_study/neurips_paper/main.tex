@@ -39,7 +39,7 @@
 \maketitle
 
 \begin{abstract}
-Neural networks deployed in harsh radiation environments—such as space missions, nuclear facilities, and particle accelerators—are vulnerable to Single Event Upsets (SEUs): transient bit flips in parameters caused by ionizing particles. While hardware-based mitigation techniques exist, they incur substantial area, power, and cost overhead. We investigate whether \textit{training methodology}—specifically, flood level training—can improve inherent model robustness to SEUs. Flood training prevents models from achieving arbitrarily low training loss by maintaining a minimum loss threshold, encouraging convergence to flatter loss minima. Through systematic experiments across 36 configurations (3 datasets, 6 flood levels, with/without dropout), we demonstrate that flood training consistently reduces SEU vulnerability by 6.5--14.2\% with minimal accuracy cost (0.41\% at optimal configuration). Our findings suggest that simple training-time interventions can provide meaningful robustness improvements at zero inference overhead, complementing or reducing reliance on expensive hardware protections.
+Neural networks deployed in harsh radiation environments—such as space missions, nuclear facilities, and particle accelerators—are vulnerable to Single Event Upsets (SEUs): transient bit flips in parameters caused by ionizing particles. While hardware-based mitigation techniques exist, they incur substantial area, power, and cost overhead. We investigate whether \textit{training methodology}—specifically, flood level training—can improve inherent model robustness to SEUs. In this \textbf{proof-of-concept study on small MLPs and synthetic 2D datasets}, we explore whether flood training, which prevents models from achieving arbitrarily low training loss, encourages convergence to flatter loss minima that are more robust to parameter perturbations. Through systematic experiments across 36 configurations (3 datasets, 6 flood levels, with/without dropout), we demonstrate that flood training consistently reduces SEU vulnerability by 6.5--14.2\% with minimal accuracy cost (0.41\% at optimal configuration). While these results establish feasibility on simplified benchmarks, generalizability to large-scale models and real-world applications requires further validation. Our findings suggest that training-time interventions merit investigation as potential complements to hardware protections.
 \end{abstract}
 
 \section{Introduction}
@@ -77,11 +77,14 @@ where $\mathcal{L}(\theta)$ is the original loss (e.g., cross-entropy) and $b$ i
 
 \textbf{Contributions}:
 \begin{enumerate}
-    \item First systematic study of flood training for SEU robustness across multiple datasets and configurations
-    \item Quantitative evidence that flood training reduces SEU vulnerability by 6.5--14.2\% with optimal cost-benefit ratio of 15.9$\times$
+    \item First \textbf{proof-of-concept study} of flood training for SEU robustness on simplified benchmarks (small MLPs, synthetic 2D datasets)
+    \item Preliminary quantitative evidence that flood training reduces SEU vulnerability by 6.5--14.2\% with minimal accuracy cost (0.41\%)
     \item Analysis of optimal flood levels and interaction with dropout regularization
     \item Public release of experimental data and code for community validation
+    \item Foundation for future large-scale validation on complex architectures and real-world tasks
 \end{enumerate}
+
+\textbf{Scope and Limitations}: This study establishes feasibility on simplified benchmarks. Results may not generalize to large-scale models (ResNets, Transformers), complex tasks (ImageNet, NLP), or real hardware deployments. Section~\ref{sec:limitations} discusses limitations in detail.
 
 \section{Related Work}
 
@@ -220,15 +223,33 @@ Figure~\ref{fig:heatmap} shows results across all 36 configurations. The effect 
 
 \subsection{Why Does Flooding Improve Robustness?}
 
-We hypothesize that flooding works through \textit{loss landscape regularization}:
+We hypothesize that flooding improves SEU robustness by encouraging convergence to flatter regions of the loss landscape.
 
-\begin{enumerate}
-    \item \textbf{Prevention of overfitting}: Standard training often achieves near-zero training loss, potentially fitting noise. Flooding maintains $\sim$5--15\% training loss, forcing generalization.
-    
-    \item \textbf{Convergence to flatter minima}: By preventing convergence to sharp minima (zero loss), flooding may encourage solutions in regions of lower curvature, which are theoretically more robust to parameter perturbations \cite{hochreiter1997flat}.
-    
-    \item \textbf{Parameter distribution effects}: Flooding may encourage smaller, more uniform weight distributions, reducing sensitivity to individual bit flips.
-\end{enumerate}
+\textbf{Mathematical Formulation:} For parameter vector $\theta$ and bit-flip perturbation $\delta$, the expected accuracy drop under SEU is approximately:
+\[
+\mathbb{E}[\text{Accuracy Drop}] \approx \sum_i p(i) \cdot |\nabla_{\theta_i} \mathcal{L}(\theta)| \cdot |\delta_i|
+\]
+where $p(i)$ is the bit-flip probability and $\nabla_{\theta_i} \mathcal{L}$ is the loss gradient. Second-order analysis via Hessian $H$ shows:
+\[
+\mathcal{L}(\theta + \delta) \approx \mathcal{L}(\theta) + \delta^T\nabla\mathcal{L} + \frac{1}{2}\delta^T H \delta
+\]
+Flatter minima (lower eigenvalues of $H$) yield smaller $\delta^T H \delta$ terms, reducing perturbation sensitivity \cite{hochreiter1997flat}.
+
+\textbf{Empirical Support:}
+\begin{itemize}
+    \item Training losses match flood levels (0.101 for $b=0.10$), confirming constraint is active
+    \item Validation loss increases modestly (2.8\%), suggesting regularization without overfitting
+    \item Consistent 6.5--14.2\% robustness improvement across datasets
+\end{itemize}
+
+\textbf{Testable Predictions} (not measured in this study):
+\begin{itemize}
+    \item Flood-trained models should have lower Hessian trace: $\text{tr}(H_{\text{flood}}) < \text{tr}(H_{\text{standard}})$
+    \item Lower maximum eigenvalue: $\lambda_{\max}(H_{\text{flood}}) < \lambda_{\max}(H_{\text{standard}})$
+    \item Smaller gradient norms at convergence
+\end{itemize}
+
+\textbf{Caveat:} The loss landscape hypothesis requires direct Hessian measurement for validation. Our evidence is circumstantial.
 
 \subsection{Interaction with Dropout}
 
@@ -252,35 +273,63 @@ For a typical space mission neural network:
     \item \textbf{Hardware savings}: Potentially reduce ECC/TMR requirements
 \end{itemize}
 
-\subsection{Limitations}
+\subsection{Limitations and Threats to Validity}
+\label{sec:limitations}
 
-\begin{enumerate}
-    \item \textbf{Task scope}: Results specific to synthetic 2D binary classification. Validation needed on realistic datasets (CIFAR-10, ImageNet) and tasks.
-    
-    \item \textbf{Architecture scope}: Single MLP architecture tested. May not generalize to CNNs, Transformers, or large-scale models.
-    
-    \item \textbf{Simulation}: Bit-flip injection simulates SEUs but may not capture all real-world radiation effects.
-    
-    \item \textbf{Single-bit faults}: Real radiation environments may cause multiple simultaneous upsets.
-\end{enumerate}
+\textbf{Scale Limitations:}
+\begin{itemize}
+    \item \textbf{Small models}: 3-layer MLP with 1,280 parameters. Large-scale models (ResNet-50: 25M params, GPT-3: 175B params) may behave fundamentally differently. Scaling behavior unknown.
+    \item \textbf{Synthetic datasets}: 2D binary classification with 400 training samples. Real-world tasks (ImageNet: 1000 classes, 224×224×3 images) are orders of magnitude more complex.
+    \item \textbf{Task simplicity}: Binary classification vastly simpler than multi-class, structured prediction, or sequence tasks.
+\end{itemize}
+
+\textbf{Generalizability Concerns:}
+\begin{itemize}
+    \item \textbf{Architecture specificity}: MLPs with ReLU/dropout only. Untested: convolutional layers, attention mechanisms, residual connections, normalization layers (batch norm, layer norm). Different components may respond differently to flooding.
+    \item \textbf{Task domain}: Binary classification only. Unclear how findings extend to multi-class, regression, structured prediction, or sequence-to-sequence tasks.
+\end{itemize}
+
+\textbf{Threat Model Simplification:}
+\begin{itemize}
+    \item \textbf{Single-bit flips}: Real radiation causes multiple simultaneous bit flips, permanent stuck-at faults, and bit flips in activations (not just parameters).
+    \item \textbf{Simulation vs. reality}: Software bit-flip simulation may miss timing-dependent behavior, manufacturing variations, and temperature effects present in real hardware.
+\end{itemize}
+
+\textbf{Theoretical Gaps:}
+\begin{itemize}
+    \item \textbf{Loss curvature unmeasured}: Hessian eigenvalues not directly computed. Flat minima hypothesis remains inferential.
+    \item \textbf{Mechanism partially speculative}: Theoretical connection between flooding and SEU robustness requires formal validation.
+\end{itemize}
+
+These limitations indicate that while flood training shows promise on simplified benchmarks, comprehensive validation on large-scale models, complex tasks, and real hardware is essential before production deployment.
 
 \section{Conclusion}
 
-We demonstrate that flood level training---a simple training-time regularization technique---consistently improves neural network robustness to Single Event Upsets by 6.5--14.2\% across multiple datasets and configurations. 
+In this proof-of-concept study on small MLPs and synthetic 2D datasets, we demonstrate that flood level training---a simple training-time regularization technique---consistently improves neural network robustness to Single Event Upsets by 6.5--14.2\% across multiple configurations. 
 
 The optimal flood level ($b=0.10$) provides a 15.9$\times$ cost-benefit ratio, sacrificing only 0.41\% baseline accuracy for 6.5\% robustness improvement, with zero inference overhead.
 
-These findings suggest that training methodology is an important but under-explored dimension of hardware fault tolerance. Simple interventions like flooding can complement or reduce reliance on expensive hardware protections (ECC, TMR, radiation-hardening), making neural network deployment in harsh environments more practical and cost-effective.
+While these results establish feasibility on simplified benchmarks, generalizability to large-scale models (CNNs, ResNets, Transformers), complex tasks (ImageNet, NLP), and real hardware deployments requires further validation. Nonetheless, our findings suggest that training methodology is a promising but under-explored dimension of hardware fault tolerance. If results extend to production scenarios, simple interventions like flooding could complement or reduce reliance on expensive hardware protections (ECC, TMR, radiation-hardening), making neural network deployment in harsh environments more practical and cost-effective.
 
 \subsection{Future Work}
 
+\textbf{Critical immediate priorities for validation:}
+
 \begin{enumerate}
-    \item \textbf{Scale validation}: Test on realistic datasets (CIFAR-10, ImageNet) and modern architectures (ResNets, Transformers)
-    \item \textbf{Mechanism analysis}: Direct measurement of loss landscape curvature to validate flat minima hypothesis
-    \item \textbf{Hardware validation}: Real radiation testing in particle accelerator facilities
-    \item \textbf{Co-design}: Investigate optimal combinations of training techniques and hardware protections
-    \item \textbf{Multi-bit faults}: Extend to multiple simultaneous upsets
+    \item \textbf{Scale-up}: CNNs on CIFAR-10/ImageNet (ResNet-18/50), Transformers (BERT, ViT). Question: Does benefit scale or saturate?
+    
+    \item \textbf{Architecture diversity}: Test convolutional layers, attention mechanisms, batch/layer normalization. Risk: Different components may interact differently with SEUs.
+    
+    \item \textbf{Task complexity}: Multi-class classification, object detection, language modeling. Critical: 2D binary tasks vastly simpler than production scenarios.
+    
+    \item \textbf{Theoretical validation}: Direct Hessian measurement (eigenvalue spectrum, trace). Move from speculation to proof.
+    
+    \item \textbf{Hardware testing}: FPGA/ASIC deployment, proton beam testing, neutron sources. Essential: Software simulation may miss critical real-world effects.
+    
+    \item \textbf{Extended threat model}: Multi-bit upsets, permanent faults, activation corruption. Real radiation environments are more complex than single transient flips.
 \end{enumerate}
+
+\textbf{Note}: Generalizability to large-scale models and production deployments is an open question requiring extensive validation. This proof-of-concept establishes feasibility but not production readiness.
 
 \subsection{Data Availability}
 

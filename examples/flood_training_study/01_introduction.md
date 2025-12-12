@@ -91,32 +91,39 @@ We hypothesize three mechanisms:
 
 ### Scope and Limitations
 
+**This is a proof-of-concept study** on simplified benchmarks to establish feasibility:
+
 **In Scope:**
 - Binary classification tasks (moons, circles, and blobs datasets)
-- Single neural network architecture (MLP with dropout)
+- Simple 3-layer MLP architecture (1,280 parameters)
 - IEEE 754 float32 parameter representation
 - Systematic bit-flip injection at representative bit positions
 - Comparison of standard vs. flood training across multiple configurations
 
 **Out of Scope:**
 - Large-scale datasets (ImageNet, CIFAR) - future work
-- Multiple architectures - focus on controlled study
+- Complex architectures (CNNs, ResNets, Transformers) - focused controlled study
 - Hardware validation - simulation-based study
 - Multiple-bit upsets - single-bit fault model
 - Quantized models - float32 only
 
 **Limitations:**
-- Results are specific to the chosen task and architecture
-- Simulation may not capture all real-world radiation effects
-- Statistical power limited by computational constraints
+- **Scale**: Small models and synthetic datasets; generalizability to large-scale models unknown
+- **Architecture specificity**: Results may not transfer to CNNs, ResNets, or Transformers
+- **Simplified threat model**: Single-bit flips only; real radiation causes diverse fault patterns
+- **Simulation-based**: Real hardware behavior may differ
+- **Statistical power**: Limited by computational constraints
+
+**Goal**: Establish whether flood training shows promise for SEU robustness, providing foundation for future large-scale validation rather than production-ready solution.
 
 ## 1.4 Contribution and Significance
 
 ### Scientific Contributions
 
-1. **First systematic study** of flood level training for SEU robustness
-2. **Quantitative evidence** that training methodology affects fault tolerance
-3. **Mechanism analysis** explaining the robustness-generalization connection
+1. **First proof-of-concept study** of flood level training for SEU robustness on simplified benchmarks
+2. **Preliminary quantitative evidence** that training methodology affects fault tolerance (6.5-14.2% improvement)
+3. **Mechanism analysis** exploring potential robustness-generalization connections
+4. **Foundation for future research** identifying promising directions for large-scale validation
 
 ### Practical Impact
 

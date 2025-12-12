@@ -88,54 +88,71 @@ For most harsh environment deployments, this inequality holds.
 
 ## 6.3 Future Research Directions
 
-### Short-Term (3-6 months)
+**Critical Validation Required**: This proof-of-concept study on small MLPs and synthetic datasets must be validated at scale before production deployment.
 
-1. **Validation on Standard Benchmarks**
-   - Replicate on CIFAR-10 with CNNs
-   - Test on ImageNet with ResNet-50
-   - Evaluate on BERT for NLP tasks
-   - **Goal**: Establish generalizability
+### Immediate Priorities (Scale-Up)
 
-2. **Architecture Comparison**
-   - Compare MLP, CNN, ResNet, Transformer
-   - Identify architecture-specific benefits
-   - **Goal**: Architectural guidelines
+1. **Large-Scale Model Validation**
+   - **CNNs on CIFAR-10/ImageNet**: Test flooding on standard vision benchmarks with ResNet-18/50
+   - **Transformers**: Validate on BERT (NLP), ViT (vision)
+   - **Question**: Does robustness benefit scale with model size, or saturate?
+   - **Critical**: Results may not generalize; small models could be misleading
 
-3. **Flood Level Optimization**
-   - Systematic sweep of b ∈ [0.01, 0.30]
-   - Develop automatic selection algorithm
-   - **Goal**: Remove manual tuning
+2. **Architecture Generalization**
+   - **Test diverse architectures**: Convolutional layers, attention mechanisms, residual connections, normalization layers
+   - **Question**: Which architectural components benefit most from flooding?
+   - **Risk**: Batch normalization, layer normalization may interact differently with SEUs
 
-4. **Mechanism Analysis**
-   - Compute Hessian eigenvalues (loss curvature)
-   - Analyze weight distributions
-   - Measure effective dimensionality
-   - **Goal**: Understand *why* it works
+3. **Real-World Task Complexity**
+   - **Multi-class classification**: 1000-way ImageNet, not just binary
+   - **Structured prediction**: Object detection, semantic segmentation
+   - **Sequence tasks**: Language modeling, machine translation
+   - **Critical**: 2D binary classification vastly simpler than production tasks
 
-### Medium-Term (6-12 months)
+### Theoretical Validation
 
-5. **Hardware Validation**
-   - Proton beam testing (simulated space radiation)
-   - Neutron source testing (nuclear environment)
-   - Compare simulation vs. real SEUs
-   - **Goal**: Real-world validation
+4. **Loss Landscape Measurement**
+   - **Direct Hessian analysis**: Compute eigenvalue spectrum, trace, maximum eigenvalue
+   - **Hypothesis test**: Verify tr(H_flood) < tr(H_standard)
+   - **Sharp vs flat quantification**: Measure actual curvature, not infer
+   - **Goal**: Move from speculation to proof
 
-6. **Combination Studies**
-   - Flood + SAM (Sharpness-Aware Minimization)
-   - Flood + Adversarial Training
-   - Flood + Quantization
-   - **Goal**: Explore synergies
+5. **Mathematical Formalization**
+   - **Perturbation bounds**: Derive formal sensitivity bounds under flooding
+   - **PAC-Bayes connection**: Link flooding to generalization theory
+   - **Failure mode analysis**: Characterize when/why flooding might fail
+   - **Goal**: Rigorous theoretical foundation
 
-7. **Multiple-Bit Upsets**
-   - Test robustness to 2-bit, 3-bit flips
-   - Evaluate burst errors
-   - **Goal**: Extreme scenario resilience
+### Hardware and Deployment Validation
 
-8. **Optimal Training Recipes**
-   - Dynamic flood level schedules
-   - Layer-specific flooding
-   - Task-adaptive flooding
-   - **Goal**: Maximum efficiency
+6. **Real Hardware Testing** (Essential)
+   - **FPGA/ASIC deployment**: Test on actual hardware, not simulation
+   - **Proton beam testing**: Simulated space radiation at accelerator facilities
+   - **Neutron source testing**: Nuclear environment simulation
+   - **Critical**: Software simulation may miss timing-dependent, temperature-dependent, and manufacturing variation effects
+   - **Risk**: Real hardware SEUs may behave fundamentally differently
+
+7. **Extended Threat Model**
+   - **Multiple-bit upsets**: Real radiation causes 2-bit, 3-bit, burst errors
+   - **Permanent faults**: Stuck-at faults, not just transient flips
+   - **Activation faults**: SEUs in intermediate activations, not just parameters
+   - **Correlated failures**: Adjacent memory cells fail together
+   - **Goal**: Realistic fault coverage
+
+### Optimization and Composition
+
+8. **Adaptive Flood Level Selection**
+   - **Automatic tuning**: Learn optimal b per dataset/architecture
+   - **Layer-specific flooding**: Different flood levels per layer
+   - **Dynamic schedules**: Time-varying flood levels during training
+   - **Goal**: Remove manual hyperparameter tuning
+
+9. **Combination with Other Techniques**
+   - **Flood + SAM (Sharpness-Aware Minimization)**: Explicit flatness seeking
+   - **Flood + Adversarial Training**: Combined robustness
+   - **Flood + Quantization**: Compression + fault tolerance
+   - **Flood + Knowledge Distillation**: Transfer robustness to smaller models
+   - **Question**: Do regularizers compose additively or interfere?
 
 ### Long-Term (1-2 years)
 

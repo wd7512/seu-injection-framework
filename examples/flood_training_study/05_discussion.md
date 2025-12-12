@@ -50,20 +50,45 @@ The accuracy-robustness trade-off is well-characterized:
 
 **Hypothesis: Loss Landscape Regularization**
 
-Flooding appears to work by preventing overfit solutions that occupy sharp minima. Evidence:
+We hypothesize that flooding improves SEU robustness by encouraging convergence to flatter regions of the loss landscape. Theoretical foundation:
 
-1. **Training Loss Control**: Final training losses match flood levels (0.101 for b=0.10)
-2. **Validation Loss**: Moderate increase (2.8% for b=0.10) suggests better generalization region
-3. **Robustness Improvement**: Consistent with flatter minima being more robust to perturbations
+**Mathematical Formulation:**
 
-**Theoretical Connection:**
+For a parameter vector θ and bit-flip perturbation δ (where δ represents the change from a single bit flip), the expected accuracy degradation under SEU is:
 
 ```
-Sharp Minima → Overfitting → High sensitivity to parameter changes (SEUs)
-Flat Minima → Regularization → Lower sensitivity to parameter changes
+E[Accuracy Drop] ≈ ∑ᵢ p(i) · |∇θᵢ L(θ)| · |δᵢ|
 ```
 
-Flooding explicitly prevents convergence to sharp minima by maintaining minimum loss threshold.
+Where:
+- p(i) is the probability of flipping bit i
+- ∇θᵢ L(θ) is the gradient w.r.t. parameter i
+- δᵢ is the magnitude of the bit flip
+
+**Connection to Hessian:**
+
+The second-order approximation relates loss curvature to perturbation sensitivity:
+
+```
+L(θ + δ) ≈ L(θ) + δᵀ∇L + ½δᵀHδ
+```
+
+Where H is the Hessian matrix. Flatter minima (lower eigenvalues of H) → smaller δᵀHδ → lower sensitivity to perturbations.
+
+**Empirical Evidence:**
+
+1. **Training Loss Control**: Final training losses match flood levels (0.101 for b=0.10), confirming flooding constraint is active
+2. **Validation Loss**: Moderate increase (2.8% for b=0.10) suggests regularization without overfitting
+3. **Robustness Improvement**: Consistent 6.5-14.2% reduction in SEU vulnerability
+
+**Theoretical Prediction (Untested):**
+
+If our hypothesis is correct, flood-trained models should exhibit:
+- Lower trace of Hessian matrix: tr(H_flood) < tr(H_standard)
+- Smaller gradient norms at convergence
+- Lower maximum eigenvalue of Hessian: λₘₐₓ(H_flood) < λₘₐₓ(H_standard)
+
+**Caveat**: Direct measurement of Hessian eigenvalues was not performed in this study. The loss landscape hypothesis remains inferential and requires future validation.
 
 ### 5.2.2 Interaction with Dropout
 
@@ -125,25 +150,56 @@ The combination provides the best overall robustness, suggesting flooding adds r
 
 ---
 
-## 5.4 Limitations and Caveats
+## 5.4 Limitations and Threats to Validity
 
-### 5.4.1 Experimental Limitations
+### 5.4.1 Scale Limitations
 
-1. **Synthetic Datasets**: All experiments used 2D synthetic binary classification tasks
-   - Real-world tasks (images, NLP) are higher-dimensional and more complex
-   - Results may not fully generalize
+**Small Model Architecture:**
+- **Current**: Simple 3-layer MLP with 1,280 parameters
+- **Concern**: Large-scale models (ResNet-50: 25M params, GPT-3: 175B params) may behave fundamentally differently
+- **Unknown**: Whether flooding's benefits scale linearly, sublinearly, or not at all
+- **Impact**: Results establish feasibility but not production readiness
 
-2. **Small Models**: 2,305-parameter MLPs
-   - Large models (millions/billions of parameters) may behave differently
-   - Scaling behavior is unknown
+**Synthetic Dataset Simplicity:**
+- **Current**: 2D binary classification (400 training samples, 2 features)
+- **Concern**: Real-world tasks (ImageNet: 1000 classes, 224×224×3 images) are orders of magnitude more complex
+- **Unknown**: How task complexity interacts with flooding and SEU robustness
+- **Impact**: Generalization to practical applications requires validation
 
-3. **Stochastic SEU Injection**: 15% sampling rate
-   - Real radiation events have different statistical properties
-   - Bit position criticality may vary by architecture
+### 5.4.2 Generalizability Concerns
 
-4. **No Temporal Effects**: Single-injection fault model
-   - Real deployments may experience multiple concurrent faults
-   - Accumulation effects not studied
+**Architecture Specificity:**
+- **Current**: MLPs with ReLU and dropout only
+- **Untested**: Convolutional layers, residual connections, attention mechanisms, normalization layers
+- **Concern**: Different architectural components may respond differently to flooding
+- **Example**: Batch normalization parameters might be more/less sensitive to SEUs than linear weights
+- **Impact**: Cannot confidently recommend flooding for CNNs, ResNets, or Transformers without further study
+
+**Task Domain:**
+- **Current**: Binary classification only
+- **Untested**: Multi-class classification, regression, structured prediction, sequence-to-sequence
+- **Concern**: Loss landscape geometry varies significantly across task types
+- **Impact**: Optimal flood levels likely task-dependent
+
+### 5.4.3 Threat Model Simplification
+
+**Single-Bit Fault Model:**
+- **Current**: One bit flip per parameter per test
+- **Reality**: Radiation can cause:
+  - Multiple simultaneous bit flips
+  - Permanent stuck-at faults
+  - Bit flips in activations (not just parameters)
+  - Correlated failures in nearby memory cells
+- **Impact**: Real-world robustness may differ significantly
+
+**Simulation vs. Reality:**
+- **Current**: Software-simulated bit flips with perfect IEEE 754 compliance
+- **Reality**: Real hardware exhibits:
+  - Timing-dependent behavior
+  - Manufacturing variations
+  - Temperature effects
+  - Interaction with other system components
+- **Impact**: Hardware validation essential before deployment
 
 ### 5.4.2 Theoretical Gaps
 
