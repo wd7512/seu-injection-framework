@@ -182,7 +182,7 @@ class FloodingLoss(nn.Module):
 \subsection{Limitations and Threats to Validity}
 \label{sec:limitations}
 
-\textbf{Scale & Generalizability}: Results on small MLPs and synthetic data may not transfer to large models (ResNets, Transformers) or complex tasks (ImageNet). Different architectures (CNNs, attention) may behave differently.
+\textbf{Scale \& Generalizability}: Results on small MLPs and synthetic data may not transfer to large models (ResNets, Transformers) or complex tasks (ImageNet). Different architectures (CNNs, attention) may behave differently.
 \textbf{Threat Model}: Single-bit flips simplify real radiation effects (multi-bit, permanent faults, latch-ups).
 \textbf{Theory}: Loss curvature (Hessian) was not directly measured.
 
@@ -195,7 +195,7 @@ This proof-of-concept study demonstrates that flood level training consistently 
 \begin{enumerate}
     \item \textbf{Scale-up}: Validate on CNNs (CIFAR/ImageNet) and Transformers.
     \item \textbf{Architecture}: Test convolutional, attention, and normalization layers.
-    \item \textbf{Theory & Hardware}: Measure Hessian spectra; validate with FPGA/beam testing.
+    \item \textbf{Theory \& Hardware}: Measure Hessian spectra; validate with FPGA/beam testing.
     \item \textbf{Threats}: Extend to multi-bit and permanent faults.
 \end{enumerate}
 
