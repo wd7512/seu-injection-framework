@@ -1,0 +1,290 @@
+\documentclass{article}
+
+% NeurIPS-style formatting
+\usepackage[preprint]{neurips_2024}
+
+% Standard packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{subcaption}
+
+\title{Flood Level Training: Improving Neural Network Robustness to Single Event Upsets Through Loss Landscape Regularization}
+
+\author{%
+  Anonymous Authors \\
+  Institution(s) \\
+  \texttt{email@example.com} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Neural networks deployed in harsh radiation environments—such as space missions, nuclear facilities, and particle accelerators—are vulnerable to Single Event Upsets (SEUs): transient bit flips in parameters caused by ionizing particles. While hardware-based mitigation techniques exist, they incur substantial area, power, and cost overhead. We investigate whether \textit{training methodology}—specifically, flood level training—can improve inherent model robustness to SEUs. Flood training prevents models from achieving arbitrarily low training loss by maintaining a minimum loss threshold, encouraging convergence to flatter loss minima. Through systematic experiments across 36 configurations (3 datasets, 6 flood levels, with/without dropout), we demonstrate that flood training consistently reduces SEU vulnerability by 6.5--14.2\% with minimal accuracy cost (0.41\% at optimal configuration). Our findings suggest that simple training-time interventions can provide meaningful robustness improvements at zero inference overhead, complementing or reducing reliance on expensive hardware protections.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{Motivation: Hardware Faults in Harsh Environments}
+
+Neural networks are increasingly deployed in radiation-intensive environments where hardware reliability is compromised:
+
+\begin{itemize}
+    \item \textbf{Space missions}: Cosmic rays and solar particles cause frequent bit flips in spacecraft electronics
+    \item \textbf{Nuclear facilities}: High neutron flux affects computing systems
+    \item \textbf{Particle accelerators}: Intense radiation fields at CERN, Fermilab, and similar facilities
+    \item \textbf{High-altitude aviation}: Increased cosmic radiation exposure
+\end{itemize}
+
+In these settings, \textbf{Single Event Upsets (SEUs)}—transient bit flips in memory caused by ionizing particles—pose critical threats to neural network reliability. A single bit flip in a model parameter can cascade through the network, causing catastrophic prediction failures.
+
+Traditional mitigation approaches focus on hardware-level protections (Error-Correcting Codes, Triple Modular Redundancy, radiation-hardened components), incurring 30--300\% overhead in area, power, and cost. \textit{Little research examines how training methodologies affect inherent model robustness to SEUs.}
+
+\subsection{Flood Level Training}
+
+Flood level training \cite{ishida2020we} is a regularization technique that prevents models from achieving arbitrarily low training loss. Instead of minimizing loss to zero, flooding maintains a minimum loss threshold called the \textit{flood level} ($b$):
+
+\begin{equation}
+\mathcal{L}_{\text{flood}}(\theta) = \left| \mathcal{L}(\theta) - b \right| + b
+\end{equation}
+
+where $\mathcal{L}(\theta)$ is the original loss (e.g., cross-entropy) and $b$ is the flood level hyperparameter. The absolute value creates a ``flooding'' effect, preventing loss from dropping below $b$.
+
+\textbf{Hypothesis}: By preventing overfitting and encouraging convergence to flatter loss minima, flooding may improve robustness to parameter perturbations like bit flips.
+
+\subsection{Research Question and Contributions}
+
+\textbf{Primary Question}: Does flood level training improve neural network robustness to Single Event Upsets?
+
+\textbf{Contributions}:
+\begin{enumerate}
+    \item First systematic study of flood training for SEU robustness across multiple datasets and configurations
+    \item Quantitative evidence that flood training reduces SEU vulnerability by 6.5--14.2\% with optimal cost-benefit ratio of 15.9$\times$
+    \item Analysis of optimal flood levels and interaction with dropout regularization
+    \item Public release of experimental data and code for community validation
+\end{enumerate}
+
+\section{Related Work}
+
+\subsection{SEU Robustness Framework}
+
+Dennis \& Pope \cite{dennis2025framework} provide the foundational framework for this study, systematically comparing CNN architectures for SEU robustness in radiation environments. They introduced the SEU injection methodology we employ and demonstrated that architectural choices significantly impact fault tolerance. Our work extends their architectural focus to \textit{training methodology}.
+
+\subsection{Flood Level Training}
+
+Ishida et al. \cite{ishida2020we} introduced flood training at NeurIPS 2020, demonstrating improved test accuracy by preventing zero training loss. The technique is complementary to other regularization methods like dropout and weight decay.
+
+\subsection{Loss Landscape Theory}
+
+Hochreiter \& Schmidhuber \cite{hochreiter1997flat} proposed the flat minima hypothesis: solutions in regions of low curvature generalize better and are less sensitive to parameter perturbations. Keskar et al. \cite{keskar2017large} showed large-batch training leads to sharp minima and poor generalization, while small-batch training yields flatter minima.
+
+\textbf{Hypothesis}: If flooding encourages flatter loss landscapes, it may improve robustness to parameter perturbations (including bit flips). However, this connection requires empirical validation.
+
+\section{Methodology}
+
+\subsection{Experimental Design}
+
+We conduct a controlled study comparing standard training versus flood training across multiple configurations:
+
+\begin{itemize}
+    \item \textbf{Datasets}: 3 synthetic binary classification tasks (moons, circles, blobs) with 2000 samples each
+    \item \textbf{Flood levels}: [0.0, 0.05, 0.10, 0.15, 0.20, 0.30] (0.0 = standard training)
+    \item \textbf{Dropout ablation}: With dropout (0.2) and without dropout (0.0)
+    \item \textbf{Total configurations}: 36 (3 datasets $\times$ 6 flood levels $\times$ 2 dropout settings)
+\end{itemize}
+
+\subsection{Model Architecture and Training}
+
+\textbf{Architecture}: 3-layer MLP with ReLU activations:
+\begin{itemize}
+    \item Input layer: $2 \to 64$
+    \item Hidden layer: $64 \to 32$
+    \item Output layer: $32 \to 1$ (sigmoid)
+    \item Total parameters: 2,305
+\end{itemize}
+
+\textbf{Training protocol}:
+\begin{itemize}
+    \item Optimizer: Adam (lr=0.01)
+    \item Epochs: 100
+    \item Loss: Binary cross-entropy (with flooding wrapper for flood training)
+    \item Seeds: Fixed for reproducibility
+\end{itemize}
+
+\subsection{SEU Injection Protocol}
+
+We simulate SEUs as single-bit flips in IEEE 754 float32 parameters following the framework of Dennis \& Pope \cite{dennis2025framework}:
+
+\begin{itemize}
+    \item \textbf{Bit positions tested}: [0, 1, 8, 15, 23] (sign, exponent MSB/LSB, mantissa MSB/mid)
+    \item \textbf{Sampling rate}: 15\% of parameters ($\sim$345 injections per bit position)
+    \item \textbf{Metrics}: Mean accuracy drop, critical fault rate (faults causing $>$10\% accuracy degradation)
+\end{itemize}
+
+\section{Results}
+
+\subsection{Flood Training Reduces SEU Vulnerability}
+
+Figure~\ref{fig:robustness} shows mean accuracy drop under SEU injection across all three datasets. Flooding consistently reduces vulnerability, with improvements increasing monotonically with flood level.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figures/fig1_robustness_vs_flood.png}
+\caption{Mean accuracy drop under SEU injection vs. flood level for all three datasets. Flooding consistently improves robustness, with benefits present both with and without dropout.}
+\label{fig:robustness}
+\end{figure}
+
+\textbf{Cross-dataset averages} (Table~\ref{tab:main_results}):
+
+\begin{table}[h]
+\centering
+\caption{Cross-dataset average results showing consistent robustness improvements}
+\label{tab:main_results}
+\begin{tabular}{lcccc}
+\toprule
+Flood Level & Baseline Acc & Acc Drop & Rel. Improvement & ROI \\
+\midrule
+0.00 (std) & 92.08\% & 2.32\% & 0\% (baseline) & --- \\
+0.05 & 91.90\% & 2.26\% & 2.6\% & 14.4$\times$ \\
+0.10 & 91.67\% & 2.17\% & 6.5\% & \textbf{15.9$\times$} \\
+0.15 & 91.35\% & 2.09\% & 9.9\% & 13.6$\times$ \\
+0.20 & 90.85\% & 2.04\% & 12.1\% & 9.8$\times$ \\
+0.30 & 89.63\% & 1.99\% & 14.2\% & 5.8$\times$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Optimal Configuration: b=0.10}
+
+Figure~\ref{fig:cost_benefit} shows the cost-benefit trade-off. The optimal configuration ($b=0.10$) provides:
+\begin{itemize}
+    \item Robustness gain: 6.5\% (relative reduction in accuracy drop)
+    \item Accuracy cost: 0.41\% (baseline performance degradation)
+    \item ROI: 15.9$\times$ (gain/cost ratio)
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/fig2_cost_benefit.png}
+\caption{Cost-benefit analysis showing accuracy cost vs. robustness gain for different flood levels. $b=0.10$ provides optimal ROI.}
+\label{fig:cost_benefit}
+\end{figure}
+
+\subsection{Training Dynamics Validation}
+
+Figure~\ref{fig:training} verifies that flood levels are properly calibrated and actively constrain training. Final training losses closely match target flood levels, confirming that flooding is effective (not set below natural convergence).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/fig3_training_validation.png}
+\caption{Final training loss vs. target flood level, demonstrating that flooding actively constrains training across all configurations.}
+\label{fig:training}
+\end{figure}
+
+\subsection{Consistency Across Configurations}
+
+Figure~\ref{fig:heatmap} shows results across all 36 configurations. The effect is consistent across:
+\begin{itemize}
+    \item All three datasets (moons, circles, blobs)
+    \item Both dropout settings (with/without)
+    \item All flood levels tested
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{figures/fig4_heatmap.png}
+\caption{Heatmap of mean accuracy drop (\%) across all 36 configurations. Darker colors (lower values) indicate better robustness. Flooding consistently reduces vulnerability.}
+\label{fig:heatmap}
+\end{figure}
+
+\section{Discussion}
+
+\subsection{Why Does Flooding Improve Robustness?}
+
+We hypothesize that flooding works through \textit{loss landscape regularization}:
+
+\begin{enumerate}
+    \item \textbf{Prevention of overfitting}: Standard training often achieves near-zero training loss, potentially fitting noise. Flooding maintains $\sim$5--15\% training loss, forcing generalization.
+    
+    \item \textbf{Convergence to flatter minima}: By preventing convergence to sharp minima (zero loss), flooding may encourage solutions in regions of lower curvature, which are theoretically more robust to parameter perturbations \cite{hochreiter1997flat}.
+    
+    \item \textbf{Parameter distribution effects}: Flooding may encourage smaller, more uniform weight distributions, reducing sensitivity to individual bit flips.
+\end{enumerate}
+
+\subsection{Interaction with Dropout}
+
+Comparing configurations with/without dropout:
+\begin{itemize}
+    \item Dropout alone improves robustness by 6.2\% vs. no regularization
+    \item Flooding alone ($b=0.10$) improves robustness by 6.5\%
+    \item \textbf{Dropout + flooding} provides the best overall robustness
+\end{itemize}
+
+The combination suggests that flooding adds regularization beyond what dropout provides, through complementary mechanisms (stochastic neuron-level vs. deterministic loss-level regularization).
+
+\subsection{Practical Implications}
+
+For a typical space mission neural network:
+\begin{itemize}
+    \item \textbf{Training cost}: +4--6\% compute time (one-time, pre-launch)
+    \item \textbf{Accuracy cost}: --0.41\% baseline performance
+    \item \textbf{Robustness benefit}: --6.5\% accuracy degradation under SEUs
+    \item \textbf{Inference overhead}: 0\% (no deployment cost)
+    \item \textbf{Hardware savings}: Potentially reduce ECC/TMR requirements
+\end{itemize}
+
+\subsection{Limitations}
+
+\begin{enumerate}
+    \item \textbf{Task scope}: Results specific to synthetic 2D binary classification. Validation needed on realistic datasets (CIFAR-10, ImageNet) and tasks.
+    
+    \item \textbf{Architecture scope}: Single MLP architecture tested. May not generalize to CNNs, Transformers, or large-scale models.
+    
+    \item \textbf{Simulation}: Bit-flip injection simulates SEUs but may not capture all real-world radiation effects.
+    
+    \item \textbf{Single-bit faults}: Real radiation environments may cause multiple simultaneous upsets.
+\end{enumerate}
+
+\section{Conclusion}
+
+We demonstrate that flood level training—a simple training-time regularization technique—consistently improves neural network robustness to Single Event Upsets by 6.5--14.2\% across multiple datasets and configurations. The optimal flood level ($b=0.10$) provides a 15.9$\times$ cost-benefit ratio, sacrificing only 0.41\% baseline accuracy for 6.5\% robustness improvement, with zero inference overhead.
+
+These findings suggest that training methodology is an important but under-explored dimension of hardware fault tolerance. Simple interventions like flooding can complement or reduce reliance on expensive hardware protections (ECC, TMR, radiation-hardening), making neural network deployment in harsh environments more practical and cost-effective.
+
+\subsection{Future Work}
+
+\begin{enumerate}
+    \item \textbf{Scale validation}: Test on realistic datasets (CIFAR-10, ImageNet) and modern architectures (ResNets, Transformers)
+    \item \textbf{Mechanism analysis}: Direct measurement of loss landscape curvature to validate flat minima hypothesis
+    \item \textbf{Hardware validation}: Real radiation testing in particle accelerator facilities
+    \item \textbf{Co-design}: Investigate optimal combinations of training techniques and hardware protections
+    \item \textbf{Multi-bit faults}: Extend to multiple simultaneous upsets
+\end{enumerate}
+
+\subsection{Data Availability}
+
+All experimental results, code, and figures are publicly available:
+\begin{itemize}
+    \item \textbf{Code}: \texttt{comprehensive\_experiment.py}
+    \item \textbf{Data}: \texttt{comprehensive\_results.csv}, \texttt{comprehensive\_results.json}
+    \item \textbf{Repository}: [To be added for camera-ready version]
+\end{itemize}
+
+\section*{Acknowledgments}
+
+This work builds on the SEU Injection Framework developed by Dennis \& Pope \cite{dennis2025framework}. We thank the reviewers for their valuable feedback.
+
+\bibliographystyle{plain}
+\bibliography{bibliography}
+
+\end{document}

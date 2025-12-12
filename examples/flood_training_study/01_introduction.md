@@ -92,15 +92,15 @@ We hypothesize three mechanisms:
 ### Scope and Limitations
 
 **In Scope:**
-- Binary classification task (moons dataset)
+- Binary classification tasks (moons, circles, and blobs datasets)
 - Single neural network architecture (MLP with dropout)
 - IEEE 754 float32 parameter representation
 - Systematic bit-flip injection at representative bit positions
-- Comparison of standard vs. flood training
+- Comparison of standard vs. flood training across multiple configurations
 
 **Out of Scope:**
 - Large-scale datasets (ImageNet, CIFAR) - future work
-- Multiple architectures - focus on proof-of-concept
+- Multiple architectures - focus on controlled study
 - Hardware validation - simulation-based study
 - Multiple-bit upsets - single-bit fault model
 - Quantized models - float32 only

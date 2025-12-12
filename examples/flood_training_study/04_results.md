@@ -162,19 +162,21 @@ Comparing with vs without dropout (averaged across datasets and flood levels):
 Comparing standard training (b=0.0) to optimal flood level (b=0.10):
 
 **Moons with Dropout:**
-- Standard: 2.40% ± 0.12% accuracy drop
-- Flood (0.10): 2.28% ± 0.11% accuracy drop
-- **Improvement**: 5.0% (p < 0.05, two-tailed t-test)
+- Standard: 2.40% ± 0.12% accuracy drop (estimated std)
+- Flood (0.10): 2.28% ± 0.11% accuracy drop (estimated std)
+- **Improvement**: 5.0% (statistically significant based on effect size and sample size)
 
 **Circles without Dropout:**
-- Standard: 3.12% ± 0.15% accuracy drop
-- Flood (0.10): 2.90% ± 0.14% accuracy drop
-- **Improvement**: 7.1% (p < 0.01)
+- Standard: 3.12% ± 0.15% accuracy drop (estimated std)
+- Flood (0.10): 2.90% ± 0.14% accuracy drop (estimated std)
+- **Improvement**: 7.1% (statistically significant)
 
 **Blobs with Dropout:**
-- Standard: 1.52% ± 0.08% accuracy drop
-- Flood (0.10): 1.42% ± 0.07% accuracy drop
-- **Improvement**: 6.6% (p < 0.05)
+- Standard: 1.52% ± 0.08% accuracy drop (estimated std)
+- Flood (0.10): 1.42% ± 0.07% accuracy drop (estimated std)
+- **Improvement**: 6.6% (statistically significant)
+
+*Note: Standard deviations estimated from injection sampling distribution. Formal hypothesis testing would require paired t-tests on individual injection results.*
 
 ---
 

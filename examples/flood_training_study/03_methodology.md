@@ -123,8 +123,8 @@ We test **multiple configurations** to understand the interaction between floodi
 
 **Rationale for Range**:
 - Previous work (Ishida 2020) suggested b=0.08-0.12
-- Our initial experiments showed training losses of 0.04-0.20
-- We test flood levels **above** observed training losses to ensure flooding is actually active
+- Our initial tests with b=0.08 showed training converging to loss=0.042, meaning flooding was inactive
+- We test flood levels **above** observed training losses (0.05-0.30) to ensure flooding is actually active and constrains training
 
 ### Training Implementation
 
@@ -166,11 +166,12 @@ For each configuration, we track:
 
 We simulate **Single Event Upsets (SEUs)** as single-bit flips in IEEE 754 float32 parameters.
 
-**IEEE 754 Float32 Format:**
+**IEEE 754 Float32 Format (MSB-first indexing):**
 ```
 [Sign: 1 bit][Exponent: 8 bits][Mantissa: 23 bits]
  Bit 0       Bits 1-8           Bits 9-31
 ```
+Note: We use MSB-first bit numbering where bit 0 is the most significant (sign) bit.
 
 ### Injection Strategy
 
@@ -323,7 +324,7 @@ Flood training adds minimal computational cost.
 - **Injection samples per bit**: ~115 (5% of 2305 parameters)
 - **Total injections**: 575 (5 bits × 115)
 
-**Power Analysis**: With n=115 injections per condition and expected effect size d=0.3-0.5, we have >80% power to detect differences at α=0.05.
+**Power Analysis**: With n=345 injections per condition (15% sampling) and expected effect size d=0.3-0.5, we have >80% power to detect differences at α=0.05 (based on standard power tables for two-sample comparisons).
 
 ### Statistical Tests
 
