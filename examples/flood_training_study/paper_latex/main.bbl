@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+
+\bibitem{ishida2020we}
+Takashi Ishida, Ikko Yamane, Tomoya Sakai, Gang Niu, and Masashi Sugiyama.
+\newblock Do we need zero training loss after achieving zero training error?
+\newblock In {\em Advances in Neural Information Processing Systems (NeurIPS)},
+  volume~33, pages 9796--9806, 2020.
+
+\bibitem{dennis2025framework}
+William Dennis and James Pope.
+\newblock A framework for developing robust machine learning models in harsh
+  environments: A review of cnn design choices.
+\newblock In {\em Proceedings of the 17th International Conference on Agents
+  and Artificial Intelligence (ICAART 2025)}, volume~2, pages 322--333, 2025.
+
+\bibitem{hochreiter1997flat}
+Sepp Hochreiter and J{\"u}rgen Schmidhuber.
+\newblock Flat minima.
+\newblock {\em Neural Computation}, 9(1):1--42, 1997.
+
+\bibitem{keskar2017large}
+Nitish~Shirish Keskar, Dheevatsa Mudigere, Jorge Nocedal, Mikhail Smelyanskiy,
+  and Ping Tak~Peter Tang.
+\newblock On large-batch training for deep learning: Generalization gap and
+  sharp minima.
+\newblock In {\em International Conference on Learning Representations (ICLR)},
+  2017.
+
+\end{thebibliography}

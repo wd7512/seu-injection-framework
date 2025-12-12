@@ -67,7 +67,7 @@ _No response_
 - [x] I have provided sufficient context about my research
 - [x] I am open to community discussion and feedback
 
-______________________________________________________________________
+---
 
 | Field       | Value                                                       |
 | ----------- | ----------------------------------------------------------- |
