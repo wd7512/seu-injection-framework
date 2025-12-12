@@ -266,7 +266,9 @@ For a typical space mission neural network:
 
 \section{Conclusion}
 
-We demonstrate that flood level training—a simple training-time regularization technique—consistently improves neural network robustness to Single Event Upsets by 6.5--14.2\% across multiple datasets and configurations. The optimal flood level ($b=0.10$) provides a 15.9$\times$ cost-benefit ratio, sacrificing only 0.41\% baseline accuracy for 6.5\% robustness improvement, with zero inference overhead.
+We demonstrate that flood level training---a simple training-time regularization technique---consistently improves neural network robustness to Single Event Upsets by 6.5--14.2\% across multiple datasets and configurations. 
+
+The optimal flood level ($b=0.10$) provides a 15.9$\times$ cost-benefit ratio, sacrificing only 0.41\% baseline accuracy for 6.5\% robustness improvement, with zero inference overhead.
 
 These findings suggest that training methodology is an important but under-explored dimension of hardware fault tolerance. Simple interventions like flooding can complement or reduce reliance on expensive hardware protections (ECC, TMR, radiation-hardening), making neural network deployment in harsh environments more practical and cost-effective.
 
@@ -286,7 +288,9 @@ All experimental results, code, and figures are publicly available:
 \begin{itemize}
     \item \textbf{Code}: \texttt{comprehensive\_experiment.py}
     \item \textbf{Data}: \texttt{comprehensive\_results.csv}, \texttt{comprehensive\_results.json}
-    \item \textbf{Repository}: \url{https://github.com/wd7512/seu-injection-framework/tree/main/examples/flood_training_study}
+    \item \textbf{Repository}: 
+    
+    \small\url{https://github.com/wd7512/seu-injection-framework/tree/main/examples/flood_training_study}
     % TODO: Update URL if moved to different branch for publication
 \end{itemize}
 
