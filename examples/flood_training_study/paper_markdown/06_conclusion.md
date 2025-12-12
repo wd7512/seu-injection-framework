@@ -10,15 +10,15 @@ This research study investigated whether **flood level training**—a regulariza
 
 ### Primary Results
 
-Through a controlled experiment comparing standard vs. flood training (b=0.08), we found:
+Through a controlled experiment comparing standard vs. flood training across 36 configurations, we found:
 
 | Finding | Value | Significance |
 |---------|-------|--------------|
-| **Robustness Improvement** | **9.7%** reduction in accuracy drop | ⭐⭐⭐ High |
-| **Critical Fault Reduction** | **7.5%** fewer critical failures | ⭐⭐ Medium-High |
-| **Baseline Accuracy Cost** | **-0.5%** | ⭐ Low (acceptable) |
-| **Cost-Benefit Ratio** | **19.5×** ROI | ⭐⭐⭐ Excellent |
-| **Training Overhead** | **+6%** time | ⭐⭐⭐ Negligible |
+| **Robustness Improvement** | **6.5-14.2%** reduction in accuracy drop | ⭐⭐⭐ High |
+| **Optimal Flood Level** | **b=0.10** | ⭐⭐⭐ Best ROI |
+| **Baseline Accuracy Cost** | **0.41%** (at b=0.10) | ⭐ Low (acceptable) |
+| **Cost-Benefit Ratio** | **15.9×** ROI | ⭐⭐⭐ Excellent |
+| **Training Overhead** | **+4-6%** time | ⭐⭐⭐ Negligible |
 | **Inference Cost** | **0%** | ⭐⭐⭐ Perfect |
 
 **Bottom Line**: Flood training provides significant SEU robustness improvements at minimal cost.
@@ -32,15 +32,15 @@ Flood training improves robustness by:
 4. **Therefore**: Flood training → SEU robustness
 
 This connection is supported by:
-- Different training loss behavior (0.04 vs. 0.43)
-- Improved sign bit robustness (+1.0%)
-- Reduced critical fault rates (-9.8% for sign bits)
+- Training losses matching flood levels (active constraint)
+- Consistent robustness improvements across datasets
+- Theoretical link between loss curvature and perturbation sensitivity
 
 ### Statistical Validation
 
-- Effect size: d ≈ 0.48 (medium)
-- Primary metric significance: p < 0.05
-- Reproducible across multiple seeds
+- Consistent effect across 3 datasets and 2 dropout settings
+- Monotonic relationship between flood level and robustness
+- Reproducible across multiple configurations
 
 ## 6.2 Implications for Practice
 
@@ -71,7 +71,7 @@ This connection is supported by:
 
 **When accuracy matters most:**
 - If you need absolute peak performance (e.g., Kaggle competition), skip flooding
-- If 0.5% accuracy drop is unacceptable, skip flooding
+- If 0.4% accuracy drop is unacceptable, skip flooding
 
 **When robustness matters:**
 - If model will face radiation/SEUs, **use flood training**
@@ -80,7 +80,7 @@ This connection is supported by:
 
 **Rule of thumb:**
 ```
-If (deployment_risk × failure_cost) > 19.5 × (0.5% accuracy),
+If (deployment_risk × failure_cost) > 15.9 × (0.4% accuracy),
     then use_flood_training = True
 ```
 
@@ -194,8 +194,8 @@ This work:
 
 Practical impact:
 1. **Simple implementation**: 10-line PyTorch class, drop-in replacement
-2. **Minimal cost**: 0.5% accuracy, 6% training time
-3. **Significant benefit**: 9.7% robustness improvement
+2. **Minimal cost**: 0.41% accuracy, 4-6% training time
+3. **Significant benefit**: 6.5% robustness improvement
 4. **Production-ready**: Tested, validated, documented
 
 ### Societal Contribution
@@ -218,9 +218,9 @@ Each prevented failure could save:
 **Flood level training is a simple, effective, low-cost technique for improving neural network robustness to Single Event Upsets.**
 
 - **Implementation**: 10 lines of code
-- **Cost**: 0.5% accuracy, 6% training time
-- **Benefit**: 9.7% robustness improvement, 7.5% fewer critical failures
-- **ROI**: 19.5×
+- **Cost**: 0.41% accuracy, 4-6% training time
+- **Benefit**: 6.5% robustness improvement, reduced critical failures
+- **ROI**: 15.9×
 - **Recommendation**: Adopt for all harsh environment deployments
 
 ### Call to Action

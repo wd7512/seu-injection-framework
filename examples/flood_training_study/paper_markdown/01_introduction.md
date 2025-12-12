@@ -129,12 +129,12 @@ We hypothesize three mechanisms:
 
 For a typical space mission with a neural network:
 - **Training cost**: +4-6% compute time (one-time, pre-launch)
-- **Accuracy cost**: -0.5% baseline performance (acceptable for most tasks)
-- **Robustness benefit**: -9.7% accuracy degradation under SEU (significant)
+- **Accuracy cost**: 0.41% baseline performance (acceptable for most tasks)
+- **Robustness benefit**: 6.5% accuracy degradation reduction (significant)
 - **Hardware savings**: Potentially reduce ECC/TMR requirements
 - **Mission reliability**: Lower probability of critical failures
 
-**ROI**: 19.5× return on investment (robustness gain vs. accuracy loss)
+**ROI**: 15.9× return on investment (robustness gain vs. accuracy loss)
 
 ### Broader Implications
 

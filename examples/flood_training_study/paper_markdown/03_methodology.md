@@ -11,7 +11,7 @@
 We conduct a controlled experiment comparing two training methodologies:
 
 1. **Standard Training**: Minimize cross-entropy loss to convergence
-2. **Flood Training**: Maintain flood level `b=0.08` during training
+2. **Flood Training**: Maintain flood levels `b ∈ [0.05, 0.10, 0.15, 0.20, 0.30]` during training
 
 Both models are:
 - Trained on identical data with identical hyperparameters
@@ -31,7 +31,7 @@ random.seed(42)
 torch.backends.cudnn.deterministic = True
 ```
 
-Code is available in [`experiment.py`](experiment.py).
+Code is available in [`comprehensive_experiment.py`](comprehensive_experiment.py).
 
 ## 3.2 Datasets and Tasks
 
@@ -254,7 +254,7 @@ For each injection experiment, we compute:
 
 3. **Flood Training**
    - Initialize identical model with same seed
-   - Train for 100 epochs with Flooding(BCE, b=0.08)
+   - Train for 100 epochs with Flooding(BCE, b) for each b in sweep
    - Record training/validation curves
    - Evaluate baseline test accuracy
 
