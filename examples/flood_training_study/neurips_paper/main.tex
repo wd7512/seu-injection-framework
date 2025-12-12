@@ -17,9 +17,18 @@
 \usepackage{graphicx}
 \usepackage{subcaption}
 
+% Hyperref configuration (must come after hyperref is loaded)
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  citecolor=blue,
+  urlcolor=blue
+}
+
 \title{Flood Level Training: Improving Neural Network Robustness to Single Event Upsets Through Loss Landscape Regularization}
 
 \author{%
+  % TODO: Update with actual author names and affiliations before submission
   Anonymous Authors \\
   Institution(s) \\
   \texttt{email@example.com} \\
@@ -277,14 +286,17 @@ All experimental results, code, and figures are publicly available:
 \begin{itemize}
     \item \textbf{Code}: \texttt{comprehensive\_experiment.py}
     \item \textbf{Data}: \texttt{comprehensive\_results.csv}, \texttt{comprehensive\_results.json}
-    \item \textbf{Repository}: [To be added for camera-ready version]
+    \item \textbf{Repository}: \url{https://github.com/wd7512/seu-injection-framework/tree/main/examples/flood_training_study}
+    % TODO: Update URL if moved to different branch for publication
 \end{itemize}
 
 \section*{Acknowledgments}
 
 This work builds on the SEU Injection Framework developed by Dennis \& Pope \cite{dennis2025framework}. We thank the reviewers for their valuable feedback.
 
-\bibliographystyle{plain}
+% Use 'unsrt' for better compatibility with conference standards
+% (citations in order of appearance)
+\bibliographystyle{unsrt}
 \bibliography{bibliography}
 
 \end{document}

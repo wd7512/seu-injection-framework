@@ -58,15 +58,12 @@
   \vskip 1.5em%
 }
 
-% Hyperref configuration
+% Color definitions (loaded before hyperref in main.tex)
 \usepackage{xcolor}
 \definecolor{linkcolor}{rgb}{0,0,0.5}
-\hypersetup{
-  colorlinks=true,
-  linkcolor=linkcolor,
-  citecolor=linkcolor,
-  urlcolor=linkcolor
-}
+
+% Note: hyperref package should be loaded in main.tex
+% and hypersetup should be called after hyperref is loaded
 
 % Bibliography spacing
 \let\oldthebibliography\thebibliography
