@@ -29,22 +29,27 @@
 \newlabel{tab:main_results}{{1}{4}{Cross-dataset average results showing consistent robustness improvements}{table.caption.2}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Optimal Configuration: b=0.10}{4}{subsection.4.2}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Training Dynamics Validation}{4}{subsection.4.3}\protected@file@percent }
-\citation{hochreiter1997flat}
 \@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Cost-benefit analysis showing accuracy cost vs. robustness gain for different flood levels. $b=0.10$ provides optimal ROI.}}{5}{figure.caption.3}\protected@file@percent }
 \newlabel{fig:cost_benefit}{{2}{5}{Cost-benefit analysis showing accuracy cost vs. robustness gain for different flood levels. $b=0.10$ provides optimal ROI}{figure.caption.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Consistency Across Configurations}{5}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.4}Loss Trajectories and Training Behavior}{5}{subsection.4.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.5}Consistency Across Configurations}{5}{subsection.4.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{5}{section.5}\protected@file@percent }
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.1}Why Does Flooding Improve Robustness?}{5}{subsection.5.1}\protected@file@percent }
+\citation{hochreiter1997flat}
 \@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Final training loss vs. target flood level, demonstrating that flooding actively constrains training across all configurations.}}{6}{figure.caption.4}\protected@file@percent }
 \newlabel{fig:training}{{3}{6}{Final training loss vs. target flood level, demonstrating that flooding actively constrains training across all configurations}{figure.caption.4}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Interaction with Dropout}{6}{subsection.5.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Heatmap of mean accuracy drop (\%) across all 36 configurations. Darker colors (lower values) indicate better robustness. Flooding consistently reduces vulnerability.}}{7}{figure.caption.5}\protected@file@percent }
-\newlabel{fig:heatmap}{{4}{7}{Heatmap of mean accuracy drop (\%) across all 36 configurations. Darker colors (lower values) indicate better robustness. Flooding consistently reduces vulnerability}{figure.caption.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces (\textbf  {Left}) Training loss trajectories over 100 epochs for different flood levels. Flooding creates a visible floor preventing further loss reduction. (\textbf  {Right}) Final converged loss vs. flood level, confirming that flooding actively constrains training.}}{7}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:loss_trajectories}{{4}{7}{(\textbf {Left}) Training loss trajectories over 100 epochs for different flood levels. Flooding creates a visible floor preventing further loss reduction. (\textbf {Right}) Final converged loss vs. flood level, confirming that flooding actively constrains training}{figure.caption.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {5.3}Practical Implications}{7}{subsection.5.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Limitations and Threats to Validity}{7}{subsection.5.4}\protected@file@percent }
-\newlabel{sec:limitations}{{5.4}{7}{Limitations and Threats to Validity}{subsection.5.4}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{8}{section.6}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Future Work}{8}{subsection.6.1}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Comprehensive training dynamics analysis. (\textbf  {Top-left}) Validation accuracy trajectories showing minimal degradation with flooding. (\textbf  {Top-right}) Training vs. validation loss for $b=0.10$, confirming constraint is active. (\textbf  {Bottom-left}) Gradient norm evolution showing potential relationship with flatter minima. (\textbf  {Bottom-right}) Summary of robustness improvements across all flood levels.}}{8}{figure.caption.6}\protected@file@percent }
+\newlabel{fig:training_dynamics}{{5}{8}{Comprehensive training dynamics analysis. (\textbf {Top-left}) Validation accuracy trajectories showing minimal degradation with flooding. (\textbf {Top-right}) Training vs. validation loss for $b=0.10$, confirming constraint is active. (\textbf {Bottom-left}) Gradient norm evolution showing potential relationship with flatter minima. (\textbf {Bottom-right}) Summary of robustness improvements across all flood levels}{figure.caption.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.4}Limitations and Threats to Validity}{8}{subsection.5.4}\protected@file@percent }
+\newlabel{sec:limitations}{{5.4}{8}{Limitations and Threats to Validity}{subsection.5.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Heatmap of mean accuracy drop (\%) across all 36 configurations. Darker colors (lower values) indicate better robustness. Flooding consistently reduces vulnerability.}}{9}{figure.caption.7}\protected@file@percent }
+\newlabel{fig:heatmap}{{6}{9}{Heatmap of mean accuracy drop (\%) across all 36 configurations. Darker colors (lower values) indicate better robustness. Flooding consistently reduces vulnerability}{figure.caption.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{10}{section.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Future Work}{10}{subsection.6.1}\protected@file@percent }
 \citation{dennis2025framework}
 \bibstyle{unsrt}
 \bibdata{bibliography}
@@ -52,5 +57,5 @@
 \bibcite{dennis2025framework}{2}
 \bibcite{hochreiter1997flat}{3}
 \bibcite{keskar2017large}{4}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Data Availability}{9}{subsection.6.2}\protected@file@percent }
-\gdef \@abspage@last{9}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Data Availability}{11}{subsection.6.2}\protected@file@percent }
+\gdef \@abspage@last{11}

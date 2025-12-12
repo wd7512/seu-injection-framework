@@ -203,6 +203,26 @@ Figure~\ref{fig:training} verifies that flood levels are properly calibrated and
 \label{fig:training}
 \end{figure}
 
+\subsection{Loss Trajectories and Training Behavior}
+
+Figure~\ref{fig:loss_trajectories} shows complete training curves for different flood levels. The flooding mechanism visibly prevents loss from dropping below the specified threshold, with higher flood levels creating more pronounced floors in the loss landscape.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/fig5_loss_trajectories.png}
+\caption{(\textbf{Left}) Training loss trajectories over 100 epochs for different flood levels. Flooding creates a visible floor preventing further loss reduction. (\textbf{Right}) Final converged loss vs. flood level, confirming that flooding actively constrains training.}
+\label{fig:loss_trajectories}
+\end{figure}
+
+Figure~\ref{fig:training_dynamics} provides comprehensive training analysis including validation accuracy trajectories, training/validation loss comparison, gradient norms, and robustness summary across flood levels.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{figures/fig6_training_dynamics.png}
+\caption{Comprehensive training dynamics analysis. (\textbf{Top-left}) Validation accuracy trajectories showing minimal degradation with flooding. (\textbf{Top-right}) Training vs. validation loss for $b=0.10$, confirming constraint is active. (\textbf{Bottom-left}) Gradient norm evolution showing potential relationship with flatter minima. (\textbf{Bottom-right}) Summary of robustness improvements across all flood levels.}
+\label{fig:training_dynamics}
+\end{figure}
+
 \subsection{Consistency Across Configurations}
 
 Figure~\ref{fig:heatmap} shows results across all 36 configurations. The effect is consistent across:
@@ -264,14 +284,36 @@ The combination suggests that flooding adds regularization beyond what dropout p
 
 \subsection{Practical Implications}
 
-For a typical space mission neural network:
+\textbf{Key Advantages of the Flood Training Approach:}
 \begin{itemize}
-    \item \textbf{Training cost}: +4--6\% compute time (one-time, pre-launch)
+    \item \textbf{Zero inference overhead}: Flooding is applied only during training. Deployed models have no additional latency, memory, or energy cost—unlike hardware protections (ECC, TMR) which add permanent overhead.
+    \item \textbf{Minimal training complexity}: Simple 10-line PyTorch implementation that wraps any loss function. Easily integrated into existing training pipelines.
+    \item \textbf{Widely compatible}: Works with standard architectures and is composable with other regularization techniques (dropout, weight decay).
+    \item \textbf{Deployment-constrained friendly}: Particularly valuable in environments where hardware redundancy is prohibitively costly (spacecraft, edge devices).
+\end{itemize}
+
+\textbf{Cost-Benefit Summary} for proof-of-concept setting:
+\begin{itemize}
+    \item \textbf{Training cost}: +4--6\% compute time (one-time, pre-deployment)
     \item \textbf{Accuracy cost}: --0.41\% baseline performance
     \item \textbf{Robustness benefit}: --6.5\% accuracy degradation under SEUs
-    \item \textbf{Inference overhead}: 0\% (no deployment cost)
-    \item \textbf{Hardware savings}: Potentially reduce ECC/TMR requirements
+    \item \textbf{Inference overhead}: 0\%
+    \item \textbf{Potential hardware savings}: May reduce need for expensive ECC/TMR if validated at scale
 \end{itemize}
+
+\textbf{Implementation Simplicity:}
+\begin{verbatim}
+class FloodingLoss(nn.Module):
+    def __init__(self, base_loss, flood_level=0.10):
+        super().__init__()
+        self.base_loss = base_loss
+        self.flood_level = flood_level
+    
+    def forward(self, predictions, targets):
+        loss = self.base_loss(predictions, targets)
+        return torch.abs(loss - self.flood_level) 
+               + self.flood_level
+\end{verbatim}
 
 \subsection{Limitations and Threats to Validity}
 \label{sec:limitations}
