@@ -2,7 +2,7 @@
 
 [Back to README](README.md)
 
----
+______________________________________________________________________
 
 ## Quick Start
 
@@ -42,7 +42,7 @@ for epoch in range(num_epochs):
 
 **That's it!** You now have flood training.
 
----
+______________________________________________________________________
 
 ## Complete Implementation
 
@@ -150,7 +150,7 @@ for epoch in range(num_epochs):
     print(f"Epoch {epoch}: Train Loss={loss.item():.4f}, Val Loss={val_loss:.4f}, Flood Level={criterion.flood_level:.4f}")
 ```
 
----
+______________________________________________________________________
 
 ## Hyperparameter Selection
 
@@ -159,8 +159,8 @@ for epoch in range(num_epochs):
 **Method 1: Based on Validation Loss (Recommended)**
 
 1. Train a baseline model without flooding
-2. Measure final validation loss: `val_loss_final`
-3. Set flood level: `b = 1.5 * val_loss_final` to `2.0 * val_loss_final`
+1. Measure final validation loss: `val_loss_final`
+1. Set flood level: `b = 1.5 * val_loss_final` to `2.0 * val_loss_final`
 
 ```python
 # Example
@@ -189,17 +189,17 @@ best_b = max(results.keys(), key=lambda b: results[b]['seu_robustness'] - 0.5 * 
 
 **Method 3: Task-Specific Guidelines**
 
-| Task Type | Suggested Range | Example |
-|-----------|----------------|---------|
-| Image Classification (Simple) | 0.05 - 0.10 | MNIST: 0.05 |
-| Image Classification (Complex) | 0.10 - 0.20 | CIFAR-10: 0.15, ImageNet: 0.20 |
-| NLP (Classification) | 0.08 - 0.15 | Sentiment: 0.10 |
-| Regression | 0.01 - 0.05 | Depends on scale |
-| Binary Classification | 0.05 - 0.12 | This study: 0.08 |
+| Task Type                      | Suggested Range | Example                        |
+| ------------------------------ | --------------- | ------------------------------ |
+| Image Classification (Simple)  | 0.05 - 0.10     | MNIST: 0.05                    |
+| Image Classification (Complex) | 0.10 - 0.20     | CIFAR-10: 0.15, ImageNet: 0.20 |
+| NLP (Classification)           | 0.08 - 0.15     | Sentiment: 0.10                |
+| Regression                     | 0.01 - 0.05     | Depends on scale               |
+| Binary Classification          | 0.05 - 0.12     | This study: 0.08               |
 
 **Rule of Thumb**: Start with `b=0.08` and adjust based on validation performance.
 
----
+______________________________________________________________________
 
 ## Integration with SEU Injection Framework
 
@@ -287,7 +287,7 @@ def compare_training_methods(model_fn, train_loader, test_loader, x_test, y_test
     return results
 ```
 
----
+______________________________________________________________________
 
 ## Production Deployment
 
@@ -345,7 +345,7 @@ class ProductionModel:
         }
 ```
 
----
+______________________________________________________________________
 
 ## Troubleshooting
 
@@ -354,60 +354,63 @@ class ProductionModel:
 **Symptoms**: Training loss stays high, validation accuracy poor
 
 **Solutions**:
+
 1. **Reduce flood level**: Try b = 0.05 instead of 0.08
-2. **Increase training epochs**: Model may need more time to find good minimum
-3. **Check learning rate**: May be too low, try increasing
-4. **Verify base loss**: Ensure base_loss is correctly configured
+1. **Increase training epochs**: Model may need more time to find good minimum
+1. **Check learning rate**: May be too low, try increasing
+1. **Verify base loss**: Ensure base_loss is correctly configured
 
 ### Issue: No robustness improvement
 
 **Symptoms**: Flood-trained model performs same as standard under SEU
 
 **Solutions**:
+
 1. **Check if already well-regularized**: If using heavy dropout/weight decay, flooding may have diminishing returns
-2. **Increase flood level**: Try b = 0.10 or 0.12
-3. **Verify injection protocol**: Ensure SEU injection is working correctly
-4. **Test different bit positions**: Check sign bit (0) specifically
+1. **Increase flood level**: Try b = 0.10 or 0.12
+1. **Verify injection protocol**: Ensure SEU injection is working correctly
+1. **Test different bit positions**: Check sign bit (0) specifically
 
 ### Issue: Too much baseline accuracy loss
 
 **Symptoms**: Flood training reduces baseline accuracy >1%
 
 **Solutions**:
-1. **Reduce flood level**: Try b = 0.05 or lower
-2. **Use warmup**: Start flooding after 10-20 epochs
-3. **Adaptive flooding**: Let flood level adjust automatically
-4. **Verify task difficulty**: May be too easy/hard for flooding
 
----
+1. **Reduce flood level**: Try b = 0.05 or lower
+1. **Use warmup**: Start flooding after 10-20 epochs
+1. **Adaptive flooding**: Let flood level adjust automatically
+1. **Verify task difficulty**: May be too easy/hard for flooding
+
+______________________________________________________________________
 
 ## FAQs
 
-**Q: Can I use flood training with any loss function?**  
+**Q: Can I use flood training with any loss function?**\
 A: Yes! FloodingLoss wraps any base loss (CrossEntropy, MSE, BCE, etc.)
 
-**Q: Does flood training work with all optimizers?**  
+**Q: Does flood training work with all optimizers?**\
 A: Yes, it's loss-level regularization, independent of optimizer choice.
 
-**Q: Can I combine flood training with dropout/weight decay?**  
+**Q: Can I combine flood training with dropout/weight decay?**\
 A: Yes, they're complementary. Flood training adds regularization on top.
 
-**Q: How much does flood training slow down training?**  
+**Q: How much does flood training slow down training?**\
 A: About 4-6% overhead, mostly from the abs() operation.
 
-**Q: Should I use flooding for inference?**  
+**Q: Should I use flooding for inference?**\
 A: No, flooding only affects training. Use base_loss for validation/inference.
 
-**Q: What if I don't know my optimal flood level?**  
+**Q: What if I don't know my optimal flood level?**\
 A: Start with b=0.08. If accuracy drops too much, reduce to 0.05. If no robustness gain, increase to 0.10-0.12.
 
-**Q: Can flood training replace hardware protections (ECC, TMR)?**  
+**Q: Can flood training replace hardware protections (ECC, TMR)?**\
 A: No, it's complementary. Use both for defense-in-depth in critical systems.
 
-**Q: Does flood training help with adversarial robustness?**  
+**Q: Does flood training help with adversarial robustness?**\
 A: Potentially, but this study focused on SEU robustness. Worth investigating!
 
----
+______________________________________________________________________
 
 ## Additional Resources
 
@@ -416,8 +419,8 @@ A: Potentially, but this study focused on SEU robustness. Worth investigating!
 - **[04_results.md](04_results.md)**: Detailed experimental results
 - **[references.md](references.md)**: Academic references
 
----
+______________________________________________________________________
 
-**Last Updated**: December 11, 2025  
-**Maintained by**: SEU Injection Framework Team  
+**Last Updated**: December 11, 2025\
+**Maintained by**: SEU Injection Framework Team\
 **License**: MIT (code), CC BY 4.0 (documentation)

@@ -8,17 +8,20 @@ The updated ICLR review acknowledged significant strengths while maintaining con
 
 ### 1. Added Loss Trajectory Visualizations ✅
 
-**Requested**: More charts including loss trajectories  
+**Requested**: More charts including loss trajectories\
 **Implemented**: Added 2 new comprehensive figures
 
 #### Figure 5: Loss Trajectories (NEW)
+
 - **Left panel**: Complete training curves over 100 epochs showing flooding mechanism in action
 - **Right panel**: Final converged loss vs. flood level demonstrating active constraint
 - **Key insight**: Visually confirms that flooding creates a floor preventing further loss reduction
 - **File**: `neurips_paper/figures/fig5_loss_trajectories.png` (300 DPI)
 
 #### Figure 6: Comprehensive Training Dynamics (NEW)
+
 Four-panel analysis:
+
 - **Top-left**: Validation accuracy trajectories showing minimal degradation
 - **Top-right**: Training vs. validation loss for b=0.10, confirming constraint is active
 - **Bottom-left**: Gradient norm evolution suggesting relationship with flatter minima
@@ -30,24 +33,27 @@ Four-panel analysis:
 **New subsection** highlighting key advantages per review feedback:
 
 #### Zero Inference Overhead
+
 - Flooding applied only during training
 - No additional latency, memory, or energy cost at deployment
 - Contrasts with hardware protections (ECC, TMR) that add permanent overhead
 
 #### Minimal Training Complexity
+
 - Simple 10-line PyTorch implementation included in paper
 - Wraps any loss function
 - Easy integration into existing pipelines
 
 #### Wide Compatibility
+
 - Works with standard architectures
 - Composable with other regularization techniques
 - Deployment-constrained friendly
 
 ### 3. Updated PDF Statistics
 
-**Previous version**: 9 pages, 813 KB  
-**Updated version**: 11 pages, 1.87 MB  
+**Previous version**: 9 pages, 813 KB\
+**Updated version**: 11 pages, 1.87 MB\
 **Figure count**: 6 (was 4)
 **New content**: ~2 pages of additional analysis and visualizations
 
@@ -56,6 +62,7 @@ Four-panel analysis:
 **No changes needed** - the review acknowledged that limitations are "candidly discussed" and appreciated the explicit proof-of-concept positioning.
 
 Limitations section (5.4) remains comprehensive:
+
 - Scale limitations (small MLP, synthetic datasets)
 - Generalizability concerns (architecture-specific results)
 - Threat model simplification (single-bit flips only)
@@ -64,6 +71,7 @@ Limitations section (5.4) remains comprehensive:
 ## Files Updated
 
 ### LaTeX Source
+
 - `main.tex` - Updated with new figures and enhanced practical implications
   - Added Figure 5 (loss trajectories)
   - Added Figure 6 (training dynamics)
@@ -72,11 +80,13 @@ Limitations section (5.4) remains comprehensive:
   - Maintained all previous improvements
 
 ### Generated Figures
+
 - `figures/fig5_loss_trajectories.png` (NEW) - 2-panel loss analysis
 - `figures/fig6_training_dynamics.png` (NEW) - 4-panel comprehensive analysis
 - Existing figures 1-4 unchanged
 
 ### Compiled PDF
+
 - `main.pdf` - Successfully compiled (11 pages, 1.87 MB)
   - All 6 figures embedded at 300 DPI
   - Bibliography properly compiled
@@ -86,6 +96,7 @@ Limitations section (5.4) remains comprehensive:
 ## Review Feedback Addressed
 
 ### Strengths Acknowledged ✅
+
 - ✅ "Simple and widely compatible" - emphasized in practical implications
 - ✅ "Zero inference overhead" - highlighted as key advantage
 - ✅ "Minimal training complexity" - included implementation code
@@ -93,12 +104,14 @@ Limitations section (5.4) remains comprehensive:
 - ✅ "Clear, interpretable metrics" - new charts enhance clarity
 
 ### Weaknesses Already Addressed ✅
+
 - ✅ Scale limitations - comprehensively documented in Section 5.4
 - ✅ Proof-of-concept positioning - explicit throughout paper
 - ✅ Generalizability concerns - acknowledged with specific examples
 - ✅ Future validation needs - detailed in conclusion Section 6.3
 
 ### New Requests Addressed ✅
+
 - ✅ More charts - added 2 comprehensive multi-panel figures
 - ✅ Loss trajectories - Figure 5 shows complete training curves
 - ✅ Training dynamics - Figure 6 provides 4-panel analysis
@@ -106,6 +119,7 @@ Limitations section (5.4) remains comprehensive:
 ## Summary
 
 The paper now includes:
+
 - **6 high-quality figures** (300 DPI) vs. 4 previously
 - **Comprehensive loss trajectory analysis** per reviewer request
 - **Enhanced practical implications** highlighting key advantages
@@ -118,10 +132,11 @@ All updates strengthen the paper while maintaining the honest, proof-of-concept 
 ## Next Steps
 
 Paper is ready for:
+
 1. Conference submission (NeurIPS/ICML/ICLR)
-2. arXiv preprint
-3. Community review and feedback
-4. Future large-scale validation studies
+1. arXiv preprint
+1. Community review and feedback
+1. Future large-scale validation studies
 
 ## File Locations
 

@@ -22,9 +22,9 @@ Output:
     - Comparison of standard vs flood training
     - SEU robustness metrics for both approaches
     - Visualization of robustness improvements
-    
+
 References:
-    Ishida et al. (2020): "Do We Need Zero Training Loss After 
+    Ishida et al. (2020): "Do We Need Zero Training Loss After
     Achieving Zero Training Error?" NeurIPS 2020.
 """
 
@@ -43,7 +43,6 @@ import matplotlib.pyplot as plt
 from seu_injection.core import StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
 
-
 # ============================================================================
 # Flood Level Training Implementation
 # ============================================================================
@@ -51,18 +50,18 @@ from seu_injection.metrics import classification_accuracy
 
 class FloodingLoss(nn.Module):
     """Implements flooding regularization for any base loss.
-    
+
     Flooding prevents the model from achieving arbitrarily low training loss
     by maintaining a minimum loss threshold (flood level b).
-    
+
     Loss formula: L_flood = |L(θ) - b| + b
-    
+
     Args:
         base_loss: Base loss function (e.g., nn.CrossEntropyLoss())
         flood_level: Target flood level (b), typically 0.05-0.15
-        
+
     References:
-        Ishida et al. (2020): "Do We Need Zero Training Loss After 
+        Ishida et al. (2020): "Do We Need Zero Training Loss After
         Achieving Zero Training Error?" NeurIPS 2020.
     """
 
@@ -114,12 +113,8 @@ def prepare_data():
     X = scaler.fit_transform(X)
 
     # Split data: train, validation, test
-    X_train, X_temp, y_train, y_temp = train_test_split(
-        X, y, test_size=0.4, random_state=42, stratify=y
-    )
-    X_val, X_test, y_val, y_test = train_test_split(
-        X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp
-    )
+    X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, random_state=42, stratify=y)
+    X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, random_state=42, stratify=y_temp)
 
     # Convert to PyTorch tensors
     X_train = torch.tensor(X_train, dtype=torch.float32)
@@ -129,9 +124,7 @@ def prepare_data():
     y_val = torch.tensor(y_val, dtype=torch.float32).unsqueeze(1)
     y_test = torch.tensor(y_test, dtype=torch.float32).unsqueeze(1)
 
-    print(
-        f"✅ Dataset ready: {len(X_train)} train, {len(X_val)} val, {len(X_test)} test samples"
-    )
+    print(f"✅ Dataset ready: {len(X_train)} train, {len(X_val)} val, {len(X_test)} test samples")
     return X_train, X_val, X_test, y_train, y_val, y_test
 
 
@@ -274,8 +267,10 @@ def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=T
             }
 
             if verbose:
-                print(f"    Mean accuracy: {mean_acc:.2%}, Drop: {accuracy_drop:.2%}, "
-                      f"Critical faults: {critical_fault_rate:.1%}")
+                print(
+                    f"    Mean accuracy: {mean_acc:.2%}, Drop: {accuracy_drop:.2%}, "
+                    f"Critical faults: {critical_fault_rate:.1%}"
+                )
 
     # Overall metrics
     all_drops = [results[bit]["accuracy_drop"] for bit in results]
@@ -308,16 +303,16 @@ def create_comparison_visualizations(
     print("\n📈 Creating comparison visualizations...")
 
     fig, axes = plt.subplots(2, 2, figsize=(15, 12))
-    fig.suptitle("Flood Level Training vs Standard Training: SEU Robustness Comparison", fontsize=16, fontweight='bold')
+    fig.suptitle("Flood Level Training vs Standard Training: SEU Robustness Comparison", fontsize=16, fontweight="bold")
 
     # Plot 1: Training Loss Curves
     ax1 = axes[0, 0]
     ax1.plot(standard_train_losses, label="Standard Training", linewidth=2, alpha=0.8)
     ax1.plot(flood_train_losses, label=f"Flood Training (b={flood_level})", linewidth=2, alpha=0.8)
-    ax1.axhline(y=flood_level, color='r', linestyle='--', alpha=0.5, label=f'Flood Level ({flood_level})')
+    ax1.axhline(y=flood_level, color="r", linestyle="--", alpha=0.5, label=f"Flood Level ({flood_level})")
     ax1.set_xlabel("Epoch", fontsize=11)
     ax1.set_ylabel("Training Loss", fontsize=11)
-    ax1.set_title("Training Loss Convergence", fontsize=12, fontweight='bold')
+    ax1.set_title("Training Loss Convergence", fontsize=12, fontweight="bold")
     ax1.legend(fontsize=10)
     ax1.grid(True, alpha=0.3)
 
@@ -336,11 +331,11 @@ def create_comparison_visualizations(
 
     ax2.set_xlabel("Bit Position", fontsize=11)
     ax2.set_ylabel("Accuracy Drop (%)", fontsize=11)
-    ax2.set_title("Bit Position Vulnerability Comparison", fontsize=12, fontweight='bold')
+    ax2.set_title("Bit Position Vulnerability Comparison", fontsize=12, fontweight="bold")
     ax2.set_xticks(x)
     ax2.set_xticklabels([f"Bit {bit}\n({name})" for bit, name in zip(bit_positions, bit_names)], fontsize=9)
     ax2.legend(fontsize=10)
-    ax2.grid(True, alpha=0.3, axis='y')
+    ax2.grid(True, alpha=0.3, axis="y")
 
     # Plot 3: Critical Fault Rate Comparison
     ax3 = axes[1, 0]
@@ -352,11 +347,11 @@ def create_comparison_visualizations(
 
     ax3.set_xlabel("Bit Position", fontsize=11)
     ax3.set_ylabel("Critical Fault Rate (%)", fontsize=11)
-    ax3.set_title("Critical Fault Rate (>10% Accuracy Drop)", fontsize=12, fontweight='bold')
+    ax3.set_title("Critical Fault Rate (>10% Accuracy Drop)", fontsize=12, fontweight="bold")
     ax3.set_xticks(x)
     ax3.set_xticklabels([f"Bit {bit}" for bit in bit_positions], fontsize=9)
     ax3.legend(fontsize=10)
-    ax3.grid(True, alpha=0.3, axis='y')
+    ax3.grid(True, alpha=0.3, axis="y")
 
     # Plot 4: Overall Metrics Summary
     ax4 = axes[1, 1]
@@ -377,11 +372,11 @@ def create_comparison_visualizations(
     bars6 = ax4.bar(x_metrics + width / 2, flood_vals, width, label="Flood", color="skyblue", alpha=0.8)
 
     ax4.set_ylabel("Percentage (%)", fontsize=11)
-    ax4.set_title("Overall Robustness Metrics Summary", fontsize=12, fontweight='bold')
+    ax4.set_title("Overall Robustness Metrics Summary", fontsize=12, fontweight="bold")
     ax4.set_xticks(x_metrics)
     ax4.set_xticklabels(metrics, fontsize=10)
     ax4.legend(fontsize=10)
-    ax4.grid(True, alpha=0.3, axis='y')
+    ax4.grid(True, alpha=0.3, axis="y")
 
     # Add value labels on bars
     for bars in [bars5, bars6]:
@@ -464,15 +459,15 @@ def main():
     print("\n📊 Baseline Performance:")
     print(f"  Standard Training: {standard_results['baseline_accuracy']:.2%}")
     print(f"  Flood Training:    {flood_results['baseline_accuracy']:.2%}")
-    accuracy_diff = standard_results['baseline_accuracy'] - flood_results['baseline_accuracy']
+    accuracy_diff = standard_results["baseline_accuracy"] - flood_results["baseline_accuracy"]
     print(f"  Difference:        {accuracy_diff:.2%} {'(standard better)' if accuracy_diff > 0 else '(flood better)'}")
 
     print("\n🛡️  SEU Robustness (Mean Accuracy Drop):")
     print(f"  Standard Training: {standard_results['mean_accuracy_drop']:.2%}")
     print(f"  Flood Training:    {flood_results['mean_accuracy_drop']:.2%}")
     robustness_improvement = (
-        (standard_results['mean_accuracy_drop'] - flood_results['mean_accuracy_drop'])
-        / standard_results['mean_accuracy_drop']
+        (standard_results["mean_accuracy_drop"] - flood_results["mean_accuracy_drop"])
+        / standard_results["mean_accuracy_drop"]
     ) * 100
     print(f"  Improvement:       {robustness_improvement:.1f}% (flood is more robust)")
 
@@ -480,8 +475,8 @@ def main():
     print(f"  Standard Training: {standard_results['mean_critical_fault_rate']:.1%}")
     print(f"  Flood Training:    {flood_results['mean_critical_fault_rate']:.1%}")
     cfr_reduction = (
-        (standard_results['mean_critical_fault_rate'] - flood_results['mean_critical_fault_rate'])
-        / standard_results['mean_critical_fault_rate']
+        (standard_results["mean_critical_fault_rate"] - flood_results["mean_critical_fault_rate"])
+        / standard_results["mean_critical_fault_rate"]
     ) * 100
     print(f"  Reduction:         {cfr_reduction:.1f}% (flood has fewer critical faults)")
 

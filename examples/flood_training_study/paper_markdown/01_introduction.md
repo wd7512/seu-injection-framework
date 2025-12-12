@@ -2,7 +2,7 @@
 
 [← Back to README](README.md) | [Next: Literature Review →](02_literature_review.md)
 
----
+______________________________________________________________________
 
 ## 1.1 Background
 
@@ -22,6 +22,7 @@ In these environments, **Single Event Upsets (SEUs)**—transient bit flips in m
 Existing approaches to SEU mitigation focus on hardware-level protections:
 
 **Hardware Solutions:**
+
 - **Error-Correcting Codes (ECC)**: Detect and correct bit errors in memory
   - *Limitation*: Area and power overhead (30-40%), limited correction capability
 - **Triple Modular Redundancy (TMR)**: Run three copies, vote on outputs
@@ -30,6 +31,7 @@ Existing approaches to SEU mitigation focus on hardware-level protections:
   - *Limitation*: Expensive, limited availability, performance lag
 
 **Post-Training Methods:**
+
 - Model pruning and quantization to reduce parameter count
 - Selective layer protection based on vulnerability analysis
 - Runtime error detection and recovery
@@ -43,11 +45,13 @@ Existing approaches to SEU mitigation focus on hardware-level protections:
 Flood level training, introduced by Ishida et al. (2020), is a regularization technique that prevents models from achieving arbitrarily low training loss. Instead of minimizing loss to zero, flooding maintains a minimum loss threshold called the **flood level** (`b`).
 
 **Loss Function:**
+
 ```
 L_flood(θ) = |L(θ) - b| + b
 ```
 
 Where:
+
 - `L(θ)` is the original loss (e.g., cross-entropy)
 - `b` is the flood level hyperparameter
 - The absolute value creates a "flooding" effect around the threshold
@@ -59,16 +63,19 @@ Where:
 We hypothesize three mechanisms:
 
 1. **Flatter Loss Landscapes**
+
    - Flooding encourages convergence to regions with lower curvature
    - Flat minima are more tolerant to parameter perturbations (Hochreiter & Schmidhuber, 1997)
    - Bit flips represent discrete parameter perturbations
 
-2. **Reduced Overfitting**
+1. **Reduced Overfitting**
+
    - Standard training often achieves near-zero training loss, memorizing data
    - Flooding maintains ~2-5% training loss, forcing generalization
    - Generalized models may be less brittle to parameter noise
 
-3. **Parameter Distribution Effects**
+1. **Parameter Distribution Effects**
+
    - Flooding may encourage smaller, more uniform weight distributions
    - Smaller weights are less sensitive to bit flips in critical bits (sign, exponent)
    - More uniform distributions reduce the impact of individual parameter failures
@@ -83,17 +90,18 @@ We hypothesize three mechanisms:
 
 1. **Quantify robustness improvement**: Measure the change in accuracy under systematic SEU injection for flood-trained vs. standard-trained models
 
-2. **Identify optimal configurations**: Determine the relationship between flood level, model architecture, and robustness gains
+1. **Identify optimal configurations**: Determine the relationship between flood level, model architecture, and robustness gains
 
-3. **Analyze mechanisms**: Investigate *why* flooding improves robustness through loss landscape and parameter distribution analysis
+1. **Analyze mechanisms**: Investigate *why* flooding improves robustness through loss landscape and parameter distribution analysis
 
-4. **Provide practical guidance**: Develop actionable recommendations for practitioners deploying models in harsh environments
+1. **Provide practical guidance**: Develop actionable recommendations for practitioners deploying models in harsh environments
 
 ### Scope and Limitations
 
 **This is a proof-of-concept study** on simplified benchmarks to establish feasibility:
 
 **In Scope:**
+
 - Binary classification tasks (moons, circles, and blobs datasets)
 - Simple 3-layer MLP architecture (2,305 parameters)
 - IEEE 754 float32 parameter representation
@@ -101,6 +109,7 @@ We hypothesize three mechanisms:
 - Comparison of standard vs. flood training across multiple configurations
 
 **Out of Scope:**
+
 - Large-scale datasets (ImageNet, CIFAR) - future work
 - Complex architectures (CNNs, ResNets, Transformers) - focused controlled study
 - Hardware validation - simulation-based study
@@ -108,6 +117,7 @@ We hypothesize three mechanisms:
 - Quantized models - float32 only
 
 **Limitations:**
+
 - **Scale**: Small models and synthetic datasets; generalizability to large-scale models unknown
 - **Architecture specificity**: Results may not transfer to CNNs, ResNets, or Transformers
 - **Simplified threat model**: Single-bit flips only; real radiation causes diverse fault patterns
@@ -121,13 +131,14 @@ We hypothesize three mechanisms:
 ### Scientific Contributions
 
 1. **First proof-of-concept study** of flood level training for SEU robustness on simplified benchmarks
-2. **Preliminary quantitative evidence** that training methodology affects fault tolerance (6.5-14.2% improvement)
-3. **Mechanism analysis** exploring potential robustness-generalization connections
-4. **Foundation for future research** identifying promising directions for large-scale validation
+1. **Preliminary quantitative evidence** that training methodology affects fault tolerance (6.5-14.2% improvement)
+1. **Mechanism analysis** exploring potential robustness-generalization connections
+1. **Foundation for future research** identifying promising directions for large-scale validation
 
 ### Practical Impact
 
 For a typical space mission with a neural network:
+
 - **Training cost**: +4-6% compute time (one-time, pre-launch)
 - **Accuracy cost**: 0.41% baseline performance (acceptable for most tasks)
 - **Robustness benefit**: 6.5% accuracy degradation reduction (significant)
@@ -139,6 +150,7 @@ For a typical space mission with a neural network:
 ### Broader Implications
 
 Beyond radiation environments, this work:
+
 - Demonstrates the importance of training methodology for robustness
 - Suggests connections between generalization and fault tolerance
 - Opens avenues for co-design of training and deployment strategies
@@ -154,9 +166,10 @@ This research study is organized as follows:
 - **Section 6: Conclusion** - Summary, implications, and future research directions
 
 Supplementary materials include:
+
 - **Implementation Guide** - Practical code and deployment recommendations
 - **References** - Complete bibliography
 
----
+______________________________________________________________________
 
 [← Back to README](README.md) | [Next: Literature Review →](02_literature_review.md)
