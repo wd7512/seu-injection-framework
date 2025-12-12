@@ -43,24 +43,24 @@ Navigate through the sections:
 
 ### 📄 Main Paper
 
-1. **[Introduction](01_introduction.md)** - Background, motivation, research question
-2. **[Literature Review](02_literature_review.md)** - Related work (Dennis & Pope 2025, Ishida 2020, verified references)
-3. **[Methodology](03_methodology.md)** - 3 datasets, 6 flood levels, dropout ablation, 15% SEU sampling
-4. **[Results](04_results.md)** - Comprehensive experimental data, tables, statistical analysis
-5. **[Discussion](05_discussion.md)** - Interpretation, mechanisms, limitations, recommendations
-6. **[Conclusion](06_conclusion.md)** - Summary and future research directions
+1. **[Introduction](paper_markdown/01_introduction.md)** - Background, motivation, research question
+2. **[Literature Review](paper_markdown/02_literature_review.md)** - Related work (Dennis & Pope 2025, Ishida 2020, verified references)
+3. **[Methodology](paper_markdown/03_methodology.md)** - 3 datasets, 6 flood levels, dropout ablation, 15% SEU sampling
+4. **[Results](paper_markdown/04_results.md)** - Comprehensive experimental data, tables, statistical analysis
+5. **[Discussion](paper_markdown/05_discussion.md)** - Interpretation, mechanisms, limitations, recommendations
+6. **[Conclusion](paper_markdown/06_conclusion.md)** - Summary and future research directions
 
 ### 🔧 Supplementary Materials
 
 - **[Implementation Guide](implementation_guide.md)** - Practical PyTorch code and deployment checklist
-- **[References](references.md)** - Complete bibliography
+- **[References](paper_markdown/references.md)** - Complete bibliography
 
 ### 💻 Code & Data
 
 - **[comprehensive_experiment.py](comprehensive_experiment.py)** - Full experimental suite (36 configurations)
 - **[experiment.py](experiment.py)** - Single-configuration experiment for quick testing
-- **[comprehensive_results.csv](comprehensive_results.csv)** - All experimental data (CSV format)
-- **[comprehensive_results.json](comprehensive_results.json)** - All experimental data (JSON format)
+- **[comprehensive_results.csv](data/comprehensive_results.csv)** - All experimental data (CSV format)
+- **[comprehensive_results.json](data/comprehensive_results.json)** - All experimental data (JSON format)
 
 ---
 
@@ -90,7 +90,7 @@ python experiment.py
 import pandas as pd
 
 # Load data
-df = pd.read_csv('comprehensive_results.csv')
+df = pd.read_csv('data/comprehensive_results.csv')
 
 # Filter optimal configuration
 optimal = df[(df['flood_level'] == 0.10) & (df['dropout'] == True)]

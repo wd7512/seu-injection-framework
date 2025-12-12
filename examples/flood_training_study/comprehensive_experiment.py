@@ -177,7 +177,7 @@ def evaluate_seu_robustness(model, x_test, y_test, sampling_rate=0.15, bit_posit
     """Evaluate SEU robustness with higher sampling rate."""
     
     if bit_positions is None:
-        bit_positions = [0, 1, 8, 15, 23]  # Sign, exponent, mantissa
+        bit_positions = [31, 30, 23, 22, 0]  # Sign, exponent, mantissa
     
     injector = StochasticSEUInjector(
         trained_model=model,
@@ -301,14 +301,14 @@ def run_comprehensive_experiment():
                 print(f"    SEU Drop: {mean_drop:.3f}, CFR: {mean_cfr:.3f}")
     
     # Save results as JSON
-    with open('comprehensive_results.json', 'w') as f:
+    with open('data/comprehensive_results.json', 'w') as f:
         json.dump(all_results, f, indent=2)
     
     # Save results as CSV
     csv_headers = ['dataset', 'dropout', 'flood_level', 'baseline_accuracy', 
                    'final_train_loss', 'final_val_loss', 'mean_accuracy_drop', 
                    'mean_critical_fault_rate']
-    with open('comprehensive_results.csv', 'w', newline='') as f:
+    with open('data/comprehensive_results.csv', 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=csv_headers)
         writer.writeheader()
         for result in all_results:
@@ -317,8 +317,8 @@ def run_comprehensive_experiment():
     
     print(f"\n{'='*80}")
     print("Results saved to:")
-    print("  - comprehensive_results.json")
-    print("  - comprehensive_results.csv")
+    print("  - data/comprehensive_results.json")
+    print("  - data/comprehensive_results.csv")
     print(f"{'='*80}")
     
     return all_results
@@ -383,4 +383,4 @@ if __name__ == "__main__":
     print("\n" + "="*80)
     print("EXPERIMENT COMPLETE")
     print("="*80)
-    print("Results saved to: comprehensive_results.json")
+    print("Results saved to: data/comprehensive_results.json")

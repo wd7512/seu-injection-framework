@@ -246,8 +246,8 @@ def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=T
         print(f"  Baseline accuracy: {baseline_acc:.2%}")
 
     # Test critical bit positions
-    bit_positions = [0, 1, 8, 15, 23]  # Sign, exponent, mantissa
-    bit_names = ["Sign", "Exp MSB", "Exp LSB", "Mantissa MSB", "Mantissa"]
+    bit_positions = [31, 30, 23, 22, 0]  # Sign, exponent, mantissa
+    bit_names = ["Sign", "Exp MSB", "Exp LSB", "Mantissa MSB", "Mantissa LSB"]
 
     results = {}
 

@@ -155,13 +155,13 @@ The combination provides the best overall robustness, suggesting flooding adds r
 ### 5.4.1 Scale Limitations
 
 **Small Model Architecture:**
-- **Current**: Simple 3-layer MLP with 1,280 parameters
+- **Current**: Simple 3-layer MLP with 2,305 parameters
 - **Concern**: Large-scale models (ResNet-50: 25M params, GPT-3: 175B params) may behave fundamentally differently
 - **Unknown**: Whether flooding's benefits scale linearly, sublinearly, or not at all
 - **Impact**: Results establish feasibility but not production readiness
 
 **Synthetic Dataset Simplicity:**
-- **Current**: 2D binary classification (400 training samples, 2 features)
+- **Current**: 2D binary classification (1,200 training samples, 2 features)
 - **Concern**: Real-world tasks (ImageNet: 1000 classes, 224×224×3 images) are orders of magnitude more complex
 - **Unknown**: How task complexity interacts with flooding and SEU robustness
 - **Impact**: Generalization to practical applications requires validation

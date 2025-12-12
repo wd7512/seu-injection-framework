@@ -95,7 +95,7 @@ We hypothesize three mechanisms:
 
 **In Scope:**
 - Binary classification tasks (moons, circles, and blobs datasets)
-- Simple 3-layer MLP architecture (1,280 parameters)
+- Simple 3-layer MLP architecture (2,305 parameters)
 - IEEE 754 float32 parameter representation
 - Systematic bit-flip injection at representative bit positions
 - Comparison of standard vs. flood training across multiple configurations

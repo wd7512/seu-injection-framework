@@ -320,8 +320,8 @@ class FloodingLoss(nn.Module):
 
 \textbf{Scale Limitations:}
 \begin{itemize}
-    \item \textbf{Small models}: 3-layer MLP with 1,280 parameters. Large-scale models (ResNet-50: 25M params, GPT-3: 175B params) may behave fundamentally differently. Scaling behavior unknown.
-    \item \textbf{Synthetic datasets}: 2D binary classification with 400 training samples. Real-world tasks (ImageNet: 1000 classes, 224×224×3 images) are orders of magnitude more complex.
+    \item \textbf{Small models}: 3-layer MLP with 2,305 parameters. Large-scale models (ResNet-50: 25M params, GPT-3: 175B params) may behave fundamentally differently. Scaling behavior unknown.
+    \item \textbf{Synthetic datasets}: 2D binary classification with 1,200 training samples. Real-world tasks (ImageNet: 1000 classes, 224×224×3 images) are orders of magnitude more complex.
     \item \textbf{Task simplicity}: Binary classification vastly simpler than multi-class, structured prediction, or sequence tasks.
 \end{itemize}
 

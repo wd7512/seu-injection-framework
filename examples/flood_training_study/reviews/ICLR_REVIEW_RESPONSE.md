@@ -18,7 +18,7 @@ This document details how the research paper was strengthened based on simulated
 **Actions Taken**:
 - Added explicit "proof-of-concept study" positioning in abstract
 - Created comprehensive "Scale Limitations" subsection in Section 5.4
-- Acknowledged: 1,280 parameter MLP vs production models (25M-175B parameters)
+- Acknowledged: 2,305 parameter MLP vs production models (25M-175B parameters)
 - Acknowledged: 2D synthetic datasets vs real-world complexity (ImageNet, NLP)
 - Qualified all claims with scope boundaries
 
