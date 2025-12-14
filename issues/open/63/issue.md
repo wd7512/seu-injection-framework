@@ -54,13 +54,13 @@ _No response_
 - [x] I have considered the impact on existing users
 - [x] I have thought about backward compatibility
 
-______________________________________________________________________
+---
 
-| Field       | Value                                                       |
-| ----------- | ----------------------------------------------------------- |
-| **State**   | open                                                        |
-| **Created** | 2025-12-11T16:41:07Z                                        |
-| **Updated** | 2025-12-11T16:41:07Z                                        |
-| **Labels**  | enhancement                                                 |
-| **Author**  | @Will-D-AER                                                 |
-| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/63 |
+| Field | Value |
+|-------|-------|
+| **State** | open |
+| **Created** | 2025-12-11T16:41:07Z |
+| **Updated** | 2025-12-11T16:41:07Z |
+| **Labels** | enhancement |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/63 |

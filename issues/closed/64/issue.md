@@ -69,11 +69,11 @@ _No response_
 
 ---
 
-| Field       | Value                                                       |
-| ----------- | ----------------------------------------------------------- |
-| **State**   | open                                                        |
-| **Created** | 2025-12-11T16:55:03Z                                        |
-| **Updated** | 2025-12-11T17:00:23Z                                        |
-| **Labels**  | question                                                    |
-| **Author**  | @Will-D-AER                                                 |
-| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/64 |
+| Field | Value |
+|-------|-------|
+| **State** | closed |
+| **Created** | 2025-12-11T16:55:03Z |
+| **Updated** | 2025-12-14T12:03:25Z |
+| **Labels** | question |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/64 |
