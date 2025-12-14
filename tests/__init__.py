@@ -3,4 +3,4 @@
 
 class Directories:
     outputs = "tests/outputs"
-    inputs  = "tests/inputs"
+    inputs = "tests/inputs"

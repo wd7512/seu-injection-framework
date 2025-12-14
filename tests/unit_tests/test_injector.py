@@ -416,10 +416,12 @@ class TestInjector:
         """Test that model parameters are restored after SEU injection."""
         X, y = sample_data
 
-        # Store original model state
-        original_params = {}
-        for name, param in simple_model.named_parameters():
-            original_params[name] = param.data.clone()
+        # Ensure model & data are on target device BEFORE snapshot
+        simple_model.to(device)
+        X, y = X.to(device), y.to(device)
+
+        # Store original model state (device-aligned)
+        original_params = {name: param.detach().clone() for name, param in simple_model.named_parameters()}
 
         injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
@@ -432,13 +434,33 @@ class TestInjector:
         # Run SEU injection
         injector.run_injector(bit_i=0)
 
+        # Ensure all CUDA ops are complete
+        if device.type == "cuda":
+            torch.cuda.synchronize()
+
         # Check that model parameters are restored
         for name, param in simple_model.named_parameters():
-            torch.testing.assert_close(
-                param.data,
-                original_params[name],
-                msg=f"Parameter {name} was not restored after SEU injection",
-            )
+            param_tensor = param.detach()
+            orig_tensor = original_params[name]
+
+            try:
+                torch.testing.assert_close(
+                    param_tensor,
+                    orig_tensor,
+                    rtol=0.0,
+                    atol=0.0,
+                    msg=f"Parameter {name} was not restored after SEU injection",
+                )
+            except Exception as e:
+                diff = param_tensor - orig_tensor
+
+                raise AssertionError(
+                    f"Parameter '{name}' was not restored after SEU injection\n"
+                    f"  max |Δ|      : {diff.abs().max().item():e}\n"
+                    f"  differing el.: {torch.count_nonzero(diff).item()} / {diff.numel()}\n"
+                    f"  param shape  : {tuple(param.shape)}\n"
+                    f"  dtype/device : {param.dtype} / {param.device}"
+                ) from e
 
     def test_run_stochastic_seu_layer_filtering(self, simple_model, sample_data, device):
         """Test stochastic SEU injection with layer filtering to trigger continue statement."""
