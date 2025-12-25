@@ -451,7 +451,7 @@ class TestInjector:
                     atol=0.0,
                     msg=f"Parameter {name} was not restored after SEU injection",
                 )
-            except Exception as e:
+            except AssertionError as e:
                 diff = param_tensor - orig_tensor
 
                 raise AssertionError(
