@@ -182,7 +182,7 @@ def evaluate_seu_robustness(model, x_test, y_test, sampling_rate=0.15, bit_posit
     """Evaluate SEU robustness with higher sampling rate."""
 
     if bit_positions is None:
-        bit_positions = [31, 30, 23, 22, 0]  # Sign, exponent, mantissa, TODO: this is wrong?
+        bit_positions = [0, 1, 8, 9, 31]  # Sign, Exponent (MSB/LSB), Mantissa (MSB/LSB)
 
     injector = StochasticSEUInjector(
         trained_model=model,
