@@ -62,7 +62,7 @@ _No response_
 |-------|-------|
 | **State** | open |
 | **Created** | 2025-12-25T23:41:34Z |
-| **Updated** | 2025-12-25T23:41:34Z |
-| **Labels** | enhancement |
+| **Updated** | 2025-12-25T23:52:00Z |
+| **Labels** | documentation, enhancement, good first issue |
 | **Author** | @wd7512 |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/69 |

@@ -63,7 +63,7 @@ _No response_
 |-------|-------|
 | **State** | open |
 | **Created** | 2025-12-11T23:20:48Z |
-| **Updated** | 2025-12-11T23:20:48Z |
-| **Labels** | bug |
+| **Updated** | 2025-12-25T23:51:35Z |
+| **Labels** | bug, documentation, duplicate |
 | **Author** | @Will-D-AER |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/66 |
