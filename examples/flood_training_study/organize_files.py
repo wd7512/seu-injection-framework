@@ -1,7 +1,7 @@
 import os
 import shutil
 
-base_dir = r"c:\Repositories\seu-injection-framework\examples\flood_training_study"
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
 moves = {
     "paper_markdown": [
