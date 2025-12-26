@@ -44,7 +44,7 @@ class ExhaustiveSEUInjector(BaseInjector):
         """
         # Generate all indices exhaustively
         all_indices = list(np.ndindex(tensor_shape))
-        return np.array(all_indices, dtype=object)
+        return np.array(all_indices)
 
     def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Perform systematic SEU injection across model parameters.
