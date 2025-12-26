@@ -307,6 +307,7 @@ def run_comprehensive_experiment():
                 print(f"    SEU Drop: {mean_drop:.3f}, CFR: {mean_cfr:.3f}")
 
     # Save results as JSON
+    os.makedirs("data", exist_ok=True)
     with open("data/comprehensive_results.json", "w") as f:
         json.dump(all_results, f, indent=2)
 
