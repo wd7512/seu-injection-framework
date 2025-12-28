@@ -61,9 +61,9 @@ _No response_
 
 | Field | Value |
 |-------|-------|
-| **State** | open |
+| **State** | closed |
 | **Created** | 2025-12-25T23:48:06Z |
-| **Updated** | 2025-12-28T16:42:58Z |
+| **Updated** | 2025-12-28T16:43:10Z |
 | **Labels** | bug, documentation, good first issue |
 | **Author** | @wd7512 |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/70 |
