@@ -299,4 +299,4 @@ This research study is part of the SEU Injection Framework and follows the proje
 
 ______________________________________________________________________
 
-**Next Steps**: Read [01_introduction.md](01_introduction.md) to begin exploring the research paper.
+**Next Steps**: Read [01_introduction.md](paper_markdown/01_introduction.md) to begin exploring the research paper.
