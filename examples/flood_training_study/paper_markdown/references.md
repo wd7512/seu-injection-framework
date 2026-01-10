@@ -11,7 +11,8 @@ ______________________________________________________________________
 **Ishida, T., Yamane, I., Sakai, T., Niu, G., & Sugiyama, M. (2020)**\
 "Do We Need Zero Training Loss After Achieving Zero Training Error?"\
 *Advances in Neural Information Processing Systems (NeurIPS)*, 33, 9444-9455.\
-\[Paper\](https://proceedings.neurips.cc/paper/2020/hash/6a08076e1ceaa9 fed6a9e3f4a923a58-Abstract.html)
+*Proceedings of the 37th International Conference on Machine Learning (PMLR)*, 119, 4604-4614.\
+\[Paper\](https://proceedings.mlr.press/v119/ishida20a.html)
 
 **Key contribution**: Introduced flood level training and demonstrated improved generalization.
 
