@@ -95,10 +95,8 @@ class ExhaustiveSEUInjector(BaseInjector):
                 # FUTURE: Could still vectorize entire tensor at once for even better performance
 
                 # Iterate through every parameter in the tensor
-                for idx in tqdm(
-                    np.ndindex(tensor_cpu.shape),
-                    desc=f"Injecting into {current_layer_name}",
-                ):
+                print(f"    Injecting into {current_layer_name} (bit {bit_i})...")
+                for idx in np.ndindex(tensor_cpu.shape):
                     original_val = tensor_cpu[idx]
                     seu_val = bitflip_float32_optimized(
                         original_val, bit_i, inplace=False

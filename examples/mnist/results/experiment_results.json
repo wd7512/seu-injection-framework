@@ -1,0 +1,62 @@
+{
+  "relu": {
+    "parameters": 1066,
+    "test_accuracy": 98.0,
+    "epochs_trained": 2,
+    "baseline_score": 0.98,
+    "mean_accuracy_after_injection": 0.9743,
+    "std_accuracy_after_injection": 0.0104,
+    "mean_accuracy_drop": 0.0057,
+    "max_accuracy_drop": 0.14,
+    "train_time_seconds": 4.58,
+    "injection_time_seconds": 34.8
+  },
+  "leakyrelu": {
+    "parameters": 1066,
+    "test_accuracy": 95.0,
+    "epochs_trained": 2,
+    "baseline_score": 0.95,
+    "mean_accuracy_after_injection": 0.9462,
+    "std_accuracy_after_injection": 0.0096,
+    "mean_accuracy_drop": 0.0038,
+    "max_accuracy_drop": 0.08,
+    "train_time_seconds": 4.78,
+    "injection_time_seconds": 35.48
+  },
+  "gelu": {
+    "parameters": 1066,
+    "test_accuracy": 95.0,
+    "epochs_trained": 8,
+    "baseline_score": 0.95,
+    "mean_accuracy_after_injection": 0.9468,
+    "std_accuracy_after_injection": 0.0107,
+    "mean_accuracy_drop": 0.0032,
+    "max_accuracy_drop": 0.12,
+    "train_time_seconds": 18.66,
+    "injection_time_seconds": 32.36
+  },
+  "rrelu": {
+    "parameters": 1066,
+    "test_accuracy": 95.0,
+    "epochs_trained": 2,
+    "baseline_score": 0.95,
+    "mean_accuracy_after_injection": 0.9451,
+    "std_accuracy_after_injection": 0.0125,
+    "mean_accuracy_drop": 0.0049,
+    "max_accuracy_drop": 0.23,
+    "train_time_seconds": 4.95,
+    "injection_time_seconds": 34.91
+  },
+  "rwg": {
+    "parameters": 1066,
+    "test_accuracy": 89.0,
+    "epochs_trained": 100,
+    "baseline_score": 0.87,
+    "mean_accuracy_after_injection": 0.8701,
+    "std_accuracy_after_injection": 0.0199,
+    "mean_accuracy_drop": -0.0001,
+    "max_accuracy_drop": 0.34,
+    "train_time_seconds": 168.89,
+    "injection_time_seconds": 22.16
+  }
+}

@@ -98,10 +98,8 @@ class StochasticSEUInjector(BaseInjector):
                 injection_indices = np.argwhere(injection_mask)
 
                 # Perform injections for selected indices
-                for idx_array in tqdm(
-                    injection_indices,
-                    desc=f"Stochastic injection into {current_layer_name}",
-                ):
+                print(f"    Stochastic injection into {current_layer_name} (bit {bit_i})...")
+                for idx_array in injection_indices:
                     idx = tuple(idx_array)
                     original_val = tensor_cpu[idx]
                     seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)

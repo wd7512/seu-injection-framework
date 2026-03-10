@@ -1,0 +1,6 @@
+,parameters,test_accuracy,epochs_trained,baseline_score,mean_accuracy_after_injection,std_accuracy_after_injection,mean_accuracy_drop,max_accuracy_drop,train_time_seconds,injection_time_seconds
+relu,1066.0,98.0,2.0,0.98,0.9743,0.0104,0.0057,0.14,4.58,34.8
+leakyrelu,1066.0,95.0,2.0,0.95,0.9462,0.0096,0.0038,0.08,4.78,35.48
+gelu,1066.0,95.0,8.0,0.95,0.9468,0.0107,0.0032,0.12,18.66,32.36
+rrelu,1066.0,95.0,2.0,0.95,0.9451,0.0125,0.0049,0.23,4.95,34.91
+rwg,1066.0,89.0,100.0,0.87,0.8701,0.0199,-0.0001,0.34,168.89,22.16

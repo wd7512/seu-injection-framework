@@ -41,7 +41,7 @@ requires-python = ">=3.9"
 
 # Core dependencies (intentionally slimmed; heavier analysis libs moved to extras)
 dependencies = [
-    "torch>=2.0.0,<2.3.0",
+    "torch>=2.0.0",
     "numpy>=1.21.0,<2.0.0",
     "tqdm>=4.60.0",
 ]
