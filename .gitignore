@@ -200,3 +200,18 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Project-specific ignores
+data/
+examples/mnist/results/
+tests/overhead/results/
+
+
