@@ -1,20 +1,20 @@
-# Issue #31: [FEATURE] Add Mitigating Techniques
+# Issue #76: [FEATURE] Remove changes to .md files from trigging re-run of tests
 
 ### Feature Summary
 
-Start with adding transfer learning from ReLU to RWG
+Often ci/cd tests are ran when documentation updates are made. This is waste of compute
 
 ### Feature Category
 
-Core SEU Injection (new injection methods)
+Testing/Quality Assurance
 
 ### Problem Statement
 
-We want to implement mitigating techniques from current and future research for easy implementation
+see summary
 
 ### Proposed Solution
 
-Add a new folder into src, at `src/mitigation` since is it not part of the injection framework
+_No response_
 
 ### Proposed API (if applicable)
 
@@ -24,7 +24,7 @@ Add a new folder into src, at `src/mitigation` since is it not part of the injec
 
 ### Priority Level
 
-None
+Medium (nice to have improvement)
 
 ### Research Impact
 
@@ -59,8 +59,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-11-23T11:25:27Z |
-| **Updated** | 2025-11-23T11:25:27Z |
+| **Created** | 2025-12-26T12:17:35Z |
+| **Updated** | 2025-12-26T12:17:35Z |
 | **Labels** | enhancement |
 | **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/31 |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/76 |

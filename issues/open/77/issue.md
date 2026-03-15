@@ -1,20 +1,24 @@
-# Issue #31: [FEATURE] Add Mitigating Techniques
+# Issue #77: [FEATURE] Add Smoke tests that run all example code snippets
 
 ### Feature Summary
 
-Start with adding transfer learning from ReLU to RWG
+Extract all code snippets (typically with the ``` code ``` wrapper) and automatically run them in a smoke test.
+
+This ensures that example code does not crash
 
 ### Feature Category
 
-Core SEU Injection (new injection methods)
+Testing/Quality Assurance
 
 ### Problem Statement
 
-We want to implement mitigating techniques from current and future research for easy implementation
+see above
 
 ### Proposed Solution
 
-Add a new folder into src, at `src/mitigation` since is it not part of the injection framework
+Scan all .md files for code snippets. Run these code snippets.
+
+
 
 ### Proposed API (if applicable)
 
@@ -24,7 +28,7 @@ Add a new folder into src, at `src/mitigation` since is it not part of the injec
 
 ### Priority Level
 
-None
+High (significantly improves workflow)
 
 ### Research Impact
 
@@ -59,8 +63,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-11-23T11:25:27Z |
-| **Updated** | 2025-11-23T11:25:27Z |
-| **Labels** | enhancement |
-| **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/31 |
+| **Created** | 2026-01-10T10:46:24Z |
+| **Updated** | 2026-01-10T10:46:24Z |
+| **Labels** | documentation, enhancement |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/77 |

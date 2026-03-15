@@ -1,20 +1,22 @@
-# Issue #31: [FEATURE] Add Mitigating Techniques
+# Issue #69: [FEATURE] Simplify Initial Readme.md and add future directions
 
 ### Feature Summary
 
-Start with adding transfer learning from ReLU to RWG
+The initial readme page is a bit overwhelming with multiple install options. We should state the install using UV then add a comment that it is also possible with pip.
+
+Then it would be good to create a checklist of research directions. 
 
 ### Feature Category
 
-Core SEU Injection (new injection methods)
+Documentation/Examples
 
 ### Problem Statement
 
-We want to implement mitigating techniques from current and future research for easy implementation
+See summary
 
 ### Proposed Solution
 
-Add a new folder into src, at `src/mitigation` since is it not part of the injection framework
+See summary
 
 ### Proposed API (if applicable)
 
@@ -59,8 +61,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-11-23T11:25:27Z |
-| **Updated** | 2025-11-23T11:25:27Z |
-| **Labels** | enhancement |
+| **Created** | 2025-12-25T23:41:34Z |
+| **Updated** | 2025-12-28T16:42:42Z |
+| **Labels** | documentation, enhancement, good first issue |
 | **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/31 |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/69 |

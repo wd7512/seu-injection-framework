@@ -1,20 +1,22 @@
-# Issue #31: [FEATURE] Add Mitigating Techniques
+# Issue #74: [FEATURE] Examples should be added as smoke tests
 
 ### Feature Summary
 
-Start with adding transfer learning from ReLU to RWG
+We are accumulating a number of examples in this repo. This is a great resource for smoke testing. We should create a set of sets that runs the experimental script from each example and ensure it does not crash and the results make sense. This should also be added to our CI/CD pipeline.
+
+For this to be effective we need to find what a "reasonable" result is for each example. 
 
 ### Feature Category
 
-Core SEU Injection (new injection methods)
+Testing/Quality Assurance
 
 ### Problem Statement
 
-We want to implement mitigating techniques from current and future research for easy implementation
+See Summary
 
 ### Proposed Solution
 
-Add a new folder into src, at `src/mitigation` since is it not part of the injection framework
+_No response_
 
 ### Proposed API (if applicable)
 
@@ -24,7 +26,7 @@ Add a new folder into src, at `src/mitigation` since is it not part of the injec
 
 ### Priority Level
 
-None
+High (significantly improves workflow)
 
 ### Research Impact
 
@@ -59,8 +61,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-11-23T11:25:27Z |
-| **Updated** | 2025-11-23T11:25:27Z |
+| **Created** | 2025-12-26T11:55:09Z |
+| **Updated** | 2025-12-26T11:55:09Z |
 | **Labels** | enhancement |
 | **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/31 |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/74 |

@@ -1,18 +1,18 @@
-# Issue #38: [BUG] Change Update Dependencies Workflow to Run Full Matrix Tests
+# Issue #70: [BUG] Documentation and Quickstart Link in the readme.md are wrong
 
 ### Bug Description
 
-The existing update deps workflow only does partial testing. This does not ensure that updating the dependencies wont break part of the codebase. 
+Documentation needs to go to the githubio page now. Quickstart link also needs to go to relevant page. The current quickstart link is broken. 
 
 ### Steps to Reproduce
 
 ```python
-Run the workflow.
+see summary
 ```
 
 ### Expected Behavior
 
-Run the full matrix of tests before making a pr into main and document that they all pass. 
+see summary
 
 ### Error Message
 
@@ -26,11 +26,11 @@ Windows
 
 ### Python Version
 
-3.11.8
+3+
 
 ### SEU Injection Framework Version
 
-1.0.0+
+1+
 
 ### PyTorch Version
 
@@ -61,9 +61,9 @@ _No response_
 
 | Field | Value |
 |-------|-------|
-| **State** | open |
-| **Created** | 2025-12-08T23:14:08Z |
-| **Updated** | 2025-12-08T23:14:52Z |
-| **Labels** | bug |
+| **State** | closed |
+| **Created** | 2025-12-25T23:48:06Z |
+| **Updated** | 2025-12-28T16:43:10Z |
+| **Labels** | bug, documentation, good first issue |
 | **Author** | @wd7512 |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/38 |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/70 |

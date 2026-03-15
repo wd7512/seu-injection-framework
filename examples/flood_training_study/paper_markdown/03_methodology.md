@@ -27,6 +27,10 @@ Both models are:
 All experiments use **fixed random seeds**:
 
 ```python
+import torch
+import numpy as np
+import random
+
 torch.manual_seed(42)
 np.random.seed(42)
 random.seed(42)

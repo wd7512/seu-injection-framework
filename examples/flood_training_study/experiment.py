@@ -484,12 +484,7 @@ def main():
     print(f"  1. Flood training sacrifices {accuracy_diff:.2%} baseline accuracy")
     print(f"  2. But improves SEU robustness by {robustness_improvement:.1f}%")
     print(f"  3. Critical faults reduced by {cfr_reduction:.1f}%")
-    if accuracy_diff == 0:
-        roi_text = "infinite (no baseline accuracy loss)"
-    else:
-        roi = robustness_improvement / abs(accuracy_diff * 100)
-        roi_text = f"{roi:.1f}x larger than accuracy loss"
-    print(f"  4. Robustness gain is {roi_text}")
+    print(f"  4. Robustness gain is {robustness_improvement / (accuracy_diff * 100):.1f}× larger than accuracy loss")
 
     # ========================================================================
     # Visualizations

@@ -221,9 +221,9 @@ def evaluate_seu_robustness(model, x_test, y_test, sampling_rate=0.15, bit_posit
             critical_fault_rate = critical_faults / len(fault_scores)
 
             results[bit_i] = {
-                "mean_accuracy": mean_acc,
-                "accuracy_drop": accuracy_drop,
-                "critical_fault_rate": critical_fault_rate,
+                "mean_accuracy": float(mean_acc),
+                "accuracy_drop": float(accuracy_drop),
+                "critical_fault_rate": float(critical_fault_rate),
                 "num_injections": len(fault_scores),
             }
 
@@ -330,8 +330,9 @@ def run_comprehensive_experiment():
     serializable_results = _to_serializable(all_results)
 
     # Save results as JSON
-    with json_path.open("w", encoding="utf-8") as f:
-        json.dump(serializable_results, f, indent=2)
+    os.makedirs("data", exist_ok=True)
+    with open("data/comprehensive_results.json", "w") as f:
+        json.dump(all_results, f, indent=2)
 
     # Save results as CSV
     csv_headers = [
