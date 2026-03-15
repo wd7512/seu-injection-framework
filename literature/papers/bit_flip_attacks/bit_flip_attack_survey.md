@@ -27,6 +27,11 @@ Comprehensive survey of bit-flip attacks (BFA) and defense mechanisms.
 - Few-bit flips can severely degrade DNN performance
 - Sign bit flips often have most impact
 
+## Verification Links
+
+- [Paper](https://doi.org/10.3390/electronics12040853) - DOI
+- [MDPI](https://www.mdpi.com/2079-9292/12/4/853) - MDPI
+
 ## BibTeX
 
 ```bibtex
@@ -36,7 +41,8 @@ Comprehensive survey of bit-flip attacks (BFA) and defense mechanisms.
   journal={Electronics},
   volume={12},
   number={4},
-  year={2023}
+  year={2023},
+  doi={10.3390/electronics12040853}
 }
 ```
 

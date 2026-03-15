@@ -21,6 +21,11 @@ Open-source platform using Spatio-Temporal Graph Neural Networks (STGNNs) to acc
 | FsimNNs (GNN) | Fast | Approximate |
 | SEU Injection Framework | Moderate | Exact |
 
+## Verification Links
+
+- [Paper](https://arxiv.org/abs/2511.09131) - arXiv
+- [PDF](https://arxiv.org/pdf/2511.09131.pdf) - arXiv PDF
+
 ## Relevance
 
 - Complementary approach to direct injection

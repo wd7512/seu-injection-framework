@@ -29,6 +29,10 @@ Extensive survey covering fault tolerance methodologies for DNNs in safety-criti
 - Critical vs. non-critical parameters can be identified
 - Layer-wise vulnerability varies significantly
 
+## Verification Links
+
+- [PDF](https://www.par.pl/content/download/15329/189636/file/SurveyFaultTolerantMethodologiesDeepNeuralNetworks.pdf) - PDF
+
 ## BibTeX
 
 ```bibtex

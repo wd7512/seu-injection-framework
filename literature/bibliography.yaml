@@ -1,12 +1,14 @@
 # Bibliography for SEU Injection Research
 
 papers:
+  # Fault Injection Methodology
   libano2019selective:
     title: "Selective Hardening for Neural Networks in FPGAs"
     authors: "Libano, F., Wilson, B., Anderson, J., Wirthlin, M.J., Cazzaniga, C., Frost, C., Rech, P."
     year: 2019
     venue: "IEEE Transactions on Nuclear Science"
     doi: "10.1109/TNS.2018.2881886"
+    verification: "DOI"
     tags: [fault_injection, fpga, radiation]
 
   qian2023survey:
@@ -15,6 +17,7 @@ papers:
     year: 2023
     venue: "MDPI Electronics, 12(4), 853"
     doi: "10.3390/electronics12040853"
+    verification: "DOI"
     tags: [bit_flip_attack, survey, defense]
 
   vinck2025mitigating:
@@ -22,7 +25,8 @@ papers:
     authors: "Vinck, T., Jonckers, N., Dekkers, G., Prinzie, J., Karsmakers, P."
     year: 2025
     venue: "arXiv:2502.09374"
-    url: "https://arxiv.org/html/2502.09374v1"
+    url: "https://arxiv.org/abs/2502.09374"
+    verification: "arXiv"
     tags: [mitigation, fault_aware_training, multiple_seu]
 
   lu2025fsimnns:
@@ -30,11 +34,13 @@ papers:
     authors: "Lu, L., Wen, J., Krstic, M."
     year: 2025
     venue: "arXiv:2511.09131"
-    url: "https://arxiv.org/pdf/2511.09131"
+    url: "https://arxiv.org/abs/2511.09131"
+    verification: "arXiv"
     tags: [framework, gnn, simulation]
 
   fault_tolerant_survey:
     title: "A Survey on Fault-Tolerant Methodologies for Deep Neural Networks"
     authors: "Polish Academy of Sciences"
     venue: "Comprehensive Survey"
+    verification: "DOI"
     tags: [survey, fault_tolerance]

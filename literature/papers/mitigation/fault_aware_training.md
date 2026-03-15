@@ -27,6 +27,17 @@ Fault-Aware Training (FAT) methodology improves DNN robustness to multiple SEUs.
 | Clipped ReLU | ~1.5x |
 | **Fault-Aware Training** | **~3x** |
 
+## Verification Links
+
+- [Paper](https://arxiv.org/abs/2502.09374) - arXiv
+- [PDF](https://arxiv.org/pdf/2502.09374.pdf) - arXiv PDF
+
+## Relevance
+
+- Provides training-based mitigation strategy
+- Can be combined with framework's injection capabilities
+- Validates importance of sign bit protection
+
 ## BibTeX
 
 ```bibtex

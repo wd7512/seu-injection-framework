@@ -19,6 +19,11 @@ Evaluates radiation-induced errors on neural networks in FPGAs. Focuses on Iris 
 - Certain layers are more critical for reliability
 - Selective hardening achieves fault tolerance with reduced overhead
 
+## Verification Links
+
+- [Paper](https://doi.org/10.1109/TNS.2018.2881886) - DOI
+- [IEEE Xplore](https://ieeexplore.ieee.org/document/8635205) - IEEE
+
 ## Relevance
 
 - Validates layer-wise fault injection importance
@@ -32,7 +37,8 @@ Evaluates radiation-induced errors on neural networks in FPGAs. Focuses on Iris 
   title={Selective Hardening for Neural Networks in FPGAs},
   author={Libano, F. and Wilson, B. and Anderson, J. and Wirthlin, M.J. and Cazzaniga, C. and Frost, C. and Rech, P.},
   journal={IEEE Transactions on Nuclear Science},
-  year={2019}
+  year={2019},
+  doi={10.1109/TNS.2018.2881886}
 }
 ```
 
