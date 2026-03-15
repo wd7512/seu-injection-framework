@@ -238,8 +238,8 @@ def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=T
     if verbose:
         print(f"  Baseline accuracy: {baseline_acc:.2%}")
 
-    # Test critical bit positions
-    bit_positions = [31, 30, 23, 22, 0]  # Sign, exponent, mantissa
+    # Test representative bit positions across sign, exponent, and mantissa.
+    bit_positions = [0, 1, 8, 9, 31]
     bit_names = ["Sign", "Exp MSB", "Exp LSB", "Mantissa MSB", "Mantissa LSB"]
 
     results = {}
@@ -484,7 +484,12 @@ def main():
     print(f"  1. Flood training sacrifices {accuracy_diff:.2%} baseline accuracy")
     print(f"  2. But improves SEU robustness by {robustness_improvement:.1f}%")
     print(f"  3. Critical faults reduced by {cfr_reduction:.1f}%")
-    print(f"  4. Robustness gain is {robustness_improvement / (accuracy_diff * 100):.1f}× larger than accuracy loss")
+    if accuracy_diff == 0:
+        roi_text = "infinite (no baseline accuracy loss)"
+    else:
+        roi = robustness_improvement / abs(accuracy_diff * 100)
+        roi_text = f"{roi:.1f}x larger than accuracy loss"
+    print(f"  4. Robustness gain is {roi_text}")
 
     # ========================================================================
     # Visualizations
