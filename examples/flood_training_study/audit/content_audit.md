@@ -223,4 +223,28 @@ ______________________________________________________________________
 ______________________________________________________________________
 
 **Audit completed**: 2025-12-12\
+**Re-validated**: 2026-03-15 (after bit position fix and full data re-run)\
 **Status**: Ready for figure generation and paper compilation
+
+______________________________________________________________________
+
+## Re-validation Notes (March 2026)
+
+### Bit Position Fix
+
+The original study used incorrect bit positions `[31, 30, 23, 22, 0]`. These were corrected to `[0, 1, 8, 9, 31]` matching the framework's convention (bit 0 = sign). The study was re-run and all documentation updated.
+
+### Data Integrity
+
+- All 36 configurations re-run with corrected bit positions
+- CSV and JSON now contain real per-bit-position data (previously `seu_by_bit` was empty `{}`)
+- All numbers in markdown and LaTeX documents verified against new CSV data
+- Old fabricated numbers (6.5-14.2% improvement, 15.9× ROI, 0.41% cost) replaced with real data
+
+### Key Findings Changed
+
+- Improvement is dataset-dependent, not universal
+- Best cross-dataset flood level is b=0.15 (10.0% avg improvement), not b=0.10
+- Dropout alone provides 15.1% robustness improvement
+- Bit 1 (exponent MSB) dominates all vulnerability
+- Circles dataset: flooding is never active

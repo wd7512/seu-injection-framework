@@ -1,4 +1,6 @@
 shipsnet.json
+Research/data
+testing/data
 
 ##### ----- default ignores ----- ######
 
@@ -199,4 +201,20 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.toc
+*.synctex.gz
+*.synctex(busy)
+
+# Windows artifacts
+nul
 

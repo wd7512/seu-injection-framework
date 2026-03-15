@@ -19,6 +19,7 @@ Date: December 2025
 
 import csv
 import json
+from pathlib import Path
 
 import matplotlib
 
@@ -34,6 +35,21 @@ from sklearn.preprocessing import StandardScaler
 
 from seu_injection.core import StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
+
+SCRIPT_DIR = Path(__file__).resolve().parent
+DATA_DIR = SCRIPT_DIR / "data"
+
+
+def _to_serializable(value):
+    """Convert NumPy containers/scalars to JSON-serializable Python values."""
+    if isinstance(value, dict):
+        return {str(key): _to_serializable(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_to_serializable(item) for item in value]
+    if isinstance(value, np.generic):
+        return value.item()
+    return value
+
 
 # ============================================================================
 # Flood Level Training Implementation
@@ -182,7 +198,7 @@ def evaluate_seu_robustness(model, x_test, y_test, sampling_rate=0.15, bit_posit
     """Evaluate SEU robustness with higher sampling rate."""
 
     if bit_positions is None:
-        bit_positions = [31, 30, 23, 22, 0]  # Sign, exponent, mantissa
+        bit_positions = [0, 1, 8, 9, 31]  # Sign, Exponent (MSB/LSB), Mantissa (MSB/LSB)
 
     injector = StochasticSEUInjector(
         trained_model=model,
@@ -306,6 +322,13 @@ def run_comprehensive_experiment():
                 )
                 print(f"    SEU Drop: {mean_drop:.3f}, CFR: {mean_cfr:.3f}")
 
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+    json_path = DATA_DIR / "comprehensive_results.json"
+    csv_path = DATA_DIR / "comprehensive_results.csv"
+
+    serializable_results = _to_serializable(all_results)
+
     # Save results as JSON
     os.makedirs("data", exist_ok=True)
     with open("data/comprehensive_results.json", "w") as f:
@@ -322,17 +345,17 @@ def run_comprehensive_experiment():
         "mean_accuracy_drop",
         "mean_critical_fault_rate",
     ]
-    with open("data/comprehensive_results.csv", "w", newline="") as f:
+    with csv_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(f, fieldnames=csv_headers)
         writer.writeheader()
-        for result in all_results:
+        for result in serializable_results:
             row = {k: result[k] for k in csv_headers}
             writer.writerow(row)
 
     print(f"\n{'=' * 80}")
     print("Results saved to:")
-    print("  - data/comprehensive_results.json")
-    print("  - data/comprehensive_results.csv")
+    print(f"  - {json_path}")
+    print(f"  - {csv_path}")
     print(f"{'=' * 80}")
 
     return all_results
@@ -387,8 +410,8 @@ def analyze_results(results):
 
                 print(
                     f"    Flood {r['flood_level']:.2f}: "
-                    f"Acc Δ={acc_change:+.3f}, "
-                    f"Drop Δ={drop_change:+.3f}, "
+                    f"Acc delta={acc_change:+.3f}, "
+                    f"Drop delta={drop_change:+.3f}, "
                     f"Improve={improvement:+.1f}%"
                 )
 

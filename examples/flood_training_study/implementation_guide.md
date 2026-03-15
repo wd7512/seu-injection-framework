@@ -227,7 +227,7 @@ injector = StochasticSEUInjector(
 )
 
 # Test critical bit positions
-for bit_pos, bit_name in [(0, 'Sign'), (1, 'Exp MSB'), (15, 'Mantissa')]:
+for bit_pos, bit_name in [(0, 'Sign'), (1, 'Exp MSB'), (9, 'Mantissa MSB')]:
     results = injector.run_injector(bit_i=bit_pos, p=0.05)  # 5% sampling
     mean_acc = np.mean(results['criterion_score'])
     accuracy_drop = baseline_acc - mean_acc

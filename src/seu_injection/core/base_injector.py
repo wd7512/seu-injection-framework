@@ -143,7 +143,7 @@ class BaseInjector(ABC):
         """Run the fault injection process.
 
         Args:
-            bit_i (int): Bit position to flip (0-31).
+            bit_i (int): Bit position to flip (0-31). 0 is the sign bit
             layer_name (Optional[str]): Name of the layer to target (None for all layers).
             **kwargs: Additional arguments for the injection process.
 
