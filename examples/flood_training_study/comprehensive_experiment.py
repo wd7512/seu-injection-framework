@@ -330,9 +330,8 @@ def run_comprehensive_experiment():
     serializable_results = _to_serializable(all_results)
 
     # Save results as JSON
-    os.makedirs("data", exist_ok=True)
-    with open("data/comprehensive_results.json", "w") as f:
-        json.dump(all_results, f, indent=2)
+    with json_path.open("w", encoding="utf-8") as f:
+        json.dump(serializable_results, f, indent=2)
 
     # Save results as CSV
     csv_headers = [
@@ -358,7 +357,7 @@ def run_comprehensive_experiment():
     print(f"  - {csv_path}")
     print(f"{'=' * 80}")
 
-    return all_results
+    return serializable_results
 
 
 # ============================================================================
@@ -426,4 +425,4 @@ if __name__ == "__main__":
     print("\n" + "=" * 80)
     print("EXPERIMENT COMPLETE")
     print("=" * 80)
-    print("Results saved to: data/comprehensive_results.json")
+    print(f"Results saved to: {DATA_DIR}")

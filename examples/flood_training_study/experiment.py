@@ -28,6 +28,8 @@ References:
     Achieving Zero Training Error?" NeurIPS 2020.
 """
 
+from pathlib import Path
+
 import matplotlib
 import numpy as np
 import torch
@@ -36,6 +38,8 @@ import torch.optim as optim
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+
+SCRIPT_DIR = Path(__file__).resolve().parent
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -392,8 +396,9 @@ def create_comparison_visualizations(
             )
 
     plt.tight_layout()
-    plt.savefig("flood_training_seu_robustness.png", dpi=300, bbox_inches="tight")
-    print("✅ Visualizations saved as 'flood_training_seu_robustness.png'")
+    out = SCRIPT_DIR / "flood_training_seu_robustness.png"
+    plt.savefig(out, dpi=300, bbox_inches="tight")
+    print(f"Visualizations saved as '{out}'")
 
 
 # ============================================================================
@@ -465,26 +470,27 @@ def main():
     print("\n🛡️  SEU Robustness (Mean Accuracy Drop):")
     print(f"  Standard Training: {standard_results['mean_accuracy_drop']:.2%}")
     print(f"  Flood Training:    {flood_results['mean_accuracy_drop']:.2%}")
-    robustness_improvement = (
-        (standard_results["mean_accuracy_drop"] - flood_results["mean_accuracy_drop"])
-        / standard_results["mean_accuracy_drop"]
-    ) * 100
+    std_drop = standard_results["mean_accuracy_drop"]
+    robustness_improvement = (std_drop - flood_results["mean_accuracy_drop"]) / std_drop * 100 if std_drop > 0 else 0.0
     print(f"  Improvement:       {robustness_improvement:.1f}% (flood is more robust)")
 
     print("\n⚠️  Critical Fault Rate (>10% drop):")
     print(f"  Standard Training: {standard_results['mean_critical_fault_rate']:.1%}")
     print(f"  Flood Training:    {flood_results['mean_critical_fault_rate']:.1%}")
-    cfr_reduction = (
-        (standard_results["mean_critical_fault_rate"] - flood_results["mean_critical_fault_rate"])
-        / standard_results["mean_critical_fault_rate"]
-    ) * 100
+    std_cfr = standard_results["mean_critical_fault_rate"]
+    cfr_reduction = (std_cfr - flood_results["mean_critical_fault_rate"]) / std_cfr * 100 if std_cfr > 0 else 0.0
     print(f"  Reduction:         {cfr_reduction:.1f}% (flood has fewer critical faults)")
 
     print("\n🎯 Key Findings:")
     print(f"  1. Flood training sacrifices {accuracy_diff:.2%} baseline accuracy")
     print(f"  2. But improves SEU robustness by {robustness_improvement:.1f}%")
     print(f"  3. Critical faults reduced by {cfr_reduction:.1f}%")
-    print(f"  4. Robustness gain is {robustness_improvement / (accuracy_diff * 100):.1f}× larger than accuracy loss")
+    if accuracy_diff > 0:
+        print(
+            f"  4. Robustness gain is {robustness_improvement / (accuracy_diff * 100):.1f}× larger than accuracy loss"
+        )
+    else:
+        print("  4. Robustness gain achieved with no baseline accuracy cost")
 
     # ========================================================================
     # Visualizations
@@ -520,7 +526,7 @@ def main():
     print("\n" + "=" * 80)
     print("EXPERIMENT COMPLETE")
     print("=" * 80)
-    print("Check 'flood_training_seu_robustness.png' for detailed visualizations!")
+    print(f"Check '{SCRIPT_DIR / 'flood_training_seu_robustness.png'}' for detailed visualizations!")
 
 
 if __name__ == "__main__":
