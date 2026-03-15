@@ -146,8 +146,6 @@ For a typical space mission with a neural network:
 - **Hardware savings**: Potentially reduce ECC/TMR requirements
 - **Mission reliability**: Lower probability of critical failures
 
-**ROI**: 20.0x return on investment at b=0.15 (robustness gain vs. accuracy loss). At b=0.10, ROI reaches 43.0x but with a smaller 3.6% robustness gain.
-
 **Important caveat**: These benefits are dataset-dependent. Flooding is only effective when the flood level exceeds the model's natural training loss convergence point. For tasks where standard training loss is already high (e.g., circles dataset at ~0.43), flooding has no effect.
 
 ### Broader Implications

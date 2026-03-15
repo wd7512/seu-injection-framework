@@ -202,3 +202,19 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.toc
+*.synctex.gz
+*.synctex(busy)
+
+# Windows artifacts
+nul
+

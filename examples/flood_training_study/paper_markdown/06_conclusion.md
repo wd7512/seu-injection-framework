@@ -17,7 +17,6 @@ Through a controlled experiment comparing standard vs. flood training across 36 
 | **Robustness Improvement** | **Up to 10.0%** avg, ~49% best config    | ⭐⭐⭐ High (dataset-dependent) |
 | **Optimal Flood Level**    | **b=0.15** (cross-dataset best)          | ⭐⭐⭐ Best balance |
 | **Baseline Accuracy Cost** | **0.50%** (at b=0.15)                    | ⭐ Low (acceptable) |
-| **Cost-Benefit Ratio**     | **20.0×** ROI at b=0.15                  | ⭐⭐⭐ Strong       |
 | **Dropout Improvement**    | **15.1%** independently                  | ⭐⭐⭐ Significant  |
 | **Training Overhead**      | **+4-6%** time                           | ⭐⭐⭐ Negligible   |
 | **Inference Cost**         | **0%**                                   | ⭐⭐⭐ Perfect      |
@@ -88,15 +87,6 @@ This connection is supported by:
 - Add flood training (b=0.15) for additional benefit, **after verifying flood level > natural training loss**
 - If safety is critical, **use flood training + dropout + hardware protection**
 - If mission duration is long (Mars rover, satellite), **strongly recommend flood training**
-
-**Rule of thumb:**
-
-```
-If (deployment_risk × failure_cost) > 20.0 × (0.5% accuracy),
-    then use_flood_training = True
-```
-
-For most harsh environment deployments, this inequality holds.
 
 ## 6.3 Future Research Directions
 
@@ -249,7 +239,7 @@ Each prevented failure could save:
 
 - **Implementation**: 10 lines of code
 - **Cost**: 0.50% accuracy at b=0.15, 4-6% training time
-- **Benefit**: Up to 10.0% avg robustness improvement (20.0x ROI); up to ~49% for favorable configurations
+- **Benefit**: Up to 10.0% avg robustness improvement; up to ~49% for favorable configurations
 - **Prerequisite**: Flood level must exceed natural training loss to be active
 - **Complement with dropout**: Dropout alone provides 15.1% improvement; use both for best results
 - **Recommendation**: Adopt for harsh environment deployments where flood level can be properly calibrated

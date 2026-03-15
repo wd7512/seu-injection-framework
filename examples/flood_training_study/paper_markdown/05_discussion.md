@@ -41,11 +41,11 @@ The accuracy-robustness trade-off shows a nuanced, non-monotonic relationship:
 
 | Flood Level | Accuracy Cost | Robustness Gain | Assessment                          |
 | ----------- | ------------- | --------------- | ----------------------------------- |
-| 0.05        | 0.79%         | 0.9%            | Poor ROI, accuracy cost exceeds gain |
-| 0.10        | 0.08%         | 3.6%            | High ROI (43.0x) but small gain     |
-| **0.15**    | **0.50%**     | **10.0%**       | **Best balance (20.0x ROI)**        |
+| 0.05        | 0.79%         | 0.9%            | Minimal gain                        |
+| 0.10        | 0.08%         | 3.6%            | Small gain, low cost                |
+| **0.15**    | **0.50%**     | **10.0%**       | **Best balance**                    |
 | 0.20        | -0.12%*       | 9.2%            | Anomalous (negative cost)           |
-| 0.30        | 1.04%         | 6.0%            | Declining benefit, rising cost      |
+| 0.30        | 1.04%         | 6.0%            | Declining benefit                   |
 
 *b=0.20 shows negative accuracy cost due to random variation, not a genuine benefit.
 
@@ -349,7 +349,7 @@ ______________________________________________________________________
 
 1. ✅ Flooding can improve SEU robustness, with up to 10.0% average improvement at b=0.15 and up to ~49% for individual configurations (blobs with dropout)
 1. ✅ Effect is **dataset-dependent**, not universal — flooding must be active (flood level > natural training loss)
-1. ✅ Optimal cross-dataset configuration is b=0.15 with dropout (20.0x ROI)
+1. ✅ Optimal cross-dataset configuration is b=0.15 with dropout
 1. ✅ Dropout alone provides 15.1% robustness improvement — a strong independent technique
 1. ✅ Bit 1 (exponent MSB) dominates all SEU vulnerability; other tested bits have negligible impact
 1. ✅ Practical deployment guidelines established (with important caveats)

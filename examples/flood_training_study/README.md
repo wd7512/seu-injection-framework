@@ -28,7 +28,7 @@ Where `b` is the flood level. We investigated whether this improves robustness t
 | Metric                       | Result                                   |
 | ---------------------------- | ---------------------------------------- |
 | **Robustness Improvement**   | Up to 10.0% avg (b=0.15), ~49% best config (blobs+dropout) |
-| **Optimal Configuration**    | b=0.15 with dropout (20.0× ROI)          |
+| **Optimal Configuration**    | b=0.15 with dropout                      |
 | **Accuracy Cost**            | 0.50% at optimal setting                 |
 | **Dropout Alone**            | 15.1% robustness improvement (0.10% cost) |
 | **Dominant Vulnerability**   | Bit 1 (exponent MSB) accounts for nearly all SEU impact |
@@ -125,13 +125,13 @@ ______________________________________________________________________
 
 ### Cost-Benefit Analysis
 
-| Flood Level | Accuracy Cost | Robustness Gain | ROI       |
-| ----------- | ------------- | --------------- | --------- |
-| 0.05        | 0.79%         | 0.9%            | 1.2×      |
-| 0.10        | 0.08%         | 3.6%            | 43.0×     |
-| **0.15**    | **0.50%**     | **10.0%**       | **20.0×** |
-| 0.20        | -0.12%*       | 9.2%            | N/A*      |
-| 0.30        | 1.04%         | 6.0%            | 5.8×      |
+| Flood Level | Accuracy Cost | Robustness Gain |
+| ----------- | ------------- | --------------- |
+| 0.05        | 0.79%         | 0.9%            |
+| 0.10        | 0.08%         | 3.6%            |
+| **0.15**    | **0.50%**     | **10.0%**       |
+| 0.20        | -0.12%*       | 9.2%            |
+| 0.30        | 1.04%         | 6.0%            |
 
 *b=0.20 shows negative accuracy cost due to random variation.
 

@@ -141,17 +141,17 @@ Averaging across all datasets and dropout configurations:
 
 ### 4.3.2 Cost-Benefit Analysis
 
-| Flood Level | Acc Cost | Robustness Gain | ROI (Gain/Cost) |
-| ----------- | -------- | --------------- | --------------- |
-| 0.05        | 0.79%    | 0.9%            | 1.2×            |
-| 0.10        | 0.08%    | 3.6%            | 43.0×           |
-| **0.15**    | **0.50%**| **10.0%**       | **20.0×**       |
-| 0.20        | -0.12%*  | 9.2%            | N/A*            |
-| 0.30        | 1.04%    | 6.0%            | 5.8×            |
+| Flood Level | Acc Cost | Robustness Gain |
+| ----------- | -------- | --------------- |
+| 0.05        | 0.79%    | 0.9%            |
+| 0.10        | 0.08%    | 3.6%            |
+| **0.15**    | **0.50%**| **10.0%**       |
+| 0.20        | -0.12%*  | 9.2%            |
+| 0.30        | 1.04%    | 6.0%            |
 
-*b=0.20 shows negative accuracy cost (i.e., slightly higher baseline accuracy on average), making ROI undefined. This is likely due to random variation rather than a genuine benefit.
+*b=0.20 shows negative accuracy cost (i.e., slightly higher baseline accuracy on average). This is likely due to random variation rather than a genuine benefit.
 
-**Optimal Configuration**: b=0.15 provides the best balance of robustness gain (10.0%) with modest accuracy cost (0.50%), yielding a 20.0x ROI. Alternatively, b=0.10 offers a very high ROI (43.0x) due to near-zero accuracy cost, but the robustness gain is smaller (3.6%).
+**Optimal Configuration**: b=0.15 provides the best balance of robustness gain (10.0%) with modest accuracy cost (0.50%).
 
 ### 4.3.3 Dropout Interaction
 
@@ -279,7 +279,7 @@ ______________________________________________________________________
 1. **Flooding can improve SEU robustness**: Up to 10.0% average improvement at b=0.15, and up to ~49% for individual dataset-configurations (blobs with dropout)
 1. **Effect is dataset-dependent**: Blobs benefits strongly, circles shows minimal benefit (flooding inactive), moons shows modest benefit
 1. **Flooding requires calibration**: The flood level must exceed the natural training loss convergence point to be active; otherwise it has no effect
-1. **Optimal cross-dataset configuration**: b=0.15 with dropout (10.0% improvement, 0.50% accuracy cost, 20.0× ROI)
+1. **Optimal cross-dataset configuration**: b=0.15 with dropout (10.0% improvement, 0.50% accuracy cost)
 1. **Dropout is independently beneficial**: 15.1% robustness improvement from dropout alone, with negligible accuracy cost
 1. **Bit-1 dominance**: The exponent MSB (bit 1) accounts for essentially all observed vulnerability; targeted protection of this bit position would be highly effective
 1. **Non-monotonic relationship**: Higher flood levels do not always yield better robustness; b=0.15 is the cross-dataset optimum
