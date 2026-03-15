@@ -10,15 +10,15 @@ API Enhancement
 
 ### Problem Statement
 
-To build new injectors we must build a new function into the existing class, this is not scaleable and the file gets very very long with docstrings.
+To build new injectors we must build a new function into the existing class, this is not scaleable and the file gets very very long with docstrings. 
 
 ### Proposed Solution
 
-create an injector.py file with a base injector class and core methods.
+create an injector.py file with a base injector class and core methods. 
 
 create a exhaustive_seu_injector.py file which performs the exhaustive seu injection. This class will inherit from the base injector
 
-create the stochastic injector in stochastic_seu_injector.py
+create the stochastic injector in stochastic_seu_injector.py 
 
 adjust the unit tests with the new classes. ensure these all this pass without changing the test logic.
 
@@ -60,13 +60,13 @@ _No response_
 - [x] I have considered the impact on existing users
 - [x] I have thought about backward compatibility
 
-______________________________________________________________________
+---
 
-| Field       | Value                                                       |
-| ----------- | ----------------------------------------------------------- |
-| **State**   | closed                                                      |
-| **Created** | 2025-11-15T22:07:15Z                                        |
-| **Updated** | 2025-11-15T23:50:12Z                                        |
-| **Labels**  | enhancement                                                 |
-| **Author**  | @Will-D-AER                                                 |
-| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/13 |
+| Field | Value |
+|-------|-------|
+| **State** | closed |
+| **Created** | 2025-11-15T22:07:15Z |
+| **Updated** | 2025-11-15T23:50:12Z |
+| **Labels** | enhancement |
+| **Author** | @Will-D-AER |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/13 |

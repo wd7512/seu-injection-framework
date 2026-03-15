@@ -2,7 +2,7 @@
 
 ### Feature Summary
 
-We can easily find open and closed issues without having to read each file individually.
+We can easily find open and closed issues without having to read each file individually. 
 
 ### Feature Category
 
@@ -54,13 +54,13 @@ _No response_
 - [x] I have considered the impact on existing users
 - [x] I have thought about backward compatibility
 
-______________________________________________________________________
+---
 
-| Field       | Value                                                       |
-| ----------- | ----------------------------------------------------------- |
-| **State**   | closed                                                      |
-| **Created** | 2025-12-09T08:49:16Z                                        |
-| **Updated** | 2025-12-09T09:06:10Z                                        |
-| **Labels**  | enhancement                                                 |
-| **Author**  | @wd7512                                                     |
-| **URL**     | https://github.com/wd7512/seu-injection-framework/issues/45 |
+| Field | Value |
+|-------|-------|
+| **State** | closed |
+| **Created** | 2025-12-09T08:49:16Z |
+| **Updated** | 2025-12-09T09:06:10Z |
+| **Labels** | enhancement |
+| **Author** | @wd7512 |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/45 |
