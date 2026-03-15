@@ -14,14 +14,15 @@ Through a controlled experiment comparing standard vs. flood training across 36 
 
 | Finding                    | Value                                    | Significance        |
 | -------------------------- | ---------------------------------------- | ------------------- |
-| **Robustness Improvement** | **6.5-14.2%** reduction in accuracy drop | ⭐⭐⭐ High         |
-| **Optimal Flood Level**    | **b=0.10**                               | ⭐⭐⭐ Best ROI     |
-| **Baseline Accuracy Cost** | **0.41%** (at b=0.10)                    | ⭐ Low (acceptable) |
-| **Cost-Benefit Ratio**     | **15.9×** ROI                            | ⭐⭐⭐ Excellent    |
+| **Robustness Improvement** | **Up to 10.0%** avg, ~49% best config    | ⭐⭐⭐ High (dataset-dependent) |
+| **Optimal Flood Level**    | **b=0.15** (cross-dataset best)          | ⭐⭐⭐ Best balance |
+| **Baseline Accuracy Cost** | **0.50%** (at b=0.15)                    | ⭐ Low (acceptable) |
+| **Cost-Benefit Ratio**     | **20.0×** ROI at b=0.15                  | ⭐⭐⭐ Strong       |
+| **Dropout Improvement**    | **15.1%** independently                  | ⭐⭐⭐ Significant  |
 | **Training Overhead**      | **+4-6%** time                           | ⭐⭐⭐ Negligible   |
 | **Inference Cost**         | **0%**                                   | ⭐⭐⭐ Perfect      |
 
-**Bottom Line**: Flood training provides significant SEU robustness improvements at minimal cost.
+**Bottom Line**: Flood training can provide meaningful SEU robustness improvements, but the effect is dataset-dependent and requires that the flood level exceed the model's natural training loss. Dropout alone provides a strong 15.1% robustness improvement and should be used regardless.
 
 ### Mechanism
 
@@ -40,9 +41,10 @@ This connection is supported by:
 
 ### Statistical Validation
 
-- Consistent effect across 3 datasets and 2 dropout settings
-- Monotonic relationship between flood level and robustness
-- Reproducible across multiple configurations
+- Effect observed across 3 datasets, with varying magnitude (strongest for blobs, weakest for circles)
+- **Non-monotonic** relationship between flood level and robustness: peaks at b=0.15
+- Flooding is only active when flood level > natural training loss convergence point
+- Per-bit-position analysis reveals bit 1 (exponent MSB) as the dominant vulnerability
 
 ## 6.2 Implications for Practice
 
@@ -78,18 +80,19 @@ This connection is supported by:
 **When accuracy matters most:**
 
 - If you need absolute peak performance (e.g., Kaggle competition), skip flooding
-- If 0.4% accuracy drop is unacceptable, skip flooding
+- If 0.5% accuracy drop is unacceptable, skip flooding
 
 **When robustness matters:**
 
-- If model will face radiation/SEUs, **use flood training**
-- If safety is critical, **use flood training + hardware protection**
+- If model will face radiation/SEUs, **use dropout (0.2) as a baseline** — provides 15.1% robustness improvement
+- Add flood training (b=0.15) for additional benefit, **after verifying flood level > natural training loss**
+- If safety is critical, **use flood training + dropout + hardware protection**
 - If mission duration is long (Mars rover, satellite), **strongly recommend flood training**
 
 **Rule of thumb:**
 
 ```
-If (deployment_risk × failure_cost) > 15.9 × (0.4% accuracy),
+If (deployment_risk × failure_cost) > 20.0 × (0.5% accuracy),
     then use_flood_training = True
 ```
 
@@ -218,9 +221,10 @@ This work:
 Practical impact:
 
 1. **Simple implementation**: 10-line PyTorch class, drop-in replacement
-1. **Minimal cost**: 0.41% accuracy, 4-6% training time
-1. **Significant benefit**: 6.5% robustness improvement
-1. **Production-ready**: Tested, validated, documented
+1. **Minimal cost**: 0.50% accuracy at b=0.15, 4-6% training time
+1. **Significant benefit**: Up to 10.0% average robustness improvement, ~49% for best configuration
+1. **Dropout as strong baseline**: 15.1% robustness improvement from dropout alone
+1. **Critical insight**: Exponent MSB (bit 1) is the dominant vulnerability — targeted protection highly effective
 
 ### Societal Contribution
 
@@ -241,13 +245,14 @@ Each prevented failure could save:
 
 ### Key Takeaway
 
-**Flood level training is a simple, effective, low-cost technique for improving neural network robustness to Single Event Upsets.**
+**Flood level training is a simple, low-cost technique that can improve neural network robustness to Single Event Upsets, provided the flood level is calibrated above the model's natural training loss.**
 
 - **Implementation**: 10 lines of code
-- **Cost**: 0.41% accuracy, 4-6% training time
-- **Benefit**: 6.5% robustness improvement, reduced critical failures
-- **ROI**: 15.9×
-- **Recommendation**: Adopt for all harsh environment deployments
+- **Cost**: 0.50% accuracy at b=0.15, 4-6% training time
+- **Benefit**: Up to 10.0% avg robustness improvement (20.0x ROI); up to ~49% for favorable configurations
+- **Prerequisite**: Flood level must exceed natural training loss to be active
+- **Complement with dropout**: Dropout alone provides 15.1% improvement; use both for best results
+- **Recommendation**: Adopt for harsh environment deployments where flood level can be properly calibrated
 
 ### Call to Action
 
@@ -278,7 +283,7 @@ Flood level training is one step toward this goal. The journey continues.
 ______________________________________________________________________
 
 **Research Status**: Complete ✅\
-**Last Updated**: December 11, 2025\
+**Last Updated**: March 15, 2026\
 **Contact**: wwdennis.home@gmail.com\
 **GitHub**: [SEU Injection Framework](https://github.com/wd7512/seu-injection-framework)
 

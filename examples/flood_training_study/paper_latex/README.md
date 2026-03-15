@@ -13,7 +13,7 @@
 ### Supporting Files
 
 - `bibliography.bib` - Complete bibliography with all cited references
-- `figures/` - Directory containing 4 publication-quality figures (PNG format, 300 DPI)
+- `figures/` - Directory containing 6 publication-quality figures (PNG format, 300 DPI)
 
 ______________________________________________________________________
 
@@ -83,7 +83,7 @@ ______________________________________________________________________
 
 - **Size**: 110 KB (3000×1800 pixels, 300 DPI)
 - **Description**: Bar chart comparing accuracy cost vs. robustness gain for different flood levels
-- **Highlights**: Optimal configuration ($b=0.10$) with 15.9× ROI
+- **Highlights**: Optimal configuration ($b=0.15$) with 20.0× ROI
 
 ### Figure 3: Training Loss Validation
 
@@ -111,9 +111,10 @@ Shows baseline accuracy, accuracy drop, relative improvement, and ROI for each f
 
 **Key findings**:
 
-- Standard training (b=0.0): 2.32% accuracy drop
-- Optimal flooding (b=0.10): 2.17% accuracy drop (6.5% improvement, 15.9× ROI)
-- Maximum flooding (b=0.30): 1.99% accuracy drop (14.2% improvement, 5.8× ROI)
+- Standard training (b=0.0): 1.94% accuracy drop
+- Optimal flooding (b=0.15): 1.75% accuracy drop (10.0% improvement, 20.0× ROI)
+- At b=0.10: 1.87% accuracy drop (3.6% improvement, 43.0× ROI)
+- Effect is dataset-dependent; blobs shows strongest benefit (~49%), circles shows no benefit
 
 ______________________________________________________________________
 
@@ -121,7 +122,7 @@ ______________________________________________________________________
 
 - **Page count**: ~8 pages (including references and figures)
 - **Word count**: ~5,000 words
-- **Figures**: 4 (all publication-quality, 300 DPI)
+- **Figures**: 6 (all publication-quality, 300 DPI)
 - **Tables**: 1 main results table
 - **References**: 6 key papers
 - **Sections**: 6 main sections + abstract + acknowledgments
@@ -227,5 +228,5 @@ This research paper is provided for academic and research purposes. Figures and 
 
 ______________________________________________________________________
 
-**Last Updated**: 2025-12-12\
-**Status**: Ready for compilation and submission
+**Last Updated**: 2026-03-15\
+**Status**: Figures need regeneration; LaTeX needs recompilation after figure update

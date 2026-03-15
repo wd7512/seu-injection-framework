@@ -39,7 +39,7 @@
 \maketitle
 
 \begin{abstract}
-Neural networks in radiation environments (space, nuclear, accelerators) are vulnerable to Single Event Upsets (SEUs): transient bit flips in parameters. While hardware protections exist, they incur significant overhead. We investigate whether \textit{flood level training}---a regularization technique preventing zero training loss---can improve inherent model robustness. In this \textbf{proof-of-concept study on small MLPs and synthetic datasets}, we explore whether flooding encourages convergence to flatter, more robust loss minima. Across 36 configurations, flood training consistently reduces SEU vulnerability by 6.5--14.2\% with minimal accuracy cost (0.41\% at optimal $b=0.10$). While establishing feasibility, generalizability to large-scale models requires further validation. Our findings suggest training-time interventions may complement hardware protections.
+Neural networks in radiation environments (space, nuclear, accelerators) are vulnerable to Single Event Upsets (SEUs): transient bit flips in parameters. While hardware protections exist, they incur significant overhead. We investigate whether \textit{flood level training}---a regularization technique preventing zero training loss---can improve inherent model robustness. In this \textbf{proof-of-concept study on small MLPs and synthetic datasets}, we explore whether flooding encourages convergence to flatter, more robust loss minima. Across 36 configurations, flood training reduces SEU vulnerability by up to 10.0\% on average at $b=0.15$ (20.0$\times$ ROI), with individual configurations showing up to $\sim$49\% improvement. However, the effect is dataset-dependent: flooding is only active when the flood level exceeds the model's natural training loss. Dropout alone provides a 15.1\% robustness improvement. Per-bit analysis reveals the exponent MSB (bit~1) dominates all vulnerability. While establishing feasibility, generalizability to large-scale models requires further validation.
 \end{abstract}
 
 \section{Introduction}
@@ -60,8 +60,9 @@ Flood level training \cite{ishida2020we} prevents overfitting by maintaining a m
 \textbf{Contributions}:
 \begin{enumerate}
     \item First \textbf{proof-of-concept study} of flood training for SEU robustness (small MLPs, synthetic data).
-    \item Evidence of 6.5--14.2\% vulnerability reduction with minimal accuracy cost (0.41\%).
-    \item Analysis of optimal flood levels ($b=0.10$) and dropout interaction.
+    \item Evidence of up to 10.0\% average vulnerability reduction at $b=0.15$ (0.50\% accuracy cost, 20.0$\times$ ROI), with dataset-dependent effects up to $\sim$49\%.
+    \item Discovery that flooding effectiveness requires calibration: flood level must exceed natural training loss.
+    \item Per-bit-position analysis revealing exponent MSB (bit~1) dominates all vulnerability.
     \item Public release of data and code.
 \end{enumerate}
 
@@ -81,49 +82,50 @@ Flood level training \cite{ishida2020we} prevents overfitting by maintaining a m
 
 \textbf{Model}: 3-layer MLP ($2 \to 64 \to 32 \to 1$, ReLU, 2,305 params). Trained with Adam (lr=0.01) for 100 epochs using binary cross-entropy (wrapped with flooding).
 
-\textbf{SEU Injection}: Following \cite{dennis2025framework}, we simulate single-bit flips in float32 parameters (sign, exponent, mantissa). We test 15\% of parameters ($\sim$345 injections/bit position) and measure mean accuracy drop.
+\textbf{SEU Injection}: Following \cite{dennis2025framework}, we simulate single-bit flips in float32 parameters at 5 representative bit positions: bit~0 (sign), bit~1 (exponent MSB), bit~8 (exponent LSB), bit~9 (mantissa MSB), and bit~31 (mantissa LSB). We test 15\% of parameters ($\sim$345 injections/bit position) and measure mean accuracy drop.
 
 \section{Results}
 
 \subsection{Robustness and Cost-Benefit Analysis}
 
-Flooding consistently reduces SEU vulnerability across all datasets (Figure~\ref{fig:robustness}). Table~\ref{tab:main_results} summarizes the cross-dataset averages. The optimal configuration ($b=0.10$) yields a 6.5\% robustness gain for only 0.41\% accuracy cost, achieving a 15.9$\times$ ROI (Figure~\ref{fig:cost_benefit}).
+Flooding can reduce SEU vulnerability, but the effect is dataset-dependent and non-monotonic (Figure~\ref{fig:robustness}). Table~\ref{tab:main_results} summarizes cross-dataset averages. The optimal cross-dataset configuration ($b=0.15$) yields a 10.0\% robustness gain for 0.50\% accuracy cost, achieving a 20.0$\times$ ROI (Figure~\ref{fig:cost_benefit}). At $b=0.10$, ROI is 43.0$\times$ but the robustness gain is smaller (3.6\%). Importantly, blobs (where flooding is strongly active) drives most of the average improvement, while circles (where training loss $\sim$0.43 exceeds all flood levels) shows no benefit.
 
 \begin{figure}[t]
 \centering
 \includegraphics[width=\textwidth]{figures/fig1_robustness_vs_flood.png}
-\caption{Mean accuracy drop under SEU injection vs. flood level. Flooding consistently improves robustness.}
+\caption{Mean accuracy drop under SEU injection vs. flood level. Flooding improves robustness for datasets where it is active (blobs, partially moons), but not for circles where training loss exceeds all flood levels.}
 \label{fig:robustness}
 \end{figure}
 
 \begin{table}[h]
 \centering
-\caption{Cross-dataset average results showing consistent robustness improvements}
+\caption{Cross-dataset average results. Best balance at $b=0.15$; highest ROI at $b=0.10$.}
 \label{tab:main_results}
 \begin{tabular}{lcccc}
 \toprule
 Flood Level & Baseline Acc & Acc Drop & Rel. Improvement & ROI \\
 \midrule
-0.00 (std) & 92.08\% & 2.32\% & 0\% (baseline) & --- \\
-0.05 & 91.90\% & 2.26\% & 2.6\% & 14.4$\times$ \\
-0.10 & 91.67\% & 2.17\% & 6.5\% & \textbf{15.9$\times$} \\
-0.15 & 91.35\% & 2.09\% & 9.9\% & 13.6$\times$ \\
-0.20 & 90.85\% & 2.04\% & 12.1\% & 9.8$\times$ \\
-0.30 & 89.63\% & 1.99\% & 14.2\% & 5.8$\times$ \\
+0.00 (std) & 90.46\% & 1.94\% & 0\% (baseline) & --- \\
+0.05 & 89.67\% & 1.93\% & 0.9\% & 1.2$\times$ \\
+0.10 & 90.38\% & 1.87\% & 3.6\% & 43.0$\times$ \\
+\textbf{0.15} & \textbf{89.96\%} & \textbf{1.75\%} & \textbf{10.0\%} & \textbf{20.0$\times$} \\
+0.20 & 90.58\% & 1.77\% & 9.2\% & N/A* \\
+0.30 & 89.42\% & 1.83\% & 6.0\% & 5.8$\times$ \\
 \bottomrule
+\multicolumn{5}{l}{\small *$b=0.20$ shows negative accuracy cost (random variation), making ROI undefined.}
 \end{tabular}
 \end{table}
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/fig2_cost_benefit.png}
-\caption{Cost-benefit analysis. $b=0.10$ provides optimal ROI.}
+\caption{Cost-benefit analysis. $b=0.15$ provides best balance; $b=0.10$ highest ROI.}
 \label{fig:cost_benefit}
 \end{figure}
 
 \subsection{Training Dynamics}
 
-Figures~\ref{fig:training}, \ref{fig:loss_trajectories}, and \ref{fig:training_dynamics} confirm that flooding actively constrains training. Final losses match target levels, and loss trajectories show a clear "floor" effect. This supports the hypothesis that flooding alters the optimization path.
+Figures~\ref{fig:training}, \ref{fig:loss_trajectories}, and \ref{fig:training_dynamics} confirm that flooding actively constrains training---but only when the flood level exceeds natural training loss. For blobs (loss $\approx 0$), all flood levels are active and final losses match targets. For circles (loss $\approx 0.43$), no flood level is active, explaining the absence of benefit. This is a critical prerequisite for flood training effectiveness.
 
 \begin{figure}[h]
 \centering
@@ -148,12 +150,12 @@ Figures~\ref{fig:training}, \ref{fig:loss_trajectories}, and \ref{fig:training_d
 
 \subsection{Consistency}
 
-The robustness improvement is consistent across all 36 configurations (Figure~\ref{fig:heatmap}), regardless of dataset or dropout setting.
+The robustness improvement varies by dataset and dropout configuration (Figure~\ref{fig:heatmap}). Blobs shows the strongest benefit (up to $\sim$49\% with dropout at $b=0.15$), moons shows modest improvement, and circles shows no consistent benefit. Dropout alone provides a 15.1\% robustness improvement (mean drop: 2.00\% $\to$ 1.70\%) with negligible accuracy cost (0.10\%), making it a strong independent technique. Per-bit analysis reveals bit~1 (exponent MSB) dominates all vulnerability, with other tested bits causing near-zero accuracy drops.
 
 \begin{figure}[h]
 \centering
 \includegraphics[width=0.9\textwidth]{figures/fig4_heatmap.png}
-\caption{Heatmap of mean accuracy drop (\%) across all configurations. Darker is better.}
+\caption{Heatmap of mean accuracy drop (\%) across all configurations. Blobs shows strongest flooding benefit; circles shows no consistent improvement.}
 \label{fig:heatmap}
 \end{figure}
 
@@ -162,7 +164,7 @@ The robustness improvement is consistent across all 36 configurations (Figure~\r
 \subsection{Mechanism: Loss Landscape Regularization}
 
 We hypothesize flooding encourages flatter loss minima. Mathematically, for parameter $\theta$ and perturbation $\delta$, expected accuracy drop is $\approx \sum_i p(i) |\nabla_{\theta_i} \mathcal{L}| |\delta_i|$. Second-order analysis $\mathcal{L}(\theta + \delta) \approx \mathcal{L}(\theta) + \delta^T\nabla\mathcal{L} + \frac{1}{2}\delta^T H \delta$ suggests flatter minima (lower Hessian eigenvalues) reduce sensitivity \cite{hochreiter1997flat}.
-Our results support this: training losses match flood levels, and robustness improves consistently. We predict flood-trained models have lower Hessian trace and max eigenvalues, though direct measurement is left for future work.
+Our results partially support this: for datasets where flooding is active (blobs, partially moons), robustness improves. For circles, where flooding is never active (training loss $\gg$ flood level), no benefit is observed. This confirms that the mechanism depends on flooding actually constraining the optimization, not merely being present in the loss function.
 
 \subsection{Practical Implications}
 
@@ -170,6 +172,8 @@ Our results support this: training losses match flood levels, and robustness imp
 \textbf{Simplicity}: Easy implementation (see below) wrapping any loss function.
 \textbf{Compatibility}: Works with standard architectures and regularization (dropout).
 \textbf{Cost-Effective}: Ideal for resource-constrained environments (space, edge).
+\textbf{Prerequisite}: Flood level must exceed natural training loss to be active.
+\textbf{Dropout}: Provides 15.1\% independent robustness improvement; always recommended.
 
 \begin{verbatim}
 class FloodingLoss(nn.Module):
@@ -188,7 +192,7 @@ class FloodingLoss(nn.Module):
 
 \section{Conclusion}
 
-This proof-of-concept study demonstrates that flood level training consistently improves SEU robustness (6.5--14.2\%) on simplified benchmarks with minimal accuracy cost. Optimal $b=0.10$ yields 15.9$\times$ ROI. While promising as a zero-overhead, training-time intervention, critical validation is needed on large-scale models and real hardware before production deployment.
+This proof-of-concept study demonstrates that flood level training can improve SEU robustness on simplified benchmarks, but the effect is dataset-dependent and non-monotonic. Optimal $b=0.15$ yields 10.0\% average improvement (20.0$\times$ ROI), with individual configurations reaching $\sim$49\%. Critically, flooding is only effective when the flood level exceeds the model's natural training loss. Dropout alone provides 15.1\% robustness improvement and should always be used. Per-bit analysis reveals the exponent MSB (bit~1) dominates all vulnerability, suggesting targeted hardware protection. While promising as a zero-overhead, training-time intervention, critical validation is needed on large-scale models and real hardware.
 
 \subsection{Future Work}
 

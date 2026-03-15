@@ -12,8 +12,10 @@ We conducted 36 systematic experiments across 3 datasets, 6 flood levels, and 2 
 
 - Baseline accuracy (no SEU injection)
 - Final training and validation losses
-- Mean accuracy drop under SEU injection (15% sampling rate)
+- Mean accuracy drop under SEU injection (15% sampling rate, ~345 injections per bit position)
 - Critical fault rate (faults causing >10% accuracy degradation)
+
+**Important note on bit-position vulnerability:** Across all 36 configurations, bit 1 (exponent MSB) is the dominant source of SEU vulnerability. Bits 0, 8, 9, and 31 cause near-zero accuracy drops. The mean accuracy drop and critical fault rate reported below are averages across all 5 tested bit positions; the bit-1-specific impact is roughly 5x larger.
 
 ______________________________________________________________________
 
@@ -23,94 +25,95 @@ ______________________________________________________________________
 
 **With Dropout (0.2):**
 
-| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR  |
-| ----------- | ------------ | ---------- | -------- | -------- | ---- |
-| 0.00 (std)  | 91.25%       | 0.042      | 0.189    | 2.40%    | 8.3% |
-| 0.05        | 91.00%       | 0.059      | 0.188    | 2.35%    | 8.0% |
-| 0.10        | 90.75%       | 0.101      | 0.191    | 2.28%    | 7.7% |
-| 0.15        | 90.50%       | 0.150      | 0.195    | 2.22%    | 7.4% |
-| 0.20        | 90.00%       | 0.200      | 0.202    | 2.18%    | 7.2% |
-| 0.30        | 89.00%       | 0.301      | 0.219    | 2.15%    | 7.1% |
-
-**Without Dropout:**
-
-| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR  |
-| ----------- | ------------ | ---------- | -------- | -------- | ---- |
-| 0.00 (std)  | 92.75%       | 0.031      | 0.175    | 2.65%    | 9.5% |
-| 0.05        | 92.50%       | 0.052      | 0.177    | 2.58%    | 9.1% |
-| 0.10        | 92.25%       | 0.101      | 0.181    | 2.48%    | 8.6% |
-| 0.15        | 91.75%       | 0.151      | 0.185    | 2.38%    | 8.1% |
-| 0.20        | 91.25%       | 0.201      | 0.192    | 2.32%    | 7.8% |
-| 0.30        | 90.00%       | 0.301      | 0.211    | 2.28%    | 7.6% |
-
-**Observations:**
-
-- Flooding reduces SEU vulnerability (lower acc drop)
-- Higher flood levels → better robustness but lower baseline accuracy
-- Effect is present both with and without dropout
-- Optimal trade-off appears to be around b=0.15-0.20
-
-### 4.2.2 Circles Dataset
-
-**With Dropout (0.2):**
-
-| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR  |
-| ----------- | ------------ | ---------- | -------- | -------- | ---- |
-| 0.00 (std)  | 89.00%       | 0.054      | 0.212    | 2.85%    | 9.8% |
-| 0.05        | 88.75%       | 0.068      | 0.211    | 2.78%    | 9.4% |
-| 0.10        | 88.50%       | 0.103      | 0.215    | 2.68%    | 8.9% |
-| 0.15        | 88.25%       | 0.152      | 0.219    | 2.58%    | 8.4% |
-| 0.20        | 87.75%       | 0.202      | 0.227    | 2.52%    | 8.1% |
-| 0.30        | 86.50%       | 0.301      | 0.245    | 2.48%    | 7.9% |
+| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR   |
+| ----------- | ------------ | ---------- | -------- | -------- | ----- |
+| 0.00 (std)  | 91.25%       | 0.2119     | 0.1985   | 1.81%    | 6.21% |
+| 0.05        | 90.75%       | 0.2125     | 0.2002   | 1.86%    | 6.06% |
+| 0.10        | 91.75%       | 0.2041     | 0.1973   | 1.99%    | 6.23% |
+| 0.15        | 91.00%       | 0.2220     | 0.2017   | 1.71%    | 5.38% |
+| 0.20        | 92.00%       | 0.2169     | 0.1991   | 2.06%    | 6.28% |
+| 0.30        | 88.50%       | 0.3016     | 0.2679   | 1.52%    | 5.68% |
 
 **Without Dropout:**
 
 | Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR   |
 | ----------- | ------------ | ---------- | -------- | -------- | ----- |
-| 0.00 (std)  | 90.50%       | 0.042      | 0.198    | 3.12%    | 11.2% |
-| 0.05        | 90.25%       | 0.059      | 0.200    | 3.03%    | 10.7% |
-| 0.10        | 90.00%       | 0.101      | 0.204    | 2.90%    | 10.0% |
-| 0.15        | 89.50%       | 0.151      | 0.210    | 2.78%    | 9.4%  |
-| 0.20        | 89.00%       | 0.201      | 0.218    | 2.68%    | 8.9%  |
-| 0.30        | 87.50%       | 0.301      | 0.239    | 2.62%    | 8.6%  |
+| 0.00 (std)  | 92.25%       | 0.1977     | 0.1984   | 2.30%    | 6.58% |
+| 0.05        | 91.50%       | 0.1976     | 0.1995   | 2.39%    | 7.46% |
+| 0.10        | 91.50%       | 0.1969     | 0.2032   | 2.31%    | 6.41% |
+| 0.15        | 91.50%       | 0.1985     | 0.1995   | 2.70%    | 7.56% |
+| 0.20        | 92.00%       | 0.2002     | 0.2001   | 1.95%    | 5.88% |
+| 0.30        | 88.75%       | 0.3019     | 0.2687   | 1.83%    | 6.00% |
 
 **Observations:**
 
-- Similar trends to moons dataset
-- Circles dataset is more challenging (lower baseline accuracy)
-- Relative improvement from flooding is consistent
-- Without dropout shows larger initial vulnerability (3.12% vs 2.85%)
+- At b=0.30, flooding reduces SEU vulnerability noticeably (1.52% with dropout vs 1.81% baseline)
+- At moderate flood levels (b=0.10-0.20), results are mixed: some configurations show slightly *worse* robustness than baseline
+- The b=0.15 with-dropout configuration achieves the best robustness for moons (1.71%)
+- Without dropout, results are noisier and no flood level consistently outperforms baseline
+
+### 4.2.2 Circles Dataset
+
+**With Dropout (0.2):**
+
+| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR   |
+| ----------- | ------------ | ---------- | -------- | -------- | ----- |
+| 0.00 (std)  | 79.50%       | 0.4473     | 0.4874   | 1.39%    | 5.39% |
+| 0.05        | 78.25%       | 0.4484     | 0.4864   | 1.41%    | 5.94% |
+| 0.10        | 80.00%       | 0.4348     | 0.4885   | 1.43%    | 5.66% |
+| 0.15        | 79.75%       | 0.4340     | 0.4912   | 1.21%    | 4.91% |
+| 0.20        | 79.50%       | 0.4460     | 0.4906   | 1.39%    | 5.89% |
+| 0.30        | 79.75%       | 0.4408     | 0.4853   | 1.72%    | 6.34% |
+
+**Without Dropout:**
+
+| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR   |
+| ----------- | ------------ | ---------- | -------- | -------- | ----- |
+| 0.00 (std)  | 79.75%       | 0.4240     | 0.4873   | 1.42%    | 7.25% |
+| 0.05        | 80.25%       | 0.4211     | 0.4860   | 1.54%    | 7.23% |
+| 0.10        | 79.50%       | 0.4210     | 0.4864   | 1.86%    | 8.89% |
+| 0.15        | 79.75%       | 0.4216     | 0.4860   | 1.87%    | 9.13% |
+| 0.20        | 80.00%       | 0.4223     | 0.4814   | 1.98%    | 8.93% |
+| 0.30        | 80.00%       | 0.4230     | 0.4877   | 1.86%    | 8.18% |
+
+**Observations:**
+
+- Circles is the most challenging dataset (baseline accuracy ~79-80%)
+- With dropout, b=0.15 shows the best robustness (1.21% drop, 4.91% CFR)
+- Without dropout, flooding consistently *worsens* SEU vulnerability compared to baseline
+- This suggests flooding's benefits are dataset- and configuration-dependent, not universal
 
 ### 4.2.3 Blobs Dataset
 
 **With Dropout (0.2):**
 
-| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR  |
-| ----------- | ------------ | ---------- | -------- | -------- | ---- |
-| 0.00 (std)  | 95.75%       | 0.020      | 0.146    | 1.52%    | 4.8% |
-| 0.05        | 95.50%       | 0.051      | 0.145    | 1.48%    | 4.6% |
-| 0.10        | 95.25%       | 0.101      | 0.148    | 1.42%    | 4.3% |
-| 0.15        | 95.00%       | 0.150      | 0.152    | 1.38%    | 4.1% |
-| 0.20        | 94.50%       | 0.201      | 0.159    | 1.35%    | 3.9% |
-| 0.30        | 93.25%       | 0.300      | 0.175    | 1.32%    | 3.8% |
+| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR   |
+| ----------- | ------------ | ---------- | -------- | -------- | ----- |
+| 0.00 (std)  | 100.00%      | 0.0000     | 0.0090   | 2.59%    | 5.86% |
+| 0.05        | 99.50%       | 0.0548     | 0.0392   | 2.12%    | 4.59% |
+| 0.10        | 99.75%       | 0.1093     | 0.0844   | 1.40%    | 3.33% |
+| 0.15        | 99.75%       | 0.1529     | 0.1494   | 1.33%    | 3.30% |
+| 0.20        | 100.00%      | 0.2020     | 0.1957   | 1.58%    | 4.10% |
+| 0.30        | 99.50%       | 0.3141     | 0.2873   | 2.03%    | 5.19% |
 
 **Without Dropout:**
 
-| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR  |
-| ----------- | ------------ | ---------- | -------- | -------- | ---- |
-| 0.00 (std)  | 97.00%       | 0.015      | 0.133    | 1.78%    | 6.2% |
-| 0.05        | 96.75%       | 0.050      | 0.134    | 1.72%    | 5.9% |
-| 0.10        | 96.50%       | 0.100      | 0.139    | 1.62%    | 5.4% |
-| 0.15        | 96.00%       | 0.151      | 0.145    | 1.55%    | 5.1% |
-| 0.20        | 95.50%       | 0.200      | 0.153    | 1.50%    | 4.8% |
-| 0.30        | 94.00%       | 0.301      | 0.171    | 1.45%    | 4.6% |
+| Flood Level | Baseline Acc | Train Loss | Val Loss | Acc Drop | CFR   |
+| ----------- | ------------ | ---------- | -------- | -------- | ----- |
+| 0.00 (std)  | 100.00%      | 0.0000     | 0.0111   | 2.14%    | 4.65% |
+| 0.05        | 97.75%       | 0.0509     | 0.0572   | 2.24%    | 5.86% |
+| 0.10        | 99.75%       | 0.1150     | 0.1147   | 2.27%    | 5.82% |
+| 0.15        | 98.00%       | 0.1535     | 0.1460   | 1.68%    | 4.08% |
+| 0.20        | 100.00%      | 0.2113     | 0.1957   | 1.63%    | 4.03% |
+| 0.30        | 100.00%      | 0.3014     | 0.3045   | 2.00%    | 4.76% |
 
 **Observations:**
 
-- Blobs is the easiest dataset (highest baseline accuracy)
-- SEU vulnerability is lower overall (1.52-1.78% vs 2.40-2.85%)
-- Flooding still provides consistent improvements
-- Effect sizes are smaller but proportionally similar
+- Blobs is the easiest dataset (baseline accuracy 97.75-100%)
+- Blobs shows the **strongest and clearest** flooding benefit, especially with dropout
+- With dropout, b=0.10 and b=0.15 reduce accuracy drop by ~46-49% compared to baseline (2.59% → 1.40-1.33%)
+- Without dropout, the benefit is smaller and concentrated at b=0.15-0.20
+- Blobs' high separability may allow the model to benefit more from regularization
 
 ______________________________________________________________________
 
@@ -122,26 +125,33 @@ Averaging across all datasets and dropout configurations:
 
 | Flood Level | Mean Baseline Acc | Mean Acc Drop | Relative Improvement |
 | ----------- | ----------------- | ------------- | -------------------- |
-| 0.00 (std)  | 92.08%            | 2.32%         | 0% (baseline)        |
-| 0.05        | 91.90%            | 2.26%         | 2.6% better          |
-| 0.10        | 91.67%            | 2.17%         | 6.5% better          |
-| 0.15        | 91.35%            | 2.09%         | 9.9% better          |
-| 0.20        | 90.85%            | 2.04%         | 12.1% better         |
-| 0.30        | 89.63%            | 1.99%         | 14.2% better         |
+| 0.00 (std)  | 90.46%            | 1.94%         | 0% (baseline)        |
+| 0.05        | 89.67%            | 1.93%         | 0.9% better          |
+| 0.10        | 90.38%            | 1.87%         | 3.6% better          |
+| 0.15        | 89.96%            | 1.75%         | 10.0% better         |
+| 0.20        | 90.58%            | 1.77%         | 9.2% better          |
+| 0.30        | 89.42%            | 1.83%         | 6.0% better          |
 
-**Key Finding**: Flooding consistently reduces SEU vulnerability, with improvements ranging from 2.6% (b=0.05) to 14.2% (b=0.30).
+**Key Findings:**
+
+- Flooding provides measurable robustness improvement, peaking at **b=0.15 (10.0% reduction in mean accuracy drop)**
+- The relationship is **non-monotonic**: improvement peaks at b=0.15 then decreases at higher flood levels
+- Even the best cross-dataset improvement (10.0%) is modest in absolute terms (1.94% → 1.75% mean accuracy drop)
+- The improvement is **not consistent** across all datasets—blobs drives most of the average improvement
 
 ### 4.3.2 Cost-Benefit Analysis
 
 | Flood Level | Acc Cost | Robustness Gain | ROI (Gain/Cost) |
 | ----------- | -------- | --------------- | --------------- |
-| 0.05        | 0.18%    | 2.6%            | 14.4×           |
-| 0.10        | 0.41%    | 6.5%            | 15.9×           |
-| 0.15        | 0.73%    | 9.9%            | 13.6×           |
-| 0.20        | 1.23%    | 12.1%           | 9.8×            |
-| 0.30        | 2.45%    | 14.2%           | 5.8×            |
+| 0.05        | 0.79%    | 0.9%            | 1.2×            |
+| 0.10        | 0.08%    | 3.6%            | 43.0×           |
+| **0.15**    | **0.50%**| **10.0%**       | **20.0×**       |
+| 0.20        | -0.12%*  | 9.2%            | N/A*            |
+| 0.30        | 1.04%    | 6.0%            | 5.8×            |
 
-**Optimal Configuration**: b=0.10 provides the best ROI (15.9×), sacrificing only 0.41% baseline accuracy for 6.5% robustness improvement.
+*b=0.20 shows negative accuracy cost (i.e., slightly higher baseline accuracy on average), making ROI undefined. This is likely due to random variation rather than a genuine benefit.
+
+**Optimal Configuration**: b=0.15 provides the best balance of robustness gain (10.0%) with modest accuracy cost (0.50%), yielding a 20.0x ROI. Alternatively, b=0.10 offers a very high ROI (43.0x) due to near-zero accuracy cost, but the robustness gain is smaller (3.6%).
 
 ### 4.3.3 Dropout Interaction
 
@@ -149,92 +159,139 @@ Comparing with vs without dropout (averaged across datasets and flood levels):
 
 | Configuration | Mean Baseline Acc | Mean Acc Drop | Mean CFR |
 | ------------- | ----------------- | ------------- | -------- |
-| With Dropout  | 90.60%            | 2.10%         | 6.9%     |
-| No Dropout    | 92.50%            | 2.24%         | 7.8%     |
+| With Dropout  | 90.03%            | 1.70%         | 5.35%    |
+| No Dropout    | 90.13%            | 2.00%         | 6.59%    |
 
 **Observations:**
 
-- Dropout reduces baseline accuracy by 1.9% but improves SEU robustness by 6.2%
-- Flooding provides benefits in both cases
-- **Dropout + Flooding** is the most robust combination
+- Dropout reduces SEU vulnerability by **15.1%** (2.00% → 1.70% mean accuracy drop) with negligible accuracy cost (0.10%)
+- Dropout also substantially reduces critical fault rate (6.59% → 5.35%)
+- Flooding provides benefits primarily **in conjunction with dropout**; without dropout, flooding often fails to improve robustness
+- **Dropout + Flooding** is the most robust combination, but the benefit comes largely from dropout itself
 
 ______________________________________________________________________
 
 ## 4.4 Statistical Significance
 
-### 4.4.1 Standard Training vs Optimal Flooding
+### 4.4.1 Standard Training vs Flood Training at b=0.15
 
-Comparing standard training (b=0.0) to optimal flood level (b=0.10):
+Comparing standard training (b=0.0) to b=0.15 (best cross-dataset flood level):
 
 **Moons with Dropout:**
 
-- Standard: 2.40% ± 0.12% accuracy drop (estimated std)
-- Flood (0.10): 2.28% ± 0.11% accuracy drop (estimated std)
-- **Improvement**: 5.0% (statistically significant based on effect size and sample size)
+- Standard: 1.81% accuracy drop
+- Flood (0.15): 1.71% accuracy drop
+- **Improvement**: 5.5%
 
-**Circles without Dropout:**
+**Circles with Dropout:**
 
-- Standard: 3.12% ± 0.15% accuracy drop (estimated std)
-- Flood (0.10): 2.90% ± 0.14% accuracy drop (estimated std)
-- **Improvement**: 7.1% (statistically significant)
+- Standard: 1.39% accuracy drop
+- Flood (0.15): 1.21% accuracy drop
+- **Improvement**: 13.0%
 
 **Blobs with Dropout:**
 
-- Standard: 1.52% ± 0.08% accuracy drop (estimated std)
-- Flood (0.10): 1.42% ± 0.07% accuracy drop (estimated std)
-- **Improvement**: 6.6% (statistically significant)
+- Standard: 2.59% accuracy drop
+- Flood (0.15): 1.33% accuracy drop
+- **Improvement**: 48.6%
 
-*Note: Standard deviations estimated from injection sampling distribution. Formal hypothesis testing would require paired t-tests on individual injection results.*
+**Blobs without Dropout:**
+
+- Standard: 2.14% accuracy drop
+- Flood (0.15): 1.68% accuracy drop
+- **Improvement**: 21.5%
+
+*Note: These comparisons use mean accuracy drop across all bit positions. Formal hypothesis testing would require paired t-tests on individual injection results. The effect is strong for blobs, moderate for circles with dropout, and modest for moons.*
 
 ______________________________________________________________________
 
-## 4.5 Training Dynamics
+## 4.5 Per-Bit-Position Analysis
 
-### 4.5.1 Does Flooding Actually Constrain Training?
+### 4.5.1 Vulnerability by Bit Position
 
-Comparing final training loss to flood level:
+Across all configurations, bit 1 (exponent MSB) accounts for essentially all observed SEU vulnerability:
 
-| Flood Level | Mean Final Train Loss | Flood Active?  |
-| ----------- | --------------------- | -------------- |
-| 0.05        | 0.051                 | Yes (slightly) |
-| 0.10        | 0.101                 | Yes (matched)  |
-| 0.15        | 0.151                 | Yes (matched)  |
-| 0.20        | 0.201                 | Yes (matched)  |
-| 0.30        | 0.301                 | Yes (matched)  |
+| Bit Position | Role          | Typical Acc Drop | Typical CFR | Impact    |
+| ------------ | ------------- | ---------------- | ----------- | --------- |
+| 0            | Sign          | <0.1%            | 0%          | Negligible|
+| 1            | Exponent MSB  | 7-13%            | 20-45%      | **Critical** |
+| 8            | Exponent LSB  | <0.1%            | 0%          | Negligible|
+| 9            | Mantissa MSB  | <0.1%            | 0%          | Negligible|
+| 31           | Mantissa LSB  | ~0%              | 0%          | None      |
 
-**Conclusion**: The flood levels are properly calibrated and actively constrain training, unlike lower values that would be below natural convergence.
+**Key Insight**: The exponent MSB (bit 1) is the single dominant vulnerability. Flipping this bit causes roughly 2× magnitude changes in parameter values, which propagates catastrophically through the network. All other tested bits cause minimal disruption. This has important implications for targeted hardware protection.
 
-### 4.5.2 Validation Loss Trends
+### 4.5.2 Flood Level Effect on Bit-1 Vulnerability
+
+The benefit of flooding is primarily visible in bit-1 vulnerability:
+
+- **Blobs (dropout, b=0.0)**: Bit-1 accuracy drop = 12.97%, CFR = 29.3%
+- **Blobs (dropout, b=0.10)**: Bit-1 accuracy drop = 7.00%, CFR = 16.7%
+- **Blobs (dropout, b=0.15)**: Bit-1 accuracy drop = 6.67%, CFR = 16.5%
+
+This ~46% reduction in bit-1 vulnerability for blobs represents the strongest observed flooding effect.
+
+______________________________________________________________________
+
+## 4.6 Training Dynamics
+
+### 4.6.1 Does Flooding Actually Constrain Training?
+
+The relationship between flood level and training loss is dataset-dependent:
+
+**Blobs** (where flooding is most effective):
+
+| Flood Level | Mean Final Train Loss | Flood Active? |
+| ----------- | --------------------- | ------------- |
+| 0.05        | 0.053                 | Yes           |
+| 0.10        | 0.112                 | Yes (matched) |
+| 0.15        | 0.153                 | Yes (matched) |
+| 0.20        | 0.207                 | Yes (matched) |
+| 0.30        | 0.308                 | Yes (matched) |
+
+**Circles** (where flooding is least effective):
+
+| Flood Level | Mean Final Train Loss | Flood Active?                  |
+| ----------- | --------------------- | ------------------------------ |
+| 0.05        | 0.435                 | No (loss >> flood level)       |
+| 0.10        | 0.428                 | No (loss >> flood level)       |
+| 0.15        | 0.428                 | No (loss >> flood level)       |
+| 0.20        | 0.434                 | No (loss >> flood level)       |
+| 0.30        | 0.432                 | No (loss >> flood level)       |
+
+**Critical Observation**: For the circles dataset, the base training loss (~0.43) is well above all tested flood levels. The flooding constraint is **never active** for circles, which explains why flooding has minimal effect on this dataset. This underscores that flood levels must be calibrated above the natural training loss convergence point.
+
+### 4.6.2 Validation Loss Trends
 
 | Flood Level | Mean Val Loss | Change from Standard |
 | ----------- | ------------- | -------------------- |
-| 0.00        | 0.176         | baseline             |
-| 0.10        | 0.181         | +2.8%                |
-| 0.20        | 0.194         | +10.2%               |
-| 0.30        | 0.217         | +23.3%               |
+| 0.00        | 0.232         | baseline             |
+| 0.10        | 0.262         | +13.1%               |
+| 0.20        | 0.294         | +26.7%               |
+| 0.30        | 0.350         | +51.0%               |
 
-Validation loss increases moderately with flood level, indicating the regularization trade-off.
-
-______________________________________________________________________
-
-## 4.6 Key Findings Summary
-
-1. **Flooding improves SEU robustness**: 6.5-14.2% improvement depending on flood level
-1. **Optimal configuration**: b=0.10 with dropout provides best ROI (15.9×)
-1. **Consistent across datasets**: Effect observed in all three datasets
-1. **Dropout synergy**: Flooding + dropout is most robust combination
-1. **Properly calibrated**: Flood levels are active and constrain training
-1. **Modest accuracy cost**: 0.41% baseline accuracy loss for 6.5% robustness gain (b=0.10)
-1. **Critical fault reduction**: 10-15% reduction in catastrophic failures (>10% accuracy drop)
+Validation loss increases with flood level, reflecting the regularization cost. The increase is driven primarily by blobs (where flooding is active and constraining) and moons at higher flood levels.
 
 ______________________________________________________________________
 
-## 4.7 Data Availability
+## 4.7 Key Findings Summary
+
+1. **Flooding can improve SEU robustness**: Up to 10.0% average improvement at b=0.15, and up to ~49% for individual dataset-configurations (blobs with dropout)
+1. **Effect is dataset-dependent**: Blobs benefits strongly, circles shows minimal benefit (flooding inactive), moons shows modest benefit
+1. **Flooding requires calibration**: The flood level must exceed the natural training loss convergence point to be active; otherwise it has no effect
+1. **Optimal cross-dataset configuration**: b=0.15 with dropout (10.0% improvement, 0.50% accuracy cost, 20.0× ROI)
+1. **Dropout is independently beneficial**: 15.1% robustness improvement from dropout alone, with negligible accuracy cost
+1. **Bit-1 dominance**: The exponent MSB (bit 1) accounts for essentially all observed vulnerability; targeted protection of this bit position would be highly effective
+1. **Non-monotonic relationship**: Higher flood levels do not always yield better robustness; b=0.15 is the cross-dataset optimum
+
+______________________________________________________________________
+
+## 4.8 Data Availability
 
 All experimental results are publicly available:
 
 - **CSV format**: `comprehensive_results.csv` (36 configurations)
-- **JSON format**: `comprehensive_results.json` (with detailed metrics)
+- **JSON format**: `comprehensive_results.json` (with per-bit-position details)
 - **Reproducible code**: `comprehensive_experiment.py`
 
 [← Previous: Methodology](03_methodology.md) | [Back to README](README.md) | [Next: Discussion →](05_discussion.md)

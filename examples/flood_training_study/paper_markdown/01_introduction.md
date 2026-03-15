@@ -131,8 +131,9 @@ We hypothesize three mechanisms:
 ### Scientific Contributions
 
 1. **First proof-of-concept study** of flood level training for SEU robustness on simplified benchmarks
-1. **Preliminary quantitative evidence** that training methodology affects fault tolerance (6.5-14.2% improvement)
-1. **Mechanism analysis** exploring potential robustness-generalization connections
+1. **Preliminary quantitative evidence** that training methodology affects fault tolerance (up to 10.0% average improvement at b=0.15, and up to ~49% for individual dataset-configurations)
+1. **Discovery that flooding effectiveness is dataset-dependent**: flooding is only active when the flood level exceeds the natural training loss convergence point
+1. **Per-bit-position vulnerability analysis** revealing exponent MSB (bit 1) dominates all SEU vulnerability
 1. **Foundation for future research** identifying promising directions for large-scale validation
 
 ### Practical Impact
@@ -140,12 +141,14 @@ We hypothesize three mechanisms:
 For a typical space mission with a neural network:
 
 - **Training cost**: +4-6% compute time (one-time, pre-launch)
-- **Accuracy cost**: 0.41% baseline performance (acceptable for most tasks)
-- **Robustness benefit**: 6.5% accuracy degradation reduction (significant)
+- **Accuracy cost**: 0.50% baseline performance at optimal b=0.15 (acceptable for most tasks)
+- **Robustness benefit**: 10.0% average SEU vulnerability reduction; up to ~49% for favorable configurations (blobs with dropout)
 - **Hardware savings**: Potentially reduce ECC/TMR requirements
 - **Mission reliability**: Lower probability of critical failures
 
-**ROI**: 15.9× return on investment (robustness gain vs. accuracy loss)
+**ROI**: 20.0x return on investment at b=0.15 (robustness gain vs. accuracy loss). At b=0.10, ROI reaches 43.0x but with a smaller 3.6% robustness gain.
+
+**Important caveat**: These benefits are dataset-dependent. Flooding is only effective when the flood level exceeds the model's natural training loss convergence point. For tasks where standard training loss is already high (e.g., circles dataset at ~0.43), flooding has no effect.
 
 ### Broader Implications
 
