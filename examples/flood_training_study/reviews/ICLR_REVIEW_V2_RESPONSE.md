@@ -1,5 +1,7 @@
 # Response to Updated ICLR Review (Version 2)
 
+**Note (March 2026)**: This document describes changes made in December 2025 in response to simulated ICLR review feedback. The paper has since been updated with corrected bit positions and re-run experimental data. Specific numbers referenced below may reflect the December 2025 version; see the current paper for up-to-date results.
+
 ## Review Summary
 
 The updated ICLR review acknowledged significant strengths while maintaining constructive feedback on limitations. The review now characterizes the work more positively as a "simple and widely compatible training-time regularizer" with "zero inference overhead" that addresses an "underexplored problem."

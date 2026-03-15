@@ -1,7 +1,6 @@
 # Response to ICLR Review Feedback
 
-**Date**: December 12, 2025\
-**Commit**: ae2ffa8
+**Note (March 2026)**: This document describes changes made in December 2025 in response to simulated ICLR review feedback. The paper has since been updated with corrected bit positions and re-run experimental data. Specific numbers referenced below may reflect the December 2025 version; see the current paper for up-to-date results.
 
 ## Summary
 

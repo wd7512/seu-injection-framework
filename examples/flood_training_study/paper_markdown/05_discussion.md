@@ -6,16 +6,17 @@ ______________________________________________________________________
 
 ## 5.1 Interpretation of Findings
 
-### 5.1.1 Primary Finding: Consistent Robustness Improvement
+### 5.1.1 Primary Finding: Dataset-Dependent Robustness Improvement
 
-Our comprehensive experiments across 36 configurations demonstrate that **flood level training consistently improves SEU robustness**:
+Our comprehensive experiments across 36 configurations demonstrate that **flood level training can improve SEU robustness, but the effect is dataset-dependent and non-monotonic**:
 
-- **Magnitude**: 6.5-14.2% reduction in SEU-induced accuracy degradation
-- **Consistency**: Effect observed across all 3 datasets
-- **Generality**: Benefits present with and without dropout
-- **Optimum**: b=0.10 provides best cost-benefit ratio (15.9× ROI)
+- **Best cross-dataset average**: b=0.15 yields 10.0% reduction in mean accuracy drop (1.94% → 1.75%)
+- **Strongest individual effect**: Blobs with dropout at b=0.15 shows ~49% reduction in accuracy drop (2.59% → 1.33%)
+- **Weakest effect**: Circles dataset shows minimal/no benefit because flooding is never active (training loss ~0.43 >> all flood levels)
+- **Non-monotonic**: Improvement peaks at b=0.15 then decreases at b=0.20-0.30
+- **Dropout interaction**: Flooding benefits are strongest in conjunction with dropout; without dropout, flooding often fails to improve robustness
 
-This goes beyond the initial single-dataset exploratory result and establishes flooding as a viable technique for improving neural network fault tolerance.
+This is a more nuanced picture than a simple "flooding always helps" narrative. The results establish feasibility but underscore the importance of calibrating the flood level above the natural training loss.
 
 ### 5.1.2 Scale of Improvement
 
@@ -23,25 +24,32 @@ This goes beyond the initial single-dataset exploratory result and establishes f
 
 For a neural network experiencing 1000 SEU events:
 
-- **Standard training**: ~23.2 failures (2.32% mean accuracy drop)
-- **Flood training (b=0.10)**: ~21.7 failures (2.17% mean accuracy drop)
-- **Benefit**: ~1.5 fewer failures per 1000 SEUs (6.5% reduction)
+- **Standard training**: ~19.4 failures (1.94% mean accuracy drop across all bit positions)
+- **Flood training (b=0.15, with dropout)**: ~17.5 failures (1.75% mean accuracy drop)
+- **Benefit**: ~1.9 fewer failures per 1000 SEUs (10.0% reduction)
 
-While modest in absolute terms, this represents a meaningful improvement for safety-critical applications with zero additional inference cost.
+However, this masks significant per-bit-position variation:
+
+- **Bit 1 (exponent MSB)**: 7-13% accuracy drop per injection — the dominant vulnerability
+- **All other tested bits**: <0.1% accuracy drop — negligible impact
+
+In practice, SEU vulnerability is concentrated in a single bit position. Targeted hardware protection of exponent MSB bits may be more cost-effective than uniform protection. Flooding's benefit is primarily visible in reducing bit-1 vulnerability.
 
 ### 5.1.3 Trade-offs
 
-The accuracy-robustness trade-off is well-characterized:
+The accuracy-robustness trade-off shows a nuanced, non-monotonic relationship:
 
-| Flood Level | Baseline Cost | Robustness Gain | Assessment                          |
+| Flood Level | Accuracy Cost | Robustness Gain | Assessment                          |
 | ----------- | ------------- | --------------- | ----------------------------------- |
-| 0.05        | 0.18%         | 2.6%            | Minimal impact, some benefit        |
-| 0.10        | 0.41%         | 6.5%            | **Recommended** (best ROI)          |
-| 0.15        | 0.73%         | 9.9%            | Good for high-risk deployments      |
-| 0.20        | 1.23%         | 12.1%           | Significant cost, strong robustness |
-| 0.30        | 2.45%         | 14.2%           | Too costly for most applications    |
+| 0.05        | 0.79%         | 0.9%            | Minimal gain                        |
+| 0.10        | 0.08%         | 3.6%            | Small gain, low cost                |
+| **0.15**    | **0.50%**     | **10.0%**       | **Best balance**                    |
+| 0.20        | -0.12%*       | 9.2%            | Anomalous (negative cost)           |
+| 0.30        | 1.04%         | 6.0%            | Declining benefit                   |
 
-**Recommendation**: b=0.10-0.15 provides optimal balance for most use cases.
+*b=0.20 shows negative accuracy cost due to random variation, not a genuine benefit.
+
+**Recommendation**: b=0.15 provides optimal balance for most use cases. b=0.10 is a conservative choice with near-zero accuracy cost.
 
 ______________________________________________________________________
 
@@ -79,9 +87,9 @@ Where H is the Hessian matrix. Flatter minima (lower eigenvalues of H) → small
 
 **Empirical Evidence:**
 
-1. **Training Loss Control**: Final training losses match flood levels (0.101 for b=0.10), confirming flooding constraint is active
-1. **Validation Loss**: Moderate increase (2.8% for b=0.10) suggests regularization without overfitting
-1. **Robustness Improvement**: Consistent 6.5-14.2% reduction in SEU vulnerability
+1. **Training Loss Control**: For blobs, final training losses match flood levels (0.112 for b=0.10), confirming the flooding constraint is active. For circles, training loss (~0.43) greatly exceeds all flood levels, so flooding is never active — and correspondingly, circles shows no robustness benefit.
+1. **Validation Loss**: Moderate increase driven by blobs and moons (where flooding is active)
+1. **Robustness Improvement**: Dataset-dependent; strong for blobs (up to ~49%), modest for moons, absent for circles
 
 **Theoretical Prediction (Untested):**
 
@@ -97,29 +105,31 @@ If our hypothesis is correct, flood-trained models should exhibit:
 
 **Observed Synergy:**
 
-- Dropout alone: Improves robustness by 6.2% (vs no regularization)
-- Flooding alone (b=0.10): Improves robustness by 6.5%
-- **Dropout + Flooding**: Combined effect (observed in "with dropout" conditions)
+- Dropout alone: Improves robustness by **15.1%** (mean accuracy drop: 2.00% → 1.70%) with negligible accuracy cost (0.10%)
+- Flooding alone (b=0.15, no dropout): Mixed results — improvement on blobs but not circles or moons
+- **Dropout + Flooding (b=0.15)**: Combined effect provides best robustness for blobs (1.33% drop vs 2.59% baseline)
 
-The combination provides the best overall robustness, suggesting flooding adds regularization beyond what dropout provides.
+Critically, flooding's benefits are **most reliable in conjunction with dropout**. Without dropout, flooding often fails to improve robustness or even slightly worsens it (e.g., circles without dropout).
 
 **Mechanism Differences:**
 
-- **Dropout**: Stochastic neuron-level regularization during training
-- **Flooding**: Deterministic loss-level regularization throughout training
-- **Complementary**: Different mechanisms, additive benefits
+- **Dropout**: Stochastic neuron-level regularization during training — provides 15.1% robustness improvement independently
+- **Flooding**: Deterministic loss-level regularization — effective only when flood level exceeds natural training loss
+- **Complementary**: Different mechanisms, but flooding adds value primarily when combined with dropout
 
 ### 5.2.3 Dataset Dependency
 
-| Dataset | Difficulty | Standard Vulnerability | Flood Benefit |
-| ------- | ---------- | ---------------------- | ------------- |
-| Blobs   | Easy       | 1.52-1.78%             | 6.6-14.2%     |
-| Moons   | Medium     | 2.40-2.65%             | 5.0-13.9%     |
-| Circles | Hard       | 2.85-3.12%             | 6.0-13.5%     |
+| Dataset | Difficulty | Baseline Acc   | Standard Vulnerability | Flood Benefit (b=0.15, dropout) | Flooding Active? |
+| ------- | ---------- | -------------- | ---------------------- | ------------------------------- | ---------------- |
+| Blobs   | Easy       | 97.75-100%     | 2.14-2.59%             | ~49% reduction                  | Yes              |
+| Moons   | Medium     | 88.50-92.25%   | 1.81-2.30%             | ~5-6% reduction                 | Partially*       |
+| Circles | Hard       | 78.25-80.25%   | 1.39-1.87%             | Minimal/none                    | No               |
 
-**Observation**: Relative improvement is consistent (6-14%) regardless of baseline vulnerability or task difficulty.
+*Moons training loss (~0.20) is close to the lowest flood levels, so only higher flood levels (b=0.20-0.30) are truly active.
 
-**Implication**: Flooding's benefits likely stem from fundamental regularization properties rather than dataset-specific effects.
+**Key Observation**: Flooding's benefit correlates strongly with whether the flood level is above the natural training loss. For circles (loss ~0.43), no tested flood level is active. For blobs (loss ~0.00), all flood levels are active. This is a fundamental prerequisite, not a dataset-specific effect.
+
+**Implication**: Before deploying flood training, practitioners must verify that the chosen flood level exceeds the model's natural training loss convergence point. Otherwise, flooding has no effect.
 
 ______________________________________________________________________
 
@@ -129,18 +139,20 @@ ______________________________________________________________________
 
 | Technique       | Training Overhead | Inference Cost | SEU Robustness | Accuracy Cost |
 | --------------- | ----------------- | -------------- | -------------- | ------------- |
-| Dropout (0.2)   | ~0%               | 0%             | +6.2%          | -1.9%         |
-| Flooding (0.10) | ~2%               | 0%             | +6.5%          | -0.41%        |
-| **Combined**    | ~2%               | 0%             | **Best**       | -2.3%         |
+| Dropout (0.2)   | ~0%               | 0%             | +15.1%         | -0.10%        |
+| Flooding (0.15) | ~2%               | 0%             | +10.0%         | -0.50%        |
+| **Combined**    | ~2%               | 0%             | **Best**       | ~0.6%         |
 | Weight Decay    | ~0%               | 0%             | Unknown        | Variable      |
 | Early Stopping  | ~-20%             | 0%             | Unknown        | Variable      |
 
+**Key finding**: Dropout alone provides a larger robustness improvement (15.1%) than flooding alone (10.0% at b=0.15), with lower accuracy cost. Flooding's value-add is most apparent for specific datasets (blobs) where it can provide dramatic improvements (~49%).
+
 **Advantages of Flooding:**
 
-- Lower accuracy cost than dropout for similar robustness gain
 - Deterministic (no stochasticity during inference)
 - Simple implementation (10 lines of code)
 - Complementary to other techniques
+- Can provide very large improvements for favorable configurations
 
 ### 5.3.2 Flooding vs Hardware Solutions
 
@@ -148,7 +160,7 @@ ______________________________________________________________________
 | ------------ | ----------------- | ------------------ | --------- | ------------ |
 | ECC Memory   | Hardware          | +30-40% area/power | Yes       | Single-bit   |
 | TMR          | Hardware/Software | +200% compute      | Yes       | Voting-based |
-| **Flooding** | Training-only     | +0.41% accuracy    | No        | Prevention   |
+| **Flooding** | Training-only     | +0.50% accuracy    | No        | Prevention   |
 
 **Position**: Flooding is not a replacement for hardware fault tolerance but a complementary software technique that reduces vulnerability without runtime overhead.
 
@@ -223,10 +235,11 @@ ______________________________________________________________________
    - Could provide additional mechanistic insights
    - Future work should investigate
 
-1. **Bit Position Specificity**: Limited analysis of which bit positions benefit most
+1. **Bit Position Specificity**: Our per-bit-position analysis reveals that **bit 1 (exponent MSB) accounts for essentially all observed vulnerability**
 
-   - Sign bits vs exponent vs mantissa effects unclear
-   - May inform targeted mitigation strategies
+   - Sign bit (bit 0), exponent LSB (bit 8), mantissa MSB (bit 9), and mantissa LSB (bit 31) cause near-zero accuracy drops
+   - This strongly suggests targeted hardware protection of exponent bits would be highly cost-effective
+   - Flooding's benefit is primarily in reducing bit-1 vulnerability
 
 ### 5.4.3 Generalization Questions
 
@@ -264,23 +277,27 @@ ______________________________________________________________________
 **Recommended Configuration:**
 
 ```python
-# For general use: b=0.10 with dropout
-criterion = FloodingLoss(nn.CrossEntropyLoss(), flood_level=0.10)
+# For general use: b=0.15 with dropout
+criterion = FloodingLoss(nn.CrossEntropyLoss(), flood_level=0.15)
 model = create_model_with_dropout(dropout_rate=0.2)
 ```
 
 **For High-Risk Deployments:**
 
 ```python
-# More aggressive: b=0.15-0.20
-criterion = FloodingLoss(nn.CrossEntropyLoss(), flood_level=0.15)
+# More aggressive: b=0.20-0.30
+criterion = FloodingLoss(nn.CrossEntropyLoss(), flood_level=0.20)
 ```
+
+**Critical Prerequisite:**
+
+Before using flood training, verify that the chosen flood level exceeds the model's natural training loss convergence point. If not, flooding will have no effect. Run a baseline training first to measure the natural loss.
 
 **Flood Level Selection:**
 
-1. Train baseline model, measure validation loss plateau (L_val)
-1. Set flood level: b = 1.5-2.0 × L_val
-1. Validate that training loss converges near b
+1. Train baseline model, measure final training loss (L_train)
+1. Set flood level: b > L_train (typically b = 1.5-2.0 × L_train)
+1. Validate that training loss converges near b (confirming flooding is active)
 1. Adjust if needed based on accuracy/robustness trade-off
 
 ### 5.5.3 Integration with Existing Systems
@@ -330,18 +347,19 @@ ______________________________________________________________________
 
 **What we learned:**
 
-1. ✅ Flooding consistently improves SEU robustness (6.5-14.2%)
-1. ✅ Effect is dataset-independent and architecture-agnostic (within tested scope)
-1. ✅ Optimal configuration is b=0.10 with dropout (15.9× ROI)
-1. ✅ Mechanism likely involves loss landscape regularization
-1. ✅ Practical deployment guidelines established
+1. ✅ Flooding can improve SEU robustness, with up to 10.0% average improvement at b=0.15 and up to ~49% for individual configurations (blobs with dropout)
+1. ✅ Effect is **dataset-dependent**, not universal — flooding must be active (flood level > natural training loss)
+1. ✅ Optimal cross-dataset configuration is b=0.15 with dropout
+1. ✅ Dropout alone provides 15.1% robustness improvement — a strong independent technique
+1. ✅ Bit 1 (exponent MSB) dominates all SEU vulnerability; other tested bits have negligible impact
+1. ✅ Practical deployment guidelines established (with important caveats)
 
 **What remains uncertain:**
 
 1. ❓ Generalization to large-scale models and realistic tasks
 1. ❓ Direct measurement of loss landscape flatness
 1. ❓ Interaction with other architectural choices (batch norm, residual connections)
-1. ❓ Bit-position-specific effects
+1. ❓ Whether the strong blobs result generalizes to other easily-separable tasks
 1. ❓ Multi-fault scenarios and temporal accumulation
 
 **Next steps**: See Conclusion for future research directions.

@@ -27,13 +27,15 @@ Where `b` is the flood level. We investigated whether this improves robustness t
 
 | Metric                       | Result                                   |
 | ---------------------------- | ---------------------------------------- |
-| **Robustness Improvement**   | 6.5-14.2% reduction in SEU vulnerability |
-| **Optimal Configuration**    | b=0.10 with dropout (15.9× ROI)          |
-| **Accuracy Cost**            | 0.41% at optimal setting                 |
-| **Consistency**              | Effect observed across all datasets      |
-| **Critical Fault Reduction** | 10-15% fewer catastrophic failures       |
+| **Robustness Improvement**   | Up to 10.0% avg (b=0.15), ~49% best config (blobs+dropout) |
+| **Optimal Configuration**    | b=0.15 with dropout                      |
+| **Accuracy Cost**            | 0.50% at optimal setting                 |
+| **Dropout Alone**            | 15.1% robustness improvement (0.10% cost) |
+| **Dominant Vulnerability**   | Bit 1 (exponent MSB) accounts for nearly all SEU impact |
 
-**Recommendation**: Adopt flood training (b=0.10-0.15) for safety-critical deployments in harsh radiation environments.
+**Important**: Flooding effectiveness is dataset-dependent — the flood level must exceed the model's natural training loss convergence point to be active. For tasks with high natural training loss (e.g., circles at ~0.43), flooding has no effect.
+
+**Recommendation**: Use dropout (0.2) as a baseline. Add flood training (b=0.15) after verifying the flood level exceeds natural training loss. Deploy in safety-critical radiation environments.
 
 ______________________________________________________________________
 
@@ -103,39 +105,41 @@ ______________________________________________________________________
 
 ### By Dataset
 
+**Blobs (Low Difficulty — Strongest Flooding Benefit)**
+
+- Standard (b=0.0, dropout): 100.00% accuracy, 2.59% SEU drop
+- Optimal (b=0.15, dropout): 99.75% accuracy, 1.33% SEU drop
+- **Improvement**: ~49%
+
 **Moons (Medium Difficulty)**
 
-- Standard (b=0.0): 91.25% accuracy, 2.40% SEU drop
-- Optimal (b=0.10): 90.75% accuracy, 2.28% SEU drop
-- **Improvement**: 5.0% (p < 0.05)
+- Standard (b=0.0, dropout): 91.25% accuracy, 1.81% SEU drop
+- Optimal (b=0.15, dropout): 91.00% accuracy, 1.71% SEU drop
+- **Improvement**: ~6%
 
-**Circles (High Difficulty)**
+**Circles (High Difficulty — Flooding Inactive)**
 
-- Standard (b=0.0): 89.00% accuracy, 2.85% SEU drop
-- Optimal (b=0.10): 88.50% accuracy, 2.68% SEU drop
-- **Improvement**: 6.0% (p < 0.05)
-
-**Blobs (Low Difficulty)**
-
-- Standard (b=0.0): 95.75% accuracy, 1.52% SEU drop
-- Optimal (b=0.10): 95.25% accuracy, 1.42% SEU drop
-- **Improvement**: 6.6% (p < 0.05)
+- Standard (b=0.0, dropout): 79.50% accuracy, 1.39% SEU drop
+- Optimal (b=0.15, dropout): 79.75% accuracy, 1.21% SEU drop
+- **Note**: Natural training loss (~0.43) exceeds all flood levels, so flooding is never active. Any improvement is within noise.
 
 ### Cost-Benefit Analysis
 
-| Flood Level | Accuracy Cost | Robustness Gain | ROI       |
-| ----------- | ------------- | --------------- | --------- |
-| 0.05        | 0.18%         | 2.6%            | 14.4×     |
-| **0.10**    | **0.41%**     | **6.5%**        | **15.9×** |
-| 0.15        | 0.73%         | 9.9%            | 13.6×     |
-| 0.20        | 1.23%         | 12.1%           | 9.8×      |
-| 0.30        | 2.45%         | 14.2%           | 5.8×      |
+| Flood Level | Accuracy Cost | Robustness Gain |
+| ----------- | ------------- | --------------- |
+| 0.05        | 0.79%         | 0.9%            |
+| 0.10        | 0.08%         | 3.6%            |
+| **0.15**    | **0.50%**     | **10.0%**       |
+| 0.20        | -0.12%*       | 9.2%            |
+| 0.30        | 1.04%         | 6.0%            |
+
+*b=0.20 shows negative accuracy cost due to random variation.
 
 ### Dropout Interaction
 
-- **Dropout alone**: 6.2% robustness improvement, -1.9% accuracy
-- **Flooding alone (b=0.10)**: 6.5% robustness improvement, -0.41% accuracy
-- **Combined (recommended)**: Best overall robustness with acceptable accuracy cost
+- **Dropout alone**: 15.1% robustness improvement, -0.10% accuracy
+- **Flooding alone (b=0.15)**: Mixed results — strong for blobs, weak/absent for circles
+- **Combined (recommended)**: Best overall robustness, particularly for datasets where flooding is active
 
 ______________________________________________________________________
 
@@ -167,13 +171,18 @@ criterion = FloodingLoss(nn.CrossEntropyLoss(), flood_level=0.10)
 
 **Standard Deployments** (space missions, medical devices):
 
-- Use b=0.10 with dropout (0.2)
-- Expected: 6.5% robustness improvement, 0.41% accuracy cost
+- Use b=0.15 with dropout (0.2) — **after verifying flood level > natural training loss**
+- Expected: Up to 10% avg robustness improvement, 0.50% accuracy cost
 
 **High-Risk Deployments** (deep space, nuclear facilities):
 
-- Use b=0.15-0.20 with dropout
-- Expected: 10-12% robustness improvement, 0.7-1.2% accuracy cost
+- Use b=0.20-0.30 with dropout
+- Expected: 6-9% avg robustness improvement, 1.0-1.2% accuracy cost
+
+**All Deployments:**
+
+- **Always use dropout (0.2)** — provides 15.1% robustness improvement independently
+- Consider targeted hardware protection of exponent MSB bits (bit 1), which dominate vulnerability
 
 **Flood Level Selection**:
 
@@ -254,8 +263,10 @@ This work provides evidence that:
 1. **Practical deployment guidance**
 
    - First systematic study of flood training for SEU robustness
-   - Establishes optimal configurations (b=0.10)
+   - Establishes optimal configurations (b=0.15 with dropout)
    - Quantifies cost-benefit trade-offs
+   - Identifies critical prerequisite: flood level must exceed natural training loss
+   - Reveals bit-1 (exponent MSB) as dominant vulnerability
 
 ______________________________________________________________________
 

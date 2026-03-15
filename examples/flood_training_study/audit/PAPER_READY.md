@@ -63,10 +63,13 @@ Output: `main.pdf` (~8 pages)
 
 ## Key Findings in Paper
 
-- Flood training reduces SEU vulnerability by **6.5-14.2%**
-- Optimal configuration: **b=0.10** with 15.9× ROI
-- Accuracy cost: only **0.41%** at optimum
-- Consistent across all 3 datasets
+- Flood training can reduce SEU vulnerability by **up to 10.0%** avg at b=0.15, **~49%** for best config (blobs+dropout)
+- Effect is **dataset-dependent**: flooding must be active (flood level > natural training loss)
+- Optimal cross-dataset configuration: **b=0.15** with 20.0× ROI
+- Accuracy cost: **0.50%** at optimum
+- Dropout alone: **15.1%** robustness improvement
+- Bit 1 (exponent MSB) accounts for nearly all SEU vulnerability
+- Non-monotonic: higher flood levels do not always improve robustness
 - Zero inference overhead
 
 ## Before Submission
@@ -118,5 +121,6 @@ The paper can now be compiled to PDF and reviewed. After adding author informati
 ______________________________________________________________________
 
 **Completed**: 2025-12-12\
+**Updated**: 2026-03-15 (bit position fix, full data re-run, all docs refreshed)\
 **Commits**: 12075f2 (main work), 7189689 (fixes)\
 **Total effort**: All 4 tasks completed as requested

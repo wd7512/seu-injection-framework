@@ -218,17 +218,17 @@ results = injector.run_injector(bit_i=bit_position, p=0.05)
 
 ### Tested Bit Positions
 
-We test **5 representative bit positions**:
+We test **5 representative bit positions** spanning the IEEE 754 float32 format:
 
-| Bit Position | Type     | IEEE 754 Role   | Expected Impact                     |
-| ------------ | -------- | --------------- | ----------------------------------- |
-| 0            | Sign     | Sign bit        | **High** (polarity flip)            |
-| 1            | Exponent | MSB of exponent | **High** (large magnitude change)   |
-| 8            | Exponent | LSB of exponent | **Medium** (small magnitude change) |
-| 15           | Mantissa | MSB of mantissa | **Low-Medium** (precision loss)     |
-| 23           | Mantissa | Middle mantissa | **Low** (minor precision loss)      |
+| Bit Position | Type     | IEEE 754 Role    | Expected Impact                     |
+| ------------ | -------- | ---------------- | ----------------------------------- |
+| 0            | Sign     | Sign bit         | **Low** (polarity flip)             |
+| 1            | Exponent | MSB of exponent  | **High** (large magnitude change)   |
+| 8            | Exponent | LSB of exponent  | **Low** (small magnitude change)    |
+| 9            | Mantissa | MSB of mantissa  | **Low** (precision loss)            |
+| 31           | Mantissa | LSB of mantissa  | **Negligible** (minimal precision)  |
 
-**Rationale**: These bits span the impact spectrum from critical (sign) to negligible (mantissa LSB).
+**Rationale**: These bits span the impact spectrum from critical (exponent MSB) to negligible (mantissa LSB). Empirically, bit 1 (exponent MSB) dominates vulnerability, causing ~7-13% accuracy drops and ~20-45% critical fault rates, while all other tested positions cause near-zero degradation.
 
 ### Metrics
 
@@ -286,8 +286,8 @@ For each injection experiment, we compute:
 
 1. **SEU Injection (Standard Model)**
 
-   - For each bit position \[0, 1, 8, 15, 23\]:
-     - Inject 5% of parameters
+   - For each bit position \[0, 1, 8, 9, 31\]:
+     - Inject 15% of parameters
      - Measure accuracy after each injection
      - Compute statistics
 
