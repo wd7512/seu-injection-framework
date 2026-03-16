@@ -228,13 +228,14 @@ def train_model_flood(model, x_train, y_train, x_val, y_val, flood_level=0.08, e
 # ============================================================================
 
 
-def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=True, fast_mode=False):
+def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=True, fast_mode=False, injection_p=None):
     """Evaluate model robustness to SEU injection."""
     if verbose:
         print(f"\n🔬 Evaluating SEU robustness for {model_name}...")
 
     # Initialize injector
-    injection_p = 0.001 if fast_mode else 0.05
+    if injection_p is None:
+        injection_p = 0.001 if fast_mode else 0.05
     injector = StochasticSEUInjector(
         trained_model=model,
         criterion=classification_accuracy,
@@ -444,7 +445,7 @@ def main(fast_mode=False):
 
     # Evaluate SEU robustness
     standard_results = evaluate_seu_robustness(
-        model_standard, X_test, y_test, model_name="Standard Model", fast_mode=fast_mode
+        model_standard, X_test, y_test, model_name="Standard Model", fast_mode=fast_mode, injection_p=injection_p
     )
 
     # ========================================================================
@@ -460,7 +461,9 @@ def main(fast_mode=False):
     )
 
     # Evaluate SEU robustness
-    flood_results = evaluate_seu_robustness(model_flood, X_test, y_test, model_name="Flood Model", fast_mode=fast_mode)
+    flood_results = evaluate_seu_robustness(
+        model_flood, X_test, y_test, model_name="Flood Model", fast_mode=fast_mode, injection_p=injection_p
+    )
 
     # ========================================================================
     # Results Comparison
