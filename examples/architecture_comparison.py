@@ -605,7 +605,7 @@ def generate_comparative_report(results, complexity_data, robustness_scores, out
     report_text = "\n".join(report)
     report_file = output_dir / "architecture_comparison_report.txt"
 
-    with open(report_file, "w") as f:
+    with open(report_file, "w", encoding="utf-8") as f:
         f.write(report_text)
 
     print(f"📄 Comparison report saved to: {report_file}")

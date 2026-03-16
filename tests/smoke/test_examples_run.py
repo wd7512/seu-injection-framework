@@ -88,7 +88,6 @@ class TestExampleScriptsRun:
         assert "FLOOD LEVEL TRAINING" in stdout, "Expected header not found"
         assert "SEU" in stdout and "robustness" in stdout.lower(), "Expected SEU robustness output not found"
 
-    @pytest.mark.skip(reason="Pre-existing bugs: tuple keys and Unicode encoding on Windows")
     def test_architecture_comparison_default_mode(self):
         """Run architecture_comparison.py (already optimized for speed)."""
         result = run_script(
