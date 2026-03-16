@@ -50,6 +50,7 @@ class SimpleNN(nn.Module):
         self.fc3 = nn.Linear(hidden_size, num_classes)
         self.dropout = nn.Dropout(0.5)
 
+    def forward(self, x):
         x = x.view(x.size(0), -1)  # Flatten
         x = functional.relu(self.fc1(x))
         x = self.dropout(x)

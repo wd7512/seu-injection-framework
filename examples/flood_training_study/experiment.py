@@ -16,7 +16,8 @@ Key Findings:
     - Works across all architectures tested
 
 Usage:
-    python flood_training_robustness.py
+    python flood_training_robustness.py           # Full run
+    python flood_training_robustness.py --fast   # Fast smoke test mode
 
 Output:
     - Comparison of standard vs flood training
@@ -28,6 +29,7 @@ References:
     Achieving Zero Training Error?" NeurIPS 2020.
 """
 
+import argparse
 from pathlib import Path
 
 import matplotlib
@@ -105,12 +107,13 @@ def create_simple_mlp():
 # ============================================================================
 
 
-def prepare_data():
+def prepare_data(fast_mode=False):
     """Prepare training and test data."""
     print("📊 Preparing dataset...")
 
     # Generate moon-shaped data for binary classification
-    X, y = make_moons(n_samples=2000, noise=0.3, random_state=42)
+    n_samples = 200 if fast_mode else 2000
+    X, y = make_moons(n_samples=n_samples, noise=0.3, random_state=42)
 
     # Normalize features
     scaler = StandardScaler()
@@ -225,12 +228,13 @@ def train_model_flood(model, x_train, y_train, x_val, y_val, flood_level=0.08, e
 # ============================================================================
 
 
-def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=True):
+def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=True, fast_mode=False):
     """Evaluate model robustness to SEU injection."""
     if verbose:
         print(f"\n🔬 Evaluating SEU robustness for {model_name}...")
 
     # Initialize injector
+    injection_p = 0.001 if fast_mode else 0.05
     injector = StochasticSEUInjector(
         trained_model=model,
         criterion=classification_accuracy,
@@ -252,8 +256,8 @@ def evaluate_seu_robustness(model, x_test, y_test, model_name="Model", verbose=T
         if verbose:
             print(f"  Testing bit {bit_i} ({bit_name})...")
 
-        # Inject with 5% sampling rate
-        injection_results = injector.run_injector(bit_i=bit_i, p=0.05)
+        # Inject with sampling rate
+        injection_results = injector.run_injector(bit_i=bit_i, p=injection_p)
 
         if len(injection_results["criterion_score"]) > 0:
             fault_scores = injection_results["criterion_score"]
@@ -406,11 +410,12 @@ def create_comparison_visualizations(
 # ============================================================================
 
 
-def main():
+def main(fast_mode=False):
     """Main experiment: compare standard vs flood training for SEU robustness."""
+    mode_str = " (FAST MODE)" if fast_mode else ""
     print("=" * 80)
     print("FLOOD LEVEL TRAINING FOR SEU ROBUSTNESS")
-    print("Comparing Standard Training vs Flood Level Training")
+    print(f"Comparing Standard Training vs Flood Level Training{mode_str}")
     print("=" * 80)
 
     # Set random seeds for reproducibility
@@ -418,11 +423,12 @@ def main():
     np.random.seed(42)
 
     # Prepare data
-    X_train, X_val, X_test, y_train, y_val, y_test = prepare_data()
+    X_train, X_val, X_test, y_train, y_val, y_test = prepare_data(fast_mode=fast_mode)
 
     # Experiment parameters
     flood_level = 0.08
-    epochs = 100
+    epochs = 5 if fast_mode else 100
+    injection_p = 0.001 if fast_mode else 0.05
 
     # ========================================================================
     # Experiment 1: Standard Training
@@ -437,7 +443,9 @@ def main():
     )
 
     # Evaluate SEU robustness
-    standard_results = evaluate_seu_robustness(model_standard, X_test, y_test, model_name="Standard Model")
+    standard_results = evaluate_seu_robustness(
+        model_standard, X_test, y_test, model_name="Standard Model", fast_mode=fast_mode
+    )
 
     # ========================================================================
     # Experiment 2: Flood Level Training
@@ -452,7 +460,7 @@ def main():
     )
 
     # Evaluate SEU robustness
-    flood_results = evaluate_seu_robustness(model_flood, X_test, y_test, model_name="Flood Model")
+    flood_results = evaluate_seu_robustness(model_flood, X_test, y_test, model_name="Flood Model", fast_mode=fast_mode)
 
     # ========================================================================
     # Results Comparison
@@ -493,11 +501,14 @@ def main():
         print("  4. Robustness gain achieved with no baseline accuracy cost")
 
     # ========================================================================
-    # Visualizations
+    # Visualizations (skip in fast mode)
     # ========================================================================
-    create_comparison_visualizations(
-        standard_results, flood_results, standard_train_losses, flood_train_losses, flood_level
-    )
+    if not fast_mode:
+        create_comparison_visualizations(
+            standard_results, flood_results, standard_train_losses, flood_train_losses, flood_level
+        )
+    else:
+        print("\n[SKIPPED] Visualizations (fast mode)")
 
     # ========================================================================
     # Summary and Recommendations
@@ -530,4 +541,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Flood Level Training for SEU Robustness")
+    parser.add_argument(
+        "--fast", action="store_true", help="Run in fast smoke-test mode with reduced parameters for quick validation"
+    )
+    args = parser.parse_args()
+    main(fast_mode=args.fast)
