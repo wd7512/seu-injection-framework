@@ -578,7 +578,7 @@ def generate_comparative_report(results, complexity_data, robustness_scores, out
 
     # Correlation analysis
     param_robust_corr = np.corrcoef(
-        [complexity_data[name]["parameters"] for name in sorted_archs],
+        [complexity_data[name]["parameters"] for name, _ in sorted_archs],
         [score for _, score in sorted_archs],
     )[0, 1]
 

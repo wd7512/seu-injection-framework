@@ -88,13 +88,25 @@ class TestExampleScriptsRun:
         assert "FLOOD LEVEL TRAINING" in stdout, "Expected header not found"
         assert "SEU" in stdout and "robustness" in stdout.lower(), "Expected SEU robustness output not found"
 
-    @pytest.mark.skip(reason="Pre-existing bug in architecture_comparison.py - sorted_archs has tuple keys")
+    @pytest.mark.skip(reason="Pre-existing bugs: tuple keys and Unicode encoding on Windows")
     def test_architecture_comparison_default_mode(self):
-        """Run architecture_comparison.py (already optimized for speed).
+        """Run architecture_comparison.py (already optimized for speed)."""
+        result = run_script(
+            EXAMPLES_DIR / "architecture_comparison.py",
+            timeout=300,
+        )
 
-        SKIPPED: This test is skipped due to a pre-existing bug in the example
-        where robustness_scores keys become tuples instead of strings.
-        """
+        stdout = result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
+        stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
+
+        assert result.returncode == 0, (
+            f"architecture_comparison.py failed with return code {result.returncode}\n"
+            f"STDOUT:\n{stdout}\n"
+            f"STDERR:\n{stderr}"
+        )
+
+        # Verify key output is present
+        assert "Robustness" in stdout, "Expected robustness output not found"
 
 
 if __name__ == "__main__":
