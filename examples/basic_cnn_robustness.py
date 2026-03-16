@@ -80,7 +80,7 @@ def train_model(model, x_train, y_train, epochs=100, fast_mode=False):
     if fast_mode:
         epochs = min(epochs, 5)
 
-    print(f"Training model... ({epochs} epochs)" if fast_mode else "Training model...")
+    print(f"Training model... ({epochs} epochs)")
 
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
@@ -317,9 +317,12 @@ def main(fast_mode=False):
         print("\nANALYSIS COMPLETE")
         print("=" * 60)
         print(f"Baseline accuracy: {baseline_acc:.2%}")
-        print(f"Layers analyzed: {len(layer_results)}")
-        print(f"Bit positions tested: {len(bit_results)}")
-        if not fast_mode:
+        if fast_mode:
+            print("Layers analyzed: Skipped in fast mode")
+            print("Bit positions tested: Skipped in fast mode")
+        else:
+            print(f"Layers analyzed: {len(layer_results)}")
+            print(f"Bit positions tested: {len(bit_results)}")
             print("Check 'cnn_robustness_analysis.png' for visualizations!")
 
     except Exception as e:
