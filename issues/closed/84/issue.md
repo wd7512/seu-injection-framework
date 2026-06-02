@@ -45,9 +45,9 @@ Clones even when dtype and device already match the target. Creates 2× unnecess
 
 | Field | Value |
 |-------|-------|
-| **State** | open |
+| **State** | closed |
 | **Created** | 2026-06-02T23:26:08Z |
-| **Updated** | 2026-06-02T23:26:08Z |
+| **Updated** | 2026-06-02T23:28:09Z |
 | **Labels** | enhancement |
 | **Author** | @wd7512 |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/84 |

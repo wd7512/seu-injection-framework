@@ -53,7 +53,7 @@ The default forces at least one injection even when `p=0.0`. This was deliberate
 |-------|-------|
 | **State** | open |
 | **Created** | 2026-06-02T23:26:24Z |
-| **Updated** | 2026-06-02T23:26:24Z |
+| **Updated** | 2026-06-02T23:28:14Z |
 | **Labels** | bug |
 | **Author** | @wd7512 |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/86 |
