@@ -12,11 +12,9 @@ Framework Version: 1.2.0
 """
 
 import warnings
-
 warnings.filterwarnings("ignore")
 
 import copy
-import os
 import random
 import time
 
@@ -24,23 +22,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-
-# PyTorch
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
-# Scikit-learn
 from sklearn.datasets import make_moons
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-from torch.utils.data import DataLoader, TensorDataset
 from tqdm.auto import tqdm
 
-from seu_injection.bitops import bitflip_float32_fast
-
-# SEU Injection Framework
-from seu_injection.core import ExhaustiveSEUInjector, StochasticSEUInjector
+from seu_injection.core import StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
 
 # =============================================================================
@@ -52,6 +42,10 @@ def get_device() -> torch.device:
     """Select the best available compute device.
 
     Priority: MPS (Apple Silicon) > CUDA > CPU.
+
+    Note: Results may vary between device types due to differing
+    floating-point reduction order. For reproducible research, run
+    on the same device type consistently.
     """
     if torch.backends.mps.is_available() and torch.backends.mps.is_built():
         return torch.device("mps")
@@ -72,24 +66,10 @@ np.random.seed(RANDOM_SEED)
 torch.manual_seed(RANDOM_SEED)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(RANDOM_SEED)
-if DEVICE.type == "mps":
-    # MPS does not have a separate seed function; torch.manual_seed covers it.
-    pass
-
-# Configure deterministic algorithms where supported
-torch.use_deterministic_algorithms(False, warn_only=True)
 
 # Configure plotting
 plt.style.use("seaborn-v0_8-darkgrid")
 sns.set_palette("husl")
-
-print("=" * 80)
-print("🔬 RESEARCH STUDY: TRAINING WITH FAULT INJECTION FOR IMPROVED ROBUSTNESS")
-print("=" * 80)
-print(f"✅ PyTorch version: {torch.__version__}")
-print(f"🎯 Device: {DEVICE}")
-print(f"🌱 Random seed: {RANDOM_SEED}")
-print("=" * 80)
 
 
 # =============================================================================
@@ -122,17 +102,12 @@ class SimpleMLP(nn.Module):
         layers.append(nn.Sigmoid())
 
         self.network = nn.Sequential(*layers)
-        self._to(DEVICE)
 
     def forward(self, x):
         return self.network(x)
 
     def count_parameters(self):
         return sum(p.numel() for p in self.parameters())
-
-    def _to(self, device):
-        """Move model to device, returning self for chaining."""
-        return self.to(device)
 
 
 # =============================================================================
@@ -176,15 +151,15 @@ def prepare_data(
 # TRAINING FUNCTIONS
 # =============================================================================
 
+PRINT_FREQ = 25  # Print training progress every N epochs
+
 
 def train_baseline_model(
     model, X_train, y_train, epochs=100, lr=0.01, verbose=True
 ):
     """Train model WITHOUT fault injection (baseline).
 
-    The model is trained with standard gradient descent. No gradient noise
-    or weight perturbation is applied. This provides the reference against
-    which fault-aware training is compared.
+    Provides the reference against which fault-aware training is compared.
     """
 
     model.train()
@@ -209,7 +184,7 @@ def train_baseline_model(
 
         losses.append(loss.item())
 
-        if verbose and (epoch + 1) % 25 == 0:
+        if verbose and (epoch + 1) % PRINT_FREQ == 0:
             pbar.set_postfix({"loss": f"{loss.item():.4f}"})
 
     model.eval()
@@ -239,14 +214,12 @@ def train_fault_aware_model(
     tolerate small perturbations — the core hypothesis behind fault-aware
     training.
 
-    We intentionally do NOT flip bits directly on weights during training
-    because:
+    We use gradient noise rather than direct weight bit-flips during
+    training because:
     1. Gradient noise is differentiable and plays well with Adam's
-       momentum / adaptive LR — direct bit flips create non-differentiable
-       discontinuities that can destabilise training.
-    2. Gradient noise encourages the loss landscape around the optimum to
-       be flat (small eigenvalues of the Hessian), which is exactly the
-       property that makes a model robust to parameter perturbations.
+       momentum / adaptive LR.
+    2. It encourages flat minima (small Hessian eigenvalues), which
+       is the hypothesised mechanism for weight-perturbation robustness.
 
     Args:
         model: PyTorch model (on the target device).
@@ -284,9 +257,7 @@ def train_fault_aware_model(
         loss = criterion(outputs, y_train)
         loss.backward()
 
-        # Simulate fault effects by adding noise to gradients at regular
-        # intervals.  This represents the model learning to be robust
-        # to parameter perturbations.
+        # Simulate fault effects by adding noise to gradients
         if epoch > 0 and epoch % fault_freq == 0:
             with torch.no_grad():
                 for param in model.parameters():
@@ -303,7 +274,7 @@ def train_fault_aware_model(
 
         losses.append(loss.item())
 
-        if verbose and (epoch + 1) % 25 == 0:
+        if verbose and (epoch + 1) % PRINT_FREQ == 0:
             pbar.set_postfix(
                 {"loss": f"{loss.item():.4f}", "faults": len(fault_epochs)}
             )
@@ -321,6 +292,9 @@ def train_fault_aware_model(
 # ROBUSTNESS EVALUATION
 # =============================================================================
 
+# Suppress numerical artifacts below this threshold
+NUMERICAL_TOLERANCE = 1e-10
+
 
 def evaluate_robustness(
     model,
@@ -329,6 +303,7 @@ def evaluate_robustness(
     model_name="Model",
     bit_positions=(0, 1, 8, 15, 23),
     sample_rate=0.1,
+    seed=None,
 ):
     """Evaluate model robustness across different IEEE 754 bit positions.
 
@@ -342,10 +317,13 @@ def evaluate_robustness(
         model_name: Name for reporting.
         bit_positions: IEEE 754 bit positions to test.
         sample_rate: Fraction of parameters to inject per trial.
+        seed: RNG seed for reproducibility. If None, uses RANDOM_SEED.
 
     Returns:
         Dictionary with results.
     """
+    if seed is None:
+        seed = RANDOM_SEED
 
     print(f"\n{'=' * 60}")
     print(f"EVALUATING ROBUSTNESS: {model_name}")
@@ -353,10 +331,14 @@ def evaluate_robustness(
 
     # Baseline accuracy
     injector = StochasticSEUInjector(
-        trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test
+        trained_model=model,
+        criterion=classification_accuracy,
+        x=X_test,
+        y=y_test,
+        seed=seed,
     )
 
-    baseline_acc = injector.baseline_score
+    baseline_acc = float(injector.baseline_score)
     print(f"Baseline Accuracy: {baseline_acc:.2%}")
 
     results = {
@@ -442,7 +424,7 @@ def plot_training_comparison(baseline_losses, fault_losses, fault_injections):
 
 
 def plot_robustness_comparison(baseline_results, fault_results):
-    """Plot robustness comparison across bit positions."""
+    """Plot robustness comparison across bit positions with error bars."""
 
     bit_positions = sorted(baseline_results["bit_results"].keys())
 
@@ -450,8 +432,16 @@ def plot_robustness_comparison(baseline_results, fault_results):
         baseline_results["bit_results"][b]["accuracy_drop"] * 100
         for b in bit_positions
     ]
+    baseline_stds = [
+        baseline_results["bit_results"][b].get("std_accuracy", 0) * 100
+        for b in bit_positions
+    ]
     fault_drops = [
         fault_results["bit_results"][b]["accuracy_drop"] * 100
+        for b in bit_positions
+    ]
+    fault_stds = [
+        fault_results["bit_results"][b].get("std_accuracy", 0) * 100
         for b in bit_positions
     ]
 
@@ -469,6 +459,8 @@ def plot_robustness_comparison(baseline_results, fault_results):
         label="Baseline Model",
         color="coral",
         alpha=0.8,
+        yerr=baseline_stds,
+        capsize=3,
     )
     bars2 = ax.bar(
         x + width / 2,
@@ -477,6 +469,8 @@ def plot_robustness_comparison(baseline_results, fault_results):
         label="Fault-Aware Model",
         color="skyblue",
         alpha=0.8,
+        yerr=fault_stds,
+        capsize=3,
     )
 
     ax.set_xlabel("Bit Position (IEEE 754)", fontsize=12)
@@ -488,14 +482,14 @@ def plot_robustness_comparison(baseline_results, fault_results):
     )
     ax.set_xticks(x)
     ax.set_xticklabels(
-        [f"{b}\\n({bit_names[i]})" for i, b in enumerate(bit_positions)]
+        [f"{b}\n({bit_names[i]})" for i, b in enumerate(bit_positions)]
     )
     ax.legend(fontsize=11)
     ax.grid(True, alpha=0.3, axis="y")
 
-    # Add improvement percentages
+    # Add improvement percentages for non-negligible drops
     for i, (b_drop, f_drop) in enumerate(zip(baseline_drops, fault_drops)):
-        if b_drop > 0:
+        if b_drop > 0.5:  # Only annotate meaningful drops (>0.5% absolute)
             improvement = ((b_drop - f_drop) / b_drop) * 100
             ax.text(
                 i,
@@ -518,23 +512,27 @@ def create_results_summary(baseline_results, fault_results):
 
     for bit_pos in sorted(baseline_results["bit_results"].keys()):
         baseline_drop = baseline_results["bit_results"][bit_pos]["accuracy_drop"]
+        baseline_std = baseline_results["bit_results"][bit_pos].get(
+            "std_accuracy", 0.0
+        )
         fault_drop = fault_results["bit_results"][bit_pos]["accuracy_drop"]
+        fault_std = fault_results["bit_results"][bit_pos].get("std_accuracy", 0.0)
 
         # Suppress numerical artifacts near machine epsilon
-        if abs(baseline_drop) < 1e-10:
+        if abs(baseline_drop) < NUMERICAL_TOLERANCE:
             baseline_drop = 0.0
-        if abs(fault_drop) < 1e-10:
+        if abs(fault_drop) < NUMERICAL_TOLERANCE:
             fault_drop = 0.0
 
-        # Calculate improvement
+        # Calculate improvement (only meaningful when baseline_drop > NUMERICAL_TOLERANCE)
         improvement = (
             ((baseline_drop - fault_drop) / baseline_drop * 100)
-            if baseline_drop > 0
-            else 0.0
+            if baseline_drop > NUMERICAL_TOLERANCE
+            else float("nan")
         )
 
         # Robustness factor (ratio of drops)
-        if fault_drop > 0 and baseline_drop > 0:
+        if fault_drop > NUMERICAL_TOLERANCE and baseline_drop > NUMERICAL_TOLERANCE:
             robustness_factor = f"{baseline_drop / fault_drop:.2f}"
         else:
             robustness_factor = "N/A"
@@ -578,21 +576,37 @@ def run_complete_experiment():
     print("PHASE 2: BASELINE MODEL TRAINING")
     print("=" * 80)
 
-    baseline_model = SimpleMLP()
-    print(f"Model Parameters: {baseline_model.count_parameters():,}")
+    # Create a single model and copy it so both training branches
+    # start from identical weight initialisation (paired design).
+    seed_model = SimpleMLP().to(DEVICE)
+    print(f"Model Parameters: {seed_model.count_parameters():,}")
 
+    baseline_model = copy.deepcopy(seed_model)
+
+    t0 = time.time()
     baseline_model, baseline_losses = train_baseline_model(
         baseline_model, X_train, y_train, epochs=100
     )
+    baseline_time = time.time() - t0
 
     print("\n" + "=" * 80)
     print("PHASE 3: FAULT-AWARE MODEL TRAINING")
     print("=" * 80)
 
-    fault_model = SimpleMLP()
+    fault_model = copy.deepcopy(seed_model)
+
+    t0 = time.time()
     fault_model, fault_losses, fault_injections = train_fault_aware_model(
         fault_model, X_train, y_train, epochs=100, fault_prob=0.01, fault_freq=10
     )
+    fault_time = time.time() - t0
+
+    # Report training overhead
+    overhead_pct = ((fault_time - baseline_time) / baseline_time) * 100
+    print(f"\n⏱️  Training Timing:")
+    print(f"  Baseline:     {baseline_time:.1f}s")
+    print(f"  Fault-aware:  {fault_time:.1f}s")
+    print(f"  Overhead:     {overhead_pct:+.1f}%")
 
     print("\n" + "=" * 80)
     print("PHASE 4: ROBUSTNESS EVALUATION")
@@ -629,18 +643,21 @@ def run_complete_experiment():
     print("\n📊 RESULTS SUMMARY:")
     print(summary_df.to_string(index=False))
 
-    # Calculate overall improvements
-    avg_baseline_drop = summary_df["Baseline Acc Drop (%)"].mean()
-    avg_fault_drop = summary_df["Fault-Aware Acc Drop (%)"].mean()
-    overall_improvement = (
-        (avg_baseline_drop - avg_fault_drop) / avg_baseline_drop * 100
-    )
-
-    print(f"\n🎯 KEY FINDINGS:")
-    print(f"  Average accuracy drop (Baseline): {avg_baseline_drop:.2f}%")
-    print(f"  Average accuracy drop (Fault-Aware): {avg_fault_drop:.2f}%")
-    print(f"  Overall improvement: {overall_improvement:.1f}%")
-    print(f"  Robustness factor: {avg_baseline_drop / avg_fault_drop:.2f}×")
+    # Per-bit-position analysis (preferred over aggregate)
+    print("\n📈 PER-BIT ANALYSIS:")
+    for _, row in summary_df.iterrows():
+        bit = int(row["Bit Position"])
+        b_drop = row["Baseline Acc Drop (%)"]
+        f_drop = row["Fault-Aware Acc Drop (%)"]
+        impr = row["Improvement (%)"]
+        if not np.isnan(impr) and b_drop > 0.5:
+            print(f"  Bit {bit:2d}: baseline {b_drop:.2f}% → fault-aware {f_drop:.2f}% "
+                  f"(+{impr:.1f}% improvement)")
+        elif b_drop > NUMERICAL_TOLERANCE * 100:
+            print(f"  Bit {bit:2d}: baseline {b_drop:.4f}% → fault-aware {f_drop:.4f}% "
+                  f"(noise-level drop)")
+        else:
+            print(f"  Bit {bit:2d}: no measurable impact from either model")
 
     print("\n" + "=" * 80)
     print("PHASE 6: VISUALIZATION")
@@ -670,32 +687,43 @@ def run_complete_experiment():
         "baseline_losses": baseline_losses,
         "fault_losses": fault_losses,
         "fault_injections": fault_injections,
+        "baseline_time": baseline_time,
+        "fault_time": fault_time,
+        "overhead_pct": overhead_pct,
     }
 
 
 if __name__ == "__main__":
+    print("=" * 80)
+    print("🔬 RESEARCH STUDY: TRAINING WITH FAULT INJECTION FOR IMPROVED ROBUSTNESS")
+    print("=" * 80)
+    print(f"✅ PyTorch version: {torch.__version__}")
+    print(f"🎯 Device: {DEVICE}")
+    print(f"🌱 Random seed: {RANDOM_SEED}")
+    print("=" * 80)
+
     results = run_complete_experiment()
 
     print("\n" + "=" * 80)
     print("📝 RESEARCH CONCLUSIONS")
     print("=" * 80)
-    print(
-        """
-✅ H1 CONFIRMED: Fault-aware training significantly improves robustness
-✅ H2 CONFIRMED: Weight importance is distributed more evenly
-✅ H3 CONFIRMED: Improvements generalize across bit positions
-✅ H4 CONFIRMED: Clean data accuracy is maintained
+    print("""
+Findings summary:
+- Clean accuracy maintained at ~92% for both models (H4 supported)
+- Bit 1 (exponent MSB): measurable improvement with fault-aware training
+- Bits 15, 23 (mantissa): no measurable impact from either model
+- H2 (weight distribution) and H3 (widespread generalization):
+  require further investigation beyond this study's scope.
 
-This study demonstrates that training with fault injection is a practical
-and effective technique for improving neural network robustness in harsh
-environments without requiring hardware modifications.
+Limitations:
+- Single synthetic dataset (Two Moons, 2D binary classification)
+- Small MLP (~2.8K parameters) — not representative of production models
+- Single architecture tested — may not generalize to CNNs, Transformers
+- Gradient noise is a proxy for actual bit-flip injection during training
+- Results are from a single seed; run-to-run variance is unreported
+    """)
 
-Recommended deployment strategy:
-1. Use fault-aware training for mission-critical applications
-2. Inject faults every 5-10 training epochs at 1-2% probability
-3. Test robustness across multiple bit positions before deployment
-4. Monitor inference accuracy in production environments
-    """
-    )
-
+    print(f"\n⏱️  Timing: baseline={results['baseline_time']:.1f}s, "
+          f"fault-aware={results['fault_time']:.1f}s, "
+          f"overhead={results['overhead_pct']:+.1f}%")
     print("=" * 80)

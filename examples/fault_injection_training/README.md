@@ -15,16 +15,20 @@ to Single Event Upsets (SEUs)?**
 | **Clean accuracy (both models)** | ~92% (maintained) |
 | **Bit 1 (exp MSB) improvement** | 13% drop reduction |
 | **Bit 0/8 improvement** | Variable (tiny baseline drops, high noise) |
-| **Training overhead** | < 5% |
-| **Inference overhead** | 0% |
+| **Inference overhead** | 0% (same architecture) |
 
-### Hypothesis Validation
+### Hypothesis Assessment
 
 - ✅ **H1: Robustness Improvement** — Fault-aware training reduces accuracy drop
-  under SEUs on the most critical bit positions (exp MSB: 13.1% improvement)
-- ✅ **H2: Weight Distribution** — Gradient noise encourages flatter minima
-- ✅ **H3: Generalization** — Improvements generalise across bit positions;
-  mantissa bits show no degradation in either model (expected)
+  under SEUs on bit 1 (exp MSB, the most critical position: ~13% improvement).
+  Other bit positions show baseline drops <0.1% (noise level) so improvement
+  cannot be reliably measured.
+- 🔶 **H2: Weight Distribution** — Gradient noise is hypothesised to encourage
+  flatter minima, but this study does not include weight-distribution or
+  loss-landscape analysis. This mechanism is asserted, not tested.
+- 🔶 **H3: Generalization** — Only bit 1 shows a meaningful signal. Mantissa
+  bits (15, 23) show zero impact from either model (floor effect).
+  Claims of generalisation across positions are not supported by these data.
 - ✅ **H4: Training Convergence** — Clean data accuracy maintained (~92%)
 
 > **Note on reproducibility:** These results are stochastic — each training run
@@ -175,6 +179,35 @@ For deploying neural networks in harsh environments:
    lose 37% performance without mitigation
 
 *arXiv IDs use YYMM format: 2502 = February 2025, not the year 2502.*
+
+---
+
+## ⚠️ Limitations
+
+This study has several important limitations that affect the generalisability of its findings:
+
+1. **Synthetic dataset** — Two Moons is a low-dimensional (2D) binary classification
+   benchmark. Results may not transfer to real-world tasks (image, text, speech).
+2. **Small model** — ~2,800 parameters. Production-scale models (millions+) may
+   behave differently under fault-aware training.
+3. **Single architecture** — Only a feedforward MLP was tested. CNNs, RNNs, and
+   Transformers are not covered.
+4. **Single seed** — Results come from one random seed (42). Confidence intervals
+   and run-to-run variance are not reported. The reported numbers should be
+   treated as indicative, not definitive.
+5. **Gradient-noise proxy** — Fault-aware training uses gradient noise rather than
+   actual bit-flip injection during training. The hypothesised mechanism
+   (flatter minima) is not directly verified with loss-landscape analysis.
+6. **No ablation study** — The effects of `fault_prob`, `fault_freq`, model depth,
+   and dataset complexity were not explored.
+7. **No comparison baselines** — Standard robustness techniques (dropout, weight
+   decay, label smoothing, adversarial training) were not compared.
+8. **Device dependence** — Results were generated on Apple Silicon (MPS).
+   Floating-point reduction order differs between MPS, CUDA, and CPU, so
+   quantitative results may vary across hardware.
+
+**Contributions extending this work** are welcome: larger models, more datasets,
+multi-seed trials, and real hardware fault-injection experiments.
 
 ---
 
