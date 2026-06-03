@@ -83,9 +83,7 @@ class TestHardcodedBitflips:
         expected = np.array([-1.0, -2.0, 1.0, 2.0], dtype=np.float32)
 
         np.testing.assert_array_equal(bitflip_float32(input_array, 0), expected)
-        np.testing.assert_array_equal(
-            bitflip_float32_optimized(input_array, 0), expected
-        )
+        np.testing.assert_array_equal(bitflip_float32_optimized(input_array, 0), expected)
         np.testing.assert_array_equal(bitflip_float32_fast(input_array, 0), expected)
 
     def test_exponent_bit_flip_known_value(self):
@@ -163,16 +161,12 @@ class TestHardcodedBitflips:
 
     def test_2d_array_partial_flip(self):
         """Test flipping specific elements in a 2D array."""
-        matrix = np.array(
-            [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], dtype=np.float32
-        )
+        matrix = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], dtype=np.float32)
 
         result_matrix = matrix.copy()
         result_matrix[1, 1] = bitflip_float32(matrix[1, 1], 0)
 
-        expected = np.array(
-            [[1.0, 2.0, 3.0], [4.0, -5.0, 6.0], [7.0, 8.0, 9.0]], dtype=np.float32
-        )
+        expected = np.array([[1.0, 2.0, 3.0], [4.0, -5.0, 6.0], [7.0, 8.0, 9.0]], dtype=np.float32)
         np.testing.assert_array_equal(result_matrix, expected)
 
     def test_sequence_of_specific_flips(self):
