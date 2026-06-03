@@ -144,7 +144,7 @@ If you use this framework in your research, please cite both the software and th
   title = {SEU Injection Framework},
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
-  version = {1.1.12}
+  version = {1.2.0}
 }
 
 @conference{icaart25,
