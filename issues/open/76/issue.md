@@ -1,18 +1,16 @@
-# Issue #54: [FEATURE] Add research explainer to readme
+# Issue #76: [FEATURE] Remove changes to .md files from trigging re-run of tests
 
 ### Feature Summary
 
-Add a link to this alongside the research paper link in the readme
-
-https://wd7512.github.io/robust-ml-in-harsh-environments-explained/
+Often ci/cd tests are ran when documentation updates are made. This is waste of compute
 
 ### Feature Category
 
-Core SEU Injection (new injection methods)
+Testing/Quality Assurance
 
 ### Problem Statement
 
-n/a
+see summary
 
 ### Proposed Solution
 
@@ -26,7 +24,7 @@ _No response_
 
 ### Priority Level
 
-None
+Medium (nice to have improvement)
 
 ### Research Impact
 
@@ -61,8 +59,8 @@ _No response_
 | Field | Value |
 |-------|-------|
 | **State** | open |
-| **Created** | 2025-12-09T22:26:52Z |
-| **Updated** | 2025-12-09T23:20:20Z |
+| **Created** | 2025-12-26T12:17:35Z |
+| **Updated** | 2025-12-26T12:17:35Z |
 | **Labels** | enhancement |
-| **Author** | @Will-D-AER |
-| **URL** | https://github.com/wd7512/seu-injection-framework/issues/54 |
+| **Author** | @wd7512 |
+| **URL** | https://github.com/wd7512/seu-injection-framework/issues/76 |

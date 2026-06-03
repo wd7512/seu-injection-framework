@@ -1,0 +1,79 @@
+% neurips_2024.sty - Simplified NeurIPS 2024 style file
+% This is a minimal implementation for preprint use
+
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{neurips_2024}[2024/01/01 NeurIPS 2024 submission/camera-ready style]
+
+% Process options
+\newif\if@preprint\@preprintfalse
+\DeclareOption{preprint}{\@preprinttrue}
+\DeclareOption{final}{\@preprintfalse}
+\ProcessOptions\relax
+
+% Page layout
+\usepackage[letterpaper]{geometry}
+\geometry{
+  left=1.5in,
+  right=1.5in,
+  top=1.5in,
+  bottom=1.5in
+}
+
+% Typography
+\usepackage{times}
+\usepackage{mathptmx}
+
+% Line spacing
+\usepackage{setspace}
+\setstretch{1.0}
+
+% Section formatting
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\itshape}{\thesubsubsection}{1em}{}
+
+% Abstract
+\renewenvironment{abstract}{%
+  \begin{center}%
+  \bfseries Abstract%
+  \end{center}%
+  \small
+  \begin{quote}
+}{%
+  \end{quote}
+}
+
+% Title and author formatting
+\renewcommand{\maketitle}{%
+  \begin{center}%
+    {\LARGE\bfseries\@title\par}%
+    \vskip 1em%
+    {\large\@author\par}%
+    \vskip 1em%
+    \if@preprint%
+      {\large Preprint. Under review.\par}%
+    \fi%
+  \end{center}%
+  \vskip 1.5em%
+}
+
+% Color definitions (loaded before hyperref in main.tex)
+\usepackage{xcolor}
+\definecolor{linkcolor}{rgb}{0,0,0.5}
+
+% Note: hyperref package should be loaded in main.tex
+% and hypersetup should be called after hyperref is loaded
+
+% Bibliography spacing
+\let\oldthebibliography\thebibliography
+\let\endoldthebibliography\endthebibliography
+\renewenvironment{thebibliography}[1]{%
+  \oldthebibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+  \setlength{\parskip}{0pt}%
+}{%
+  \endoldthebibliography%
+}
+
+\endinput

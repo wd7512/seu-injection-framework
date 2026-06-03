@@ -272,6 +272,7 @@ def classification_accuracy(
             specified classification type (binary or multiclass).
         x_tensor (Union[torch.Tensor, torch.utils.data.DataLoader]): Input data for
             evaluation. Can be either:
+
             - torch.Tensor: Input features tensor with shape (N, ...) where N is
               the number of samples. Will be processed in batches of size `batch_size`.
             - torch.utils.data.DataLoader: PyTorch DataLoader yielding (x, y) batches.

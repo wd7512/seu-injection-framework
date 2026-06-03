@@ -1,4 +1,10 @@
 shipsnet.json
+Research/data
+testing/data
+
+# Generated example artifacts
+*.png
+*.pdf
 
 ##### ----- default ignores ----- ######
 
@@ -79,6 +85,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+docs/build/
 
 # PyBuilder
 .pybuilder/
@@ -198,4 +205,20 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.lof
+*.lot
+*.out
+*.toc
+*.synctex.gz
+*.synctex(busy)
+
+# Windows artifacts
+nul
 
