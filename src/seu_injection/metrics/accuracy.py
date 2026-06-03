@@ -71,10 +71,10 @@ import torch
 # supporting accuracy computations. For production / research parity, install the
 # 'analysis' or 'dev' extra to use the official sklearn implementation.
 try:  # pragma: no cover - import guard
-    from sklearn.metrics import accuracy_score  # type: ignore
+    from sklearn.metrics import accuracy_score
 except Exception:  # pragma: no cover - fallback intentionally simple
 
-    def accuracy_score(y_true, y_pred):  # type: ignore
+    def accuracy_score(y_true, y_pred):
         """Fallback accuracy_score implementation.
 
         Provides basic classification accuracy if scikit-learn is not installed.

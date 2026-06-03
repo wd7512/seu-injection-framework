@@ -290,7 +290,7 @@ class BaseInjector(ABC):
         seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)
 
         # Inject fault using direct scalar assignment (avoids tensor allocation per call)
-        tensor.data[idx] = seu_val
+        tensor.data[idx] = float(seu_val)
         try:
             # Evaluate model
             criterion_score = self._get_criterion_score()
@@ -298,7 +298,7 @@ class BaseInjector(ABC):
             # Always restore original value, even if evaluation fails
             tensor.data[idx] = original_tensor[idx]
 
-        return criterion_score, seu_val
+        return criterion_score, float(seu_val)
 
     def _record_injection_result(
         self,
