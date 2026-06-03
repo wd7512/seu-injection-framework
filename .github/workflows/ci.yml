@@ -116,8 +116,5 @@ jobs:
     name: Main Branch - (Full Test Suite, Coverage Enforced)
     if: ${{ github.ref == 'refs/heads/main' || github.base_ref == 'main' }}
     uses: ./.github/workflows/test-matrix.yml
-    with:
-      frozen-deps: true
-      update-deps: false
 
   # Summary / gating stage can be added here if needed to aggregate statuses.
