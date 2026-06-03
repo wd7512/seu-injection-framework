@@ -154,12 +154,12 @@ class TestHardcodedBitflips:
 
         # In Python, -0.0 == 0.0, but we can distinguish them
         assert result == 0.0  # Equal value
-        assert np.signbit(result) == True  # But different sign bit
+        assert np.signbit(result)  # But different sign bit
 
         # Flipping back should give positive zero
         result2 = bitflip_float32(result, 0)
         assert result2 == 0.0
-        assert np.signbit(result2) == False
+        assert not np.signbit(result2)
 
     def test_specific_small_value_flip(self):
         """Test flipping bits on a small specific value."""
