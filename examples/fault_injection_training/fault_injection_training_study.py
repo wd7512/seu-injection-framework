@@ -656,7 +656,7 @@ def run_complete_experiment():
         impr = row["Improvement (%)"]
         if impr != "N/A" and b_drop > 0.5:
             print(f"  Bit {bit:2d}: baseline {b_drop:.2f}% → fault-aware {f_drop:.2f}% "
-                  f"({impr:+}% improvement)")
+                  f"({impr}% improvement)")
         elif b_drop > NUMERICAL_TOLERANCE * 100:
             print(f"  Bit {bit:2d}: baseline {b_drop:.4f}% → fault-aware {f_drop:.4f}% "
                   f"(noise-level drop)")

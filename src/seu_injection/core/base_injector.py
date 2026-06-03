@@ -97,8 +97,9 @@ class BaseInjector(ABC):
             self.device = torch.device(device)
 
         # Random number generator for reproducibility (used by stochastic injector).
-        # Created once per instance so the random stream is persistent across calls;
-        # ``seed=None`` yields a non-deterministic generator seeded from OS entropy.
+        # Created once per instance so the random stream is persistent across calls.
+        # ``seed=None`` yields a fresh generator seeded from OS entropy, so separate
+        # instances (and separate runs) will generally produce different sequences.
         self._rng: np.random.Generator = np.random.default_rng(seed)
 
         # Model setup
