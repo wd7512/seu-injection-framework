@@ -296,7 +296,7 @@ class BaseInjector(ABC):
             criterion_score = self._get_criterion_score()
         finally:
             # Always restore original value, even if evaluation fails
-            tensor.data[idx] = original_tensor[idx]
+            tensor.data[idx] = float(original_val)
 
         return criterion_score, float(seu_val)
 
