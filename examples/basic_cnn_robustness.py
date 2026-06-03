@@ -293,7 +293,11 @@ def main(fast_mode=False):
         injector, baseline_acc = run_baseline_analysis(model, x_test, y_test)
 
         # 4. Run SEU injection analyses
-        analyze_sign_bit_vulnerability(injector)
+        # Skip sign bit analysis in fast mode (too slow)
+        if not fast_mode:
+            analyze_sign_bit_vulnerability(injector)
+        else:
+            print("\n[SKIPPED] Sign bit vulnerability analysis (fast mode)")
 
         # Skip layer vulnerability in fast mode (too slow)
         if not fast_mode:

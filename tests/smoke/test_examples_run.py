@@ -45,6 +45,7 @@ def run_script(script_path, args=None, timeout=180):
     return result
 
 
+@pytest.mark.smoke
 class TestExampleScriptsRun:
     """Test that example scripts run without errors."""
 
@@ -56,8 +57,8 @@ class TestExampleScriptsRun:
             timeout=180,
         )
 
-        stdout = result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
-        stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
+        stdout = result.stdout.decode("utf-8", errors="replace")
+        stderr = result.stderr.decode("utf-8", errors="replace")
 
         assert result.returncode == 0, (
             f"basic_cnn_robustness.py failed with return code {result.returncode}\nSTDOUT:\n{stdout}\nSTDERR:\n{stderr}"
@@ -75,8 +76,8 @@ class TestExampleScriptsRun:
             timeout=180,
         )
 
-        stdout = result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
-        stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
+        stdout = result.stdout.decode("utf-8", errors="replace")
+        stderr = result.stderr.decode("utf-8", errors="replace")
 
         assert result.returncode == 0, (
             f"flood_training_study/experiment.py failed with return code {result.returncode}\n"
@@ -95,8 +96,8 @@ class TestExampleScriptsRun:
             timeout=300,
         )
 
-        stdout = result.stdout.decode("utf-8", errors="replace") if result.stdout else ""
-        stderr = result.stderr.decode("utf-8", errors="replace") if result.stderr else ""
+        stdout = result.stdout.decode("utf-8", errors="replace")
+        stderr = result.stderr.decode("utf-8", errors="replace")
 
         assert result.returncode == 0, (
             f"architecture_comparison.py failed with return code {result.returncode}\n"
