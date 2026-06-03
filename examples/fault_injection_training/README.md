@@ -10,32 +10,42 @@ to Single Event Upsets (SEUs)?**
 
 ## 🎯 Key Findings
 
+> **These numbers are taken directly from the committed `robustness_results.csv`,
+> which is the actual output of a single-seed run.** In this run, fault-aware
+> training did **not** improve SEU robustness — on every measurable bit position
+> the fault-aware model degraded slightly or was statistically indistinguishable
+> from the baseline. See the [Limitations](#️-limitations) and the discussion
+> below before drawing conclusions.
+
 | Metric | Result |
 |--------|--------|
 | **Clean accuracy (both models)** | ~92% (maintained) |
-| **Bit 1 (exp MSB) improvement** | 13% drop reduction |
-| **Bit 0/8 improvement** | Variable (tiny baseline drops, high noise) |
+| **Bit 1 (exp MSB), the only large baseline drop** | ~13% drop for *both* models; −0.5% change (no improvement) |
+| **Bits 0/8 (sub-0.2% baseline drops)** | Fault-aware slightly worse; dominated by sampling noise |
+| **Bits 15/23 (mantissa)** | No measurable impact for either model (floor effect) |
 | **Inference overhead** | 0% (same architecture) |
 
 ### Hypothesis Assessment
 
-- ✅ **H1: Robustness Improvement** — Fault-aware training reduces accuracy drop
-  under SEUs on bit 1 (exp MSB, the most critical position: ~13% improvement).
-  Other bit positions show baseline drops <0.1% (noise level) so improvement
-  cannot be reliably measured.
+- ❌ **H1: Robustness Improvement** — In this committed run, fault-aware training
+  did not reduce the accuracy drop under SEUs. Bit 1 (exp MSB, the most critical
+  position) showed essentially no change (−0.5%), and bits 0/8 showed small
+  *degradations*. The hypothesised improvement is **not supported** by these data.
 - 🔶 **H2: Weight Distribution** — Gradient noise is hypothesised to encourage
   flatter minima, but this study does not include weight-distribution or
   loss-landscape analysis. This mechanism is asserted, not tested.
-- 🔶 **H3: Generalization** — Only bit 1 shows a meaningful signal. Mantissa
-  bits (15, 23) show zero impact from either model (floor effect).
-  Claims of generalisation across positions are not supported by these data.
+- ❌ **H3: Generalization** — No bit position shows a reliable improvement, so
+  there is no signal to generalise across positions. Mantissa bits (15, 23)
+  show zero impact from either model (floor effect).
 - ✅ **H4: Training Convergence** — Clean data accuracy maintained (~92%)
 
-> **Note on reproducibility:** These results are stochastic — each training run
-> produces different random weight initialisations and fault injection patterns.
-> The consistent signal is that bit 1 (exponent MSB, the most critical position)
-> shows reliable improvement. Bits with tiny baseline drops (<0.1%) are dominated
-> by sampling noise and should not be over-interpreted.
+> **Note on reproducibility:** These results are stochastic and come from a
+> single seed. Sub-1% baseline drops (bits 0, 8, 15, 23) are dominated by
+> sampling noise and the corresponding "robustness factors" should not be
+> over-interpreted. The only bit with a substantial baseline drop is bit 1
+> (~13%), and there the two models are within ~0.5% of each other. A robust
+> conclusion would require multiple seeds and confidence intervals (see
+> Limitations).
 
 ---
 
@@ -76,27 +86,29 @@ jupyter notebook notebook.ipynb
 Standard training without fault injection:
 ```python
 def train_baseline(model, X, y, epochs=100):
-    optimizer.zero_grad()
-    loss = criterion(model(X), y)
-    loss.backward()
-    optimizer.step()
+    for epoch in range(epochs):
+        optimizer.zero_grad()
+        loss = criterion(model(X), y)
+        loss.backward()
+        optimizer.step()
 ```
 
 ### Fault-Aware Training
 Training with simulated fault effects via gradient noise:
 ```python
 def train_fault_aware(model, X, y, fault_prob=0.01, fault_freq=10):
-    optimizer.zero_grad()
-    loss = criterion(model(X), y)
-    loss.backward()
+    for epoch in range(epochs):
+        optimizer.zero_grad()
+        loss = criterion(model(X), y)
+        loss.backward()
 
-    # Inject noise to simulate fault effects
-    if epoch % fault_freq == 0:
-        for param in model.parameters():
-            noise = torch.randn_like(param.grad) * fault_prob * param.grad.abs().mean()
-            param.grad.add_(noise)
+        # Inject noise to simulate fault effects
+        if epoch % fault_freq == 0:
+            for param in model.parameters():
+                noise = torch.randn_like(param.grad) * fault_prob * param.grad.abs().mean()
+                param.grad.add_(noise)
 
-    optimizer.step()
+        optimizer.step()
 ```
 
 ### Robustness Evaluation
@@ -138,17 +150,29 @@ results = injector.run_injector(bit_i=bit_position, p=0.1)
 
 ## 📊 Results Summary
 
+The table below is transcribed directly from the committed `robustness_results.csv`
+(single-seed run). Positive "Improvement (%)" means the fault-aware model had a
+*smaller* accuracy drop; negative means it was *worse*. A robustness factor <1.0×
+means the fault-aware model was less robust on that bit.
+
 | Bit Position | Type          | Baseline Drop | Fault-Aware Drop | Improvement | Robustness Factor |
 |--------------|---------------|---------------|------------------|-------------|-------------------|
-| **0**        | Sign bit      | 0.08%        | 0.02%            | 74.8%*      | 3.97×            |
-| **1**        | Exp MSB       | 12.58%       | 10.93%           | 13.1%       | 1.15×            |
-| **8**        | Exp LSB       | 0.02%        | <0.01%           | 92.8%*      | 13.9×            |
-| 15           | Mantissa      | <0.01%       | <0.01%           | —           | N/A              |
-| 23           | Mantissa LSB  | <0.01%       | <0.01%           | —           | N/A              |
+| **0**        | Sign bit      | 0.11%         | 0.14%            | −30.2%*     | 0.77×             |
+| **1**        | Exp MSB       | 13.39%        | 13.46%           | −0.5%       | 0.99×             |
+| **8**        | Exp LSB       | 0.02%         | 0.05%            | −154.5%*    | 0.39×             |
+| 15           | Mantissa      | 0.00%         | 0.00%            | —           | N/A               |
+| 23           | Mantissa LSB  | 0.00%         | 0.00%            | —           | N/A               |
 
-\* Asterisked improvements are on <0.1% baseline drops — high relative improvement
-but negligible absolute effect. The primary reliable signal is bit 1 (exp MSB),
-which causes the largest accuracy drop and shows consistent improvement.
+\* Asterisked "improvements" are computed on <0.2% baseline drops, where the
+relative percentage is meaningless — a sub-0.05% absolute change is pure sampling
+noise. The only bit with a substantial baseline drop is bit 1 (~13%), where the
+two models differ by just −0.5% (no meaningful improvement).
+
+**Bottom line:** in this single-seed run, fault-aware training did not improve SEU
+robustness on this task. This is consistent with the high run-to-run variance
+documented in the Limitations — the result should be read as "no measurable
+benefit here," not as evidence that fault-aware training is ineffective in
+general.
 
 **Note:** Bit positions 15 and 23 showed no impact because flipping these less
 significant mantissa bits has minimal effect on this simple dataset.
@@ -157,13 +181,21 @@ significant mantissa bits has minimal effect on this simple dataset.
 
 ## 💡 Recommendations
 
-For deploying neural networks in harsh environments:
+> These are tentative, hypothesis-generating suggestions. The single-seed run in
+> this example did **not** demonstrate a robustness benefit, so none of the
+> following should be treated as a validated best practice without further
+> multi-seed evaluation on your own task.
 
-1. **Use fault-aware training** for mission-critical applications
-2. **Inject faults** every 5-10 training epochs at 1-2% probability
+For research into deploying neural networks in harsh environments:
+
+1. **Evaluate fault-aware training as a candidate** — do not adopt it blindly;
+   measure robustness on your own task and architecture first
+2. **Run multiple seeds** with confidence intervals before claiming any
+   improvement — single-seed differences here were within the noise band
 3. **Test robustness** across multiple bit positions before deployment
-4. **Monitor accuracy** in production environments
-5. **Focus on exponent bits** (especially bit 1) — most critical for protection
+4. **Focus measurement on exponent bits** (especially bit 1) — these cause the
+   largest accuracy drops and are where any real effect would be visible
+5. **Monitor accuracy** in production environments
 
 ---
 

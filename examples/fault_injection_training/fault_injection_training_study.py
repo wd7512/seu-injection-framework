@@ -8,7 +8,7 @@ or converted to a Jupyter notebook.
 
 Author: SEU Injection Framework Research Team
 Date: June 2026
-Framework Version: 1.2.0
+Framework Version: 1.3.0
 """
 
 import copy
@@ -656,7 +656,7 @@ def run_complete_experiment():
         impr = row["Improvement (%)"]
         if impr != "N/A" and b_drop > 0.5:
             print(f"  Bit {bit:2d}: baseline {b_drop:.2f}% → fault-aware {f_drop:.2f}% "
-                  f"(+{impr}% improvement)")
+                  f"({impr:+}% improvement)")
         elif b_drop > NUMERICAL_TOLERANCE * 100:
             print(f"  Bit {bit:2d}: baseline {b_drop:.4f}% → fault-aware {f_drop:.4f}% "
                   f"(noise-level drop)")
@@ -667,18 +667,29 @@ def run_complete_experiment():
     print("PHASE 6: VISUALIZATION")
     print("=" * 80)
 
-    # Create visualizations
+    # Create visualizations. File I/O is wrapped so a write failure (e.g. read-only
+    # directory or out-of-disk) near the end of a multi-minute run does not discard
+    # the in-memory results, which are still returned to the caller.
     fig1 = plot_training_comparison(baseline_losses, fault_losses, fault_injections)
-    fig1.savefig("training_comparison.png", dpi=300, bbox_inches="tight")
-    print("✅ Saved: training_comparison.png")
+    try:
+        fig1.savefig("training_comparison.png", dpi=300, bbox_inches="tight")
+        print("✅ Saved: training_comparison.png")
+    except OSError as exc:
+        print(f"⚠️  Could not save training_comparison.png: {exc}")
 
     fig2 = plot_robustness_comparison(baseline_results, fault_results)
-    fig2.savefig("robustness_comparison.png", dpi=300, bbox_inches="tight")
-    print("✅ Saved: robustness_comparison.png")
+    try:
+        fig2.savefig("robustness_comparison.png", dpi=300, bbox_inches="tight")
+        print("✅ Saved: robustness_comparison.png")
+    except OSError as exc:
+        print(f"⚠️  Could not save robustness_comparison.png: {exc}")
 
     # Save summary
-    summary_df.to_csv("robustness_results.csv", index=False)
-    print("✅ Saved: robustness_results.csv")
+    try:
+        summary_df.to_csv("robustness_results.csv", index=False)
+        print("✅ Saved: robustness_results.csv")
+    except OSError as exc:
+        print(f"⚠️  Could not save robustness_results.csv: {exc}")
 
     print("\n" + "=" * 80)
     print("🎉 EXPERIMENT COMPLETE!")
@@ -712,12 +723,15 @@ if __name__ == "__main__":
     print("📝 RESEARCH CONCLUSIONS")
     print("=" * 80)
     print("""
-Findings summary:
+Findings summary (single-seed run):
 - Clean accuracy maintained at ~92% for both models (H4 supported)
-- Bit 1 (exponent MSB): measurable improvement with fault-aware training
+- Bit 1 (exponent MSB): the only position with a large baseline drop (~13%);
+  fault-aware training showed no measurable improvement here in this run
+- Bits 0, 8: sub-0.2% baseline drops dominated by sampling noise
 - Bits 15, 23 (mantissa): no measurable impact from either model
+- H1 (robustness improvement): not supported by this run's data
 - H2 (weight distribution) and H3 (widespread generalization):
-  require further investigation beyond this study's scope.
+  not tested / not supported within this study's scope.
 
 Limitations:
 - Single synthetic dataset (Two Moons, 2D binary classification)
