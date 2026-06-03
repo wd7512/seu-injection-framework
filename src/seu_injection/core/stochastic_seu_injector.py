@@ -4,11 +4,7 @@ This module provides the `StochasticSEUInjector` class, which performs random bi
 statistical robustness under fault injection scenarios.
 """
 
-from typing import Any, Union
-
 import numpy as np
-import torch
-from tqdm import tqdm
 
 from .base_injector import BaseInjector
 
@@ -65,58 +61,3 @@ class StochasticSEUInjector(BaseInjector):
 
         # Get indices where injections should occur
         return np.argwhere(injection_mask)
-
-    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
-        """Randomly inject faults into model parameters using probability p.
-
-        Args:
-            bit_i (int): Bit position to flip (0-31).
-            layer_name (Optional[str]): Layer to target (None for all).
-            p (float, via kwargs): Probability of injection for each parameter (0.0-1.0).
-            run_at_least_one_injection (bool, via kwargs): If True, ensure at least one injection per layer
-                even if p is very small. Default is True to prevent empty results in smoke tests.
-
-        Returns:
-            dict[str, list[Any]]: Results including tensor locations, scores, layer names, values before/after.
-
-        Raises:
-            ValueError: If p is not in [0.0, 1.0] or bit_i is not in [0, 32].
-            RuntimeError: If model evaluation fails.
-
-        Notes:
-            - Efficient for large models and statistical analysis.
-            - All injections are reversible; model is restored after each run.
-
-        """
-        results = self._initialize_results()
-
-        with torch.no_grad():  # Disable gradient tracking for efficiency
-            # Iterate through each layer of the neural network
-            for current_layer_name, tensor in self._iterate_layers(layer_name):
-                print(f"Testing Layer: {current_layer_name}")
-
-                # Prepare tensor for injection
-                original_tensor, tensor_cpu = self._prepare_tensor_for_injection(tensor)
-
-                # Get indices for injection (stochastic strategy)
-                injection_indices = self._get_injection_indices(tensor_cpu.shape, **kwargs)
-
-                # Perform injections for selected indices
-                for idx_array in tqdm(
-                    injection_indices,
-                    desc=f"Stochastic injection into {current_layer_name}",
-                ):
-                    idx = tuple(idx_array)
-                    original_val = tensor_cpu[idx]
-
-                    # Inject fault, evaluate, and restore
-                    criterion_score, seu_val = self._inject_and_evaluate(
-                        tensor, idx, original_tensor, original_val, bit_i
-                    )
-
-                    # Record results
-                    self._record_injection_result(
-                        results, idx, criterion_score, current_layer_name, original_val, seu_val
-                    )
-
-        return results

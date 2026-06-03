@@ -4,13 +4,9 @@ This module provides the `ExhaustiveSEUInjector` class, which systematically fli
 robustness under exhaustive fault injection scenarios.
 """
 
-from typing import Any, Union
-
 import warnings
 
 import numpy as np
-import torch
-from tqdm import tqdm
 
 from .base_injector import BaseInjector
 
@@ -55,59 +51,3 @@ class ExhaustiveSEUInjector(BaseInjector):
         # Build exhaustive indices without materializing intermediate Python list
         # Using argwhere(ones(...)) is O(N) memory but avoids O(N) tuple overhead
         return np.argwhere(np.ones(tensor_shape, dtype=bool))
-
-    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
-        """Perform systematic SEU injection across model parameters.
-
-        Flips a single bit at the specified position in every float32 parameter of the model (or a specific layer),
-        evaluates the model, and restores the original value.
-
-        Args:
-            bit_i (int): Bit position to flip (0-31).
-            layer_name (Optional[str]): Layer to target (None for all).
-
-        Returns:
-            dict[str, list[Any]]: Results including tensor locations, scores, layer names, values before/after.
-
-        Raises:
-            AssertionError: If bit_i is not in [0, 32].
-            RuntimeError: If model evaluation fails.
-
-        Notes:
-            - For large models, this is computationally expensive.
-            - All injections are reversible; model is restored after each run.
-
-        """
-        results = self._initialize_results()
-
-        with torch.no_grad():  # Disable gradient tracking for efficiency
-            # Iterate through each layer of the neural network
-            for current_layer_name, tensor in self._iterate_layers(layer_name):
-                print(f"Testing Layer: {current_layer_name}")
-
-                # Prepare tensor for injection
-                original_tensor, tensor_cpu = self._prepare_tensor_for_injection(tensor)
-
-                # Get indices for injection (exhaustive strategy)
-                injection_indices = self._get_injection_indices(tensor_cpu.shape, **kwargs)
-
-                # Perform injections for all indices
-                for idx in tqdm(
-                    injection_indices,
-                    desc=f"Injecting into {current_layer_name}",
-                ):
-                    idx = tuple(idx)
-
-                    original_val = tensor_cpu[idx]
-
-                    # Inject fault, evaluate, and restore
-                    criterion_score, seu_val = self._inject_and_evaluate(
-                        tensor, idx, original_tensor, original_val, bit_i
-                    )
-
-                    # Record results
-                    self._record_injection_result(
-                        results, idx, criterion_score, current_layer_name, original_val, seu_val
-                    )
-
-        return results

@@ -29,6 +29,7 @@ from typing import Any, Union
 
 import numpy as np
 import torch
+from tqdm import tqdm
 
 from ..bitops import bitflip_float32_optimized
 
@@ -164,8 +165,43 @@ class BaseInjector(ABC):
         self.model.eval()
         return self._run_injector_impl(bit_i, layer_name, **kwargs)
 
-    @abstractmethod
-    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None], **kwargs) -> dict[str, list[Any]]: ...
+    def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
+        """Template method for SEU injection across model parameters.
+
+        Iterates layers, prepares tensors, gets injection indices from the
+        strategy-specific _get_injection_indices(), performs injection/evaluation/
+        restoration, and records results.
+
+        Args:
+            bit_i: Bit position to flip (0-31).
+            layer_name: Layer to target (None for all).
+            **kwargs: Forwarded to _get_injection_indices.
+
+        Returns:
+            dict[str, list[Any]]: Injection results.
+        """
+        results = self._initialize_results()
+
+        with torch.no_grad():
+            for current_layer_name, tensor in self._iterate_layers(layer_name):
+                print(f"Testing Layer: {current_layer_name}")
+
+                original_tensor, tensor_cpu = self._prepare_tensor_for_injection(tensor)
+                injection_indices = self._get_injection_indices(tensor_cpu.shape, **kwargs)
+
+                for idx in tqdm(injection_indices, desc=f"Injecting into {current_layer_name}"):
+                    idx = tuple(idx)
+                    original_val = tensor_cpu[idx]
+
+                    criterion_score, seu_val = self._inject_and_evaluate(
+                        tensor, idx, original_tensor, original_val, bit_i
+                    )
+
+                    self._record_injection_result(
+                        results, idx, criterion_score, current_layer_name, original_val, seu_val
+                    )
+
+        return results
 
     def _get_criterion_score(self) -> float:
         """Evaluate model performance using the configured criterion.
