@@ -10,7 +10,7 @@ src="https://img.shields.io/badge/python-3.9%20|%203.10%20|%203.11%20|%203.12-bl
 src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
 <br>
 <b><br>
-<a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">Research Paper</a> | 
+<a href="https://research-information.bris.ac.uk/en/publications/a-framework-for-developing-robust-machine-learning-models-in-hars">Research Paper</a> |
 <a href="https://wd7512.github.io/robust-ml-in-harsh-environments-explained/">Interactive Explainer</a>
 <br></b>
 
@@ -23,8 +23,8 @@ src="https://img.shields.io/badge/License-MIT-yellow.svg"/></a>
     A Python framework for <b>Single Event Upset (SEU) injection</b> in neural networks for robustness analysis in harsh environments.
   </p>
   <p>
-    <b><a href="docs/">Documentation</a></b> |
-    <b><a href="docs/quickstart.md">Quick Start</a></b>
+    <b><a href="https://wd7512.github.io/seu-injection-framework/">Documentation</a></b> |
+    <b><a href="https://wd7512.github.io/seu-injection-framework/quickstart.html">Quick Start</a></b>
   </p>
 </div>
 
@@ -70,7 +70,7 @@ pip install seu-injection-framework
 python -c "from seu_injection import ExhaustiveSEUInjector; print('Ready')"
 ```
 
-Having issues? See [`docs/installation.md`](docs/installation.md).
+Having issues? See [Installation Guide](https://wd7512.github.io/seu-injection-framework/installation.html).
 
 ## Quick example
 
@@ -108,7 +108,7 @@ fault_impacts = [injector.baseline_score - score for score in results['criterion
 print(f"Average accuracy drop: {sum(fault_impacts)/len(fault_impacts):.1%}")
 ```
 
-Full tutorial: [`docs/quickstart.md`](docs/quickstart.md).
+Full tutorial: [Quick Start Guide](https://wd7512.github.io/seu-injection-framework/quickstart.html).
 
 ### Examples
 
@@ -129,7 +129,7 @@ Recent updates include reproducible ShipsNet experiments and improvements to inj
 
 ## Contributing & support
 
-- Documentation: [`docs/`](docs/)
+- Documentation: [https://wd7512.github.io/seu-injection-framework/](https://wd7512.github.io/seu-injection-framework/)
 - Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - Issues: [GitHub Issues](https://github.com/wd7512/seu-injection-framework/issues)
 - Contact: <wwdennis.home@gmail.com>
@@ -144,7 +144,7 @@ If you use this framework in your research, please cite both the software and th
   title = {SEU Injection Framework},
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
-  version = {1.1.12}
+  version = {1.2.0}
 }
 
 @conference{icaart25,
