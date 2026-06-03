@@ -190,10 +190,14 @@ class TestSEUInjectionWorkflows:
         )
         results2 = injector2.run_injector(bit_i=0, p=0.2)
 
-        # Results should be identical
+        # Results should be reproducible: identical count AND identical injection set.
         assert len(results1["criterion_score"]) == len(results2["criterion_score"])
 
-        # Compare first few results (may vary due to randomness in injection selection)
-        if len(results1["criterion_score"]) > 0 and len(results2["criterion_score"]) > 0:
-            # At least baseline scores should be identical
-            assert abs(injector1.baseline_score - injector2.baseline_score) < 1e-6
+        # The exact set of injected locations must match for a fixed seed.
+        assert results1["tensor_location"] == results2["tensor_location"]
+        assert results1["layer_name"] == results2["layer_name"]
+        assert results1["value_after"] == results2["value_after"]
+        assert results1["criterion_score"] == results2["criterion_score"]
+
+        # Baseline scores must also be identical.
+        assert abs(injector1.baseline_score - injector2.baseline_score) < 1e-6

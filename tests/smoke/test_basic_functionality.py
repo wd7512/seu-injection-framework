@@ -83,8 +83,13 @@ def test_basic_criterion_functionality():
 
 
 def test_device_compatibility():
-    """Test basic device (CPU/CUDA) compatibility."""
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    """Test basic device (MPS/CUDA/CPU) compatibility."""
+    if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+        device = torch.device("mps")
+    elif torch.cuda.is_available():
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
 
     # Create model and move to device
     model = torch.nn.Linear(2, 1)
