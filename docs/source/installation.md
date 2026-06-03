@@ -7,7 +7,7 @@ Comprehensive instructions for installing the SEU Injection Framework.
 **From PyPI (Recommended for users):**
 
 ```bash
-# Latest stable release (v1.1.11)
+# Latest stable release (v1.2.0)
 pip install seu-injection-framework
 
 # With analysis tools
