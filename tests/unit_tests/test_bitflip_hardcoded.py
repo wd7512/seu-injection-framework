@@ -302,13 +302,14 @@ class TestHardcodedBitflips:
     def test_infinity_exponent_bit_flip(self):
         """Test flipping exponent bit on infinity produces a normal value.
 
-        Infinity has exponent = all 1s, mantissa = 0.
-        Flipping an exponent bit gives a valid exponent, producing a normal float.
+        Infinity has exponent = all 1s (0xFF), mantissa = 0.
+        Flipping bit 1 (MSB of exponent) changes exponent to 0x7F = 127.
+        Result: 1.0 * 2^(127-127) = 1.0
         """
         for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
             result = impl(np.float32(np.inf), 1)
-            # +inf -> finite value
-            assert np.isfinite(result), f"{impl.__name__} should produce finite"
+            assert result == np.float32(1.0), f"{impl.__name__}: got {result}"
+            assert np.isfinite(result)
             assert not np.isnan(result)
 
     def test_denormal_input(self):
@@ -329,16 +330,19 @@ class TestHardcodedBitflips:
             assert abs(result) == denorm
 
     def test_denormal_mantissa_flip(self):
-        """Test flipping a mantissa bit on a denormalized value."""
-        # A denormal near 2^-149 has mantissa bits close to LSB
+        """Test flipping the LSB on the smallest subnormal produces zero.
+
+        The smallest positive subnormal float32 is 2^-149 with
+        bit pattern: sign=0, exponent=0, mantissa=0x000001.
+        Flipping bit 31 (the only set mantissa bit) gives mantissa=0,
+        producing exactly +0.0.
+        """
         denorm = np.float32(2**-149)
 
-        # Flipping bit 31 (LSB) on a denormal — result is just nan or specific
-        # The exact result depends on the binary representation
         for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
             result = impl(denorm, 31)
-            # Should still be a finite float (could be subnormal or normal)
-            assert np.isfinite(result)
+            assert result == np.float32(0.0), f"{impl.__name__}: got {result}"
+            assert not np.signbit(result)  # positive zero
 
     def test_bit_index_boundary_zero(self):
         """Test bit position 0 (valid — sign bit)."""
