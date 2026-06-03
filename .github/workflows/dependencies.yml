@@ -57,8 +57,8 @@ jobs:
           ✅ **Full test suite completed successfully**
 
           Tests passed on the following configurations:
-          - **OS**: Ubuntu (latest)
-          - **Python**: 3.11, 3.12
+          - **OS**: Ubuntu, Windows, macOS
+          - **Python**: 3.10, 3.11, 3.12
           - **Coverage**: 70% minimum enforced
 
           ### Changes

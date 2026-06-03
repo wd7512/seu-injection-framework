@@ -15,12 +15,8 @@ jobs:
     strategy:
       fail-fast: false  # Continue other configs even if one fails
       matrix:
-        # Scoped to ubuntu × [3.11, 3.12] based on litmus test analysis:
-        # Python dep breakage is almost always cross-platform. The 9-config
-        # matrix (3 OS × 3 Python) had never caught a real regression.
-        # Expand this if a cross-OS bug ever materialises.
-        os: [ubuntu-latest]
-        python-version: ['3.11', '3.12']
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
     runs-on: ${{ matrix.os }}
     permissions:
       contents: read
