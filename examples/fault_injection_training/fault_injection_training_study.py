@@ -11,12 +11,10 @@ Date: June 2026
 Framework Version: 1.2.0
 """
 
-import warnings
-warnings.filterwarnings("ignore")
-
 import copy
 import random
 import time
+import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -32,6 +30,8 @@ from tqdm.auto import tqdm
 
 from seu_injection.core import StochasticSEUInjector
 from seu_injection.metrics import classification_accuracy
+
+warnings.filterwarnings("ignore")
 
 # =============================================================================
 # DEVICE CONFIGURATION
