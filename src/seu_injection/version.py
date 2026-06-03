@@ -6,7 +6,7 @@ falling back to a default version for source checkouts.
 
 from importlib.metadata import version as _pkg_version
 
-FALLBACK_VERSION = "1.2.0"  # Fallback version for source checkouts
+FALLBACK_VERSION = "1.2.1"  # Fallback version for source checkouts
 
 try:
     __version__ = _pkg_version("seu-injection-framework")
