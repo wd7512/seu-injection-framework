@@ -5,10 +5,58 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.1.12] - sometime
+## [1.2.2] - 2026-06-03
+
+### Housekeeping
+
+- **AGENTS.md**: Added workflow rules document defining the dev→main branching strategy for AI agents
+- **Changelog cleanup**: Folded orphaned 1.1.13 entry into 1.2.0 (Sphinx documentation feature)
+- **Remove generated artifact**: Deleted `architecture_comparison.png` from root and added `*.png` to `.gitignore`
+- **GitHub settings**: Disabled squash and rebase merging — only merge commits allowed
+- **CONTRIBUTING.md**: Updated branching strategy to reflect dev→main workflow, removed duplicate sections, corrected test counts and coverage numbers
+
+### Fixed
+
+- **Stale documentation references**: Updated CONTRIBUTING.md to reflect current dev workflow, removed references to non-existent files
+
+## [1.2.1] - 2026-06-03
+
+### Fixed
+
+- **Stale documentation references**: Updated citation version numbers in README.md and examples/README.md to 1.2.0
+- **Installation guide**: Corrected latest stable release version from v1.1.11 to v1.2.0
+- **versions_and_plan.md**: Marked v1.2.0 as released, added human-only edit guard
+
+## [1.2.0] - 2026-06-03
+
+### Added
+
+- **Sphinx documentation**: Auto-built and deployed to GitHub Pages on push to main. See https://wd7512.github.io/seu-injection-framework/
+- **Smoke test suite**: New `tests/smoke/test_examples_run.py` that runs all example scripts, with `--fast` mode for CI validation
+- **Autouse cleanup fixture**: Generated artifacts from smoke tests are automatically cleaned up after each run
+
+### Fixed
+
+- **`sorted_archs` tuple unpacking**: Fixed bug in `architecture_comparison.py` where sorted architectures weren't properly unpacked
+- **UTF-8 encoding**: Ensured all file writes use explicit UTF-8 encoding in `architecture_comparison.py`
+- **Missing `forward` method**: Added `def forward(self, x)` to `SimpleNN` class
+- **Redundant variable**: Removed unused `injection_p` variable in `flood_training_study`
+- **Redundant print**: Fixed misleading output in smoke test fast mode
+- **Swarm review fixes**: `analyze_sign_bit_vulnerability` gated by `--fast`, dead code removed, consistent epoch reduction (`min(epochs, 5)`), bytes decoding cleanup, `@pytest.mark.smoke` added
+
+### Changed
+
+- **Dependency updates**: Automated via PR #82 (deps/auto-update)
+- **Issue sync & cleanup**: Documentation artifacts pruned from main branch
+- **Version**: 1.1.12 → 1.2.0 (minor bump reflecting new testing infrastructure and bug fixes)
+
+## [1.1.12] - 2025-12-09
 
 - **Removing unused core dependencies**: removed mdformat and scipy into dev
-- **Replace mypy with ty**: ...
+- **Replace mypy with ty**: ty is faster and more accurate
+- **Remove unused dependencies**: removed unused dependencies
+- **Fix stochastic injector bug**: added mask-based implementation to stochastic injector. Solved issue #48.
+- **Added issues folder**: issues are now tracked in the `issues` folder by the .github/workflows/sync-issues.yml workflow. This should help agentic development as a reference point for issues.
 
 ## [1.1.11] - 2025-11-18
 
@@ -202,8 +250,8 @@ For installation instructions and usage examples, see:
 
 ## Support
 
-- **Documentation**: https://github.com/wd7512/seu-injection-framework
-- **Issues**: https://github.com/wd7512/seu-injection-framework/issues
+- **Documentation**: <https://github.com/wd7512/seu-injection-framework>
+- **Issues**: <https://github.com/wd7512/seu-injection-framework/issues>
 - **Research Questions**: Use issue template for research discussions
 - **Contributions**: See CONTRIBUTING.md for development workflow
 
@@ -330,9 +378,11 @@ ______________________________________________________________________
 ### Notes
 
 - If upgrading from 1.0.0 and you rely on scikit-learn/pandas/matplotlib functionality, install with an appropriate extra, e.g.:
+
   ```bash
   pip install "seu-injection-framework[analysis]"
   ```
+
 - Core API surface remains backward compatible; no breaking changes introduced.
 
 ### Citation Update

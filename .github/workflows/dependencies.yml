@@ -27,6 +27,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
+        ref: dev
         token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install UV
@@ -64,4 +65,5 @@ jobs:
           
           This PR is ready for review and merging.
         branch: deps/auto-update
+        base: dev
         delete-branch: true

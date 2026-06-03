@@ -416,10 +416,12 @@ class TestInjector:
         """Test that model parameters are restored after SEU injection."""
         X, y = sample_data
 
-        # Store original model state
-        original_params = {}
-        for name, param in simple_model.named_parameters():
-            original_params[name] = param.data.clone()
+        # Ensure model & data are on target device BEFORE snapshot
+        simple_model.to(device)
+        X, y = X.to(device), y.to(device)
+
+        # Store original model state (device-aligned)
+        original_params = {name: param.detach().clone() for name, param in simple_model.named_parameters()}
 
         injector = ExhaustiveSEUInjector(
             trained_model=simple_model,
@@ -432,13 +434,33 @@ class TestInjector:
         # Run SEU injection
         injector.run_injector(bit_i=0)
 
+        # Ensure all CUDA ops are complete
+        if device.type == "cuda":
+            torch.cuda.synchronize()
+
         # Check that model parameters are restored
         for name, param in simple_model.named_parameters():
-            torch.testing.assert_close(
-                param.data,
-                original_params[name],
-                msg=f"Parameter {name} was not restored after SEU injection",
-            )
+            param_tensor = param.detach()
+            orig_tensor = original_params[name]
+
+            try:
+                torch.testing.assert_close(
+                    param_tensor,
+                    orig_tensor,
+                    rtol=0.0,
+                    atol=0.0,
+                    msg=f"Parameter {name} was not restored after SEU injection",
+                )
+            except AssertionError as e:
+                diff = param_tensor - orig_tensor
+
+                raise AssertionError(
+                    f"Parameter '{name}' was not restored after SEU injection\n"
+                    f"  max |Δ|      : {diff.abs().max().item():e}\n"
+                    f"  differing el.: {torch.count_nonzero(diff).item()} / {diff.numel()}\n"
+                    f"  param shape  : {tuple(param.shape)}\n"
+                    f"  dtype/device : {param.dtype} / {param.device}"
+                ) from e
 
     def test_run_stochastic_seu_layer_filtering(self, simple_model, sample_data, device):
         """Test stochastic SEU injection with layer filtering to trigger continue statement."""
@@ -463,3 +485,266 @@ class TestInjector:
         # Also test with nonexistent layer to trigger continue for all layers
         results_empty = injector.run_injector(bit_i=0, p=1.0, layer_name="nonexistent_layer")
         assert len(results_empty["layer_name"]) == 0, "Should have no results for nonexistent layer"
+
+    def test_run_at_least_one_injection_default(self, simple_model, sample_data, device):
+        """Test that run_at_least_one_injection defaults to True and ensures at least one injection per layer."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Run with p=0 to force run_at_least_one_injection behavior
+        results = injector.run_injector(bit_i=0, p=0)
+
+        # Should have at least one result per layer
+        layer_names = [name for name, _ in simple_model.named_parameters()]
+        unique_layers = set(results["layer_name"])
+
+        # With run_at_least_one_injection=True (default), we should have results for all layers
+        assert len(unique_layers) == len(layer_names), (
+            f"Expected at least one injection per layer. Got {len(unique_layers)} layers, expected {len(layer_names)}"
+        )
+
+    def test_run_at_least_one_injection_false(self, simple_model, sample_data, device):
+        """Test that run_at_least_one_injection=False allows zero injections with low probability."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Set seed for reproducibility
+        np.random.seed(42)
+
+        # Run with p=0 and run_at_least_one_injection=False
+        results = injector.run_injector(bit_i=0, p=0, run_at_least_one_injection=False)
+
+        # With p=0 and run_at_least_one_injection=False, we should have zero results
+        # This is expected behavior and should not crash
+        assert isinstance(results, dict)
+        assert "tensor_location" in results
+        assert "criterion_score" in results
+
+    def test_run_at_least_one_injection_specific_layer(self, simple_model, sample_data, device):
+        """Test that run_at_least_one_injection works correctly with layer targeting."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Target a specific layer with p=0 to force run_at_least_one_injection
+        target_layer = "0.weight"
+        results = injector.run_injector(bit_i=0, p=0, layer_name=target_layer)
+
+        # Should have at least one result from the targeted layer
+        assert len(results["layer_name"]) >= 1, "Should have at least one injection in targeted layer"
+        assert all(layer == target_layer for layer in results["layer_name"]), (
+            f"All results should be from {target_layer}, got: {set(results['layer_name'])}"
+        )
+
+    def test_initialize_results(self, simple_model, sample_data, device):
+        """Test that _initialize_results creates proper structure."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        results = injector._initialize_results()
+
+        # Verify structure
+        assert isinstance(results, dict)
+        assert "tensor_location" in results
+        assert "criterion_score" in results
+        assert "layer_name" in results
+        assert "value_before" in results
+        assert "value_after" in results
+
+        # Verify all are empty lists
+        for key, value in results.items():
+            assert isinstance(value, list)
+            assert len(value) == 0
+
+    def test_iterate_layers(self, simple_model, sample_data, device):
+        """Test _iterate_layers helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Test iterating all layers
+        all_layers = list(injector._iterate_layers(None))
+        assert len(all_layers) > 0
+        for name, param in all_layers:
+            assert isinstance(name, str), f"Layer name should be string, got {type(name)}"
+            assert isinstance(param, torch.nn.Parameter), f"Layer param should be torch.nn.Parameter, got {type(param)}"
+
+        # Test filtering by specific layer
+        target_layer = all_layers[0][0]
+        filtered_layers = list(injector._iterate_layers(target_layer))
+        assert len(filtered_layers) == 1
+        assert filtered_layers[0][0] == target_layer
+
+    def test_prepare_tensor_for_injection(self, simple_model, sample_data, device):
+        """Test _prepare_tensor_for_injection helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Get first layer
+        layer_name, tensor = next(injector._iterate_layers(None))
+
+        # Prepare tensor
+        original_tensor, tensor_cpu = injector._prepare_tensor_for_injection(tensor)
+
+        # Verify outputs
+        assert isinstance(original_tensor, torch.Tensor)
+        assert isinstance(tensor_cpu, np.ndarray)
+        assert original_tensor.shape == tensor.shape
+        assert tensor_cpu.shape == tuple(tensor.shape)
+
+    def test_inject_and_evaluate(self, simple_model, sample_data, device):
+        """Test _inject_and_evaluate helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Get first layer
+        layer_name, tensor = next(injector._iterate_layers(None))
+        original_tensor, tensor_cpu = injector._prepare_tensor_for_injection(tensor)
+
+        # Get first index
+        idx = tuple(np.ndindex(tensor_cpu.shape))[0]
+        original_val = tensor_cpu[idx]
+
+        # Store original tensor value to verify restoration
+        original_tensor_val = tensor.data[idx].item()
+
+        # Inject and evaluate
+        criterion_score, seu_val = injector._inject_and_evaluate(tensor, idx, original_tensor, original_val, bit_i=15)
+
+        # Verify outputs
+        assert isinstance(criterion_score, float)
+        assert isinstance(seu_val, (float, np.floating))
+        assert 0.0 <= criterion_score <= 1.0
+
+        # Verify tensor was restored
+        assert tensor.data[idx].item() == original_tensor_val
+
+    def test_record_injection_result(self, simple_model, sample_data, device):
+        """Test _record_injection_result helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        results = injector._initialize_results()
+        idx = (0, 1)
+        criterion_score = 0.95
+        layer_name = "test_layer"
+        original_val = 1.5
+        seu_val = 1.6
+
+        # Record result
+        injector._record_injection_result(results, idx, criterion_score, layer_name, original_val, seu_val)
+
+        # Verify recording
+        assert len(results["tensor_location"]) == 1
+        assert results["tensor_location"][0] == idx
+        assert results["criterion_score"][0] == criterion_score
+        assert results["layer_name"][0] == layer_name
+        assert results["value_before"][0] == original_val
+        assert results["value_after"][0] == seu_val
+
+    def test_get_injection_indices_exhaustive(self, simple_model, sample_data, device):
+        """Test _get_injection_indices for exhaustive strategy."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Test with a small shape
+        tensor_shape = (2, 3)
+        indices = injector._get_injection_indices(tensor_shape)
+
+        # Should get all 6 indices
+        assert len(indices) == 6
+        assert isinstance(indices, np.ndarray)
+
+    def test_get_injection_indices_stochastic(self, simple_model, sample_data, device):
+        """Test _get_injection_indices for stochastic strategy."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Uses local default_rng (not global state), so no global state pollution
+        tensor_shape = (10, 10)
+
+        # Test with p=0.5 — probabilistic but statistically safe on 100 elements
+        indices = injector._get_injection_indices(tensor_shape, p=0.5)
+        assert len(indices) > 0
+        assert len(indices) < 100  # Should not be all indices
+        assert isinstance(indices, np.ndarray)
+
+        # Test with p=0 and run_at_least_one_injection=True
+        indices_min = injector._get_injection_indices(tensor_shape, p=0.0, run_at_least_one_injection=True)
+        assert len(indices_min) == 1  # Should have exactly one
+
+        # Test with p=1.0 — should be all 100 indices
+        indices_all = injector._get_injection_indices(tensor_shape, p=1.0)
+        assert len(indices_all) == 100
+
+        # Test error handling for invalid p
+        with pytest.raises(ValueError, match="Probability p must be in"):
+            injector._get_injection_indices(tensor_shape, p=1.5)

@@ -71,10 +71,10 @@ import torch
 # supporting accuracy computations. For production / research parity, install the
 # 'analysis' or 'dev' extra to use the official sklearn implementation.
 try:  # pragma: no cover - import guard
-    from sklearn.metrics import accuracy_score  # type: ignore
+    from sklearn.metrics import accuracy_score
 except Exception:  # pragma: no cover - fallback intentionally simple
 
-    def accuracy_score(y_true, y_pred):  # type: ignore
+    def accuracy_score(y_true, y_pred):
         """Fallback accuracy_score implementation.
 
         Provides basic classification accuracy if scikit-learn is not installed.
@@ -272,6 +272,7 @@ def classification_accuracy(
             specified classification type (binary or multiclass).
         x_tensor (Union[torch.Tensor, torch.utils.data.DataLoader]): Input data for
             evaluation. Can be either:
+
             - torch.Tensor: Input features tensor with shape (N, ...) where N is
               the number of samples. Will be processed in batches of size `batch_size`.
             - torch.utils.data.DataLoader: PyTorch DataLoader yielding (x, y) batches.
