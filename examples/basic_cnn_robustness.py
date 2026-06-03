@@ -10,7 +10,8 @@ Research Application:
 - Layer vulnerability comparison
 
 Usage:
-    python basic_cnn_robustness.py
+    python basic_cnn_robustness.py          # Full run
+    python basic_cnn_robustness.py --fast   # Fast smoke test mode
 
 Output:
     - Baseline model accuracy
@@ -19,6 +20,7 @@ Output:
     - Bit position sensitivity analysis
 """
 
+import argparse
 import matplotlib
 import numpy as np
 import torch
@@ -48,12 +50,13 @@ def create_simple_cnn():
     )
 
 
-def prepare_data():
+def prepare_data(fast_mode=False):
     """Prepare training and test data."""
     print("Preparing dataset...")
 
     # Generate moon-shaped data for binary classification
-    X, y = make_moons(n_samples=2000, noise=0.3, random_state=42)
+    n_samples = 200 if fast_mode else 2000
+    X, y = make_moons(n_samples=n_samples, noise=0.3, random_state=42)
 
     # Normalize features
     scaler = StandardScaler()
@@ -72,9 +75,12 @@ def prepare_data():
     return X_train, X_test, y_train, y_test
 
 
-def train_model(model, x_train, y_train, epochs=100):
+def train_model(model, x_train, y_train, epochs=100, fast_mode=False):
     """Train the CNN model."""
-    print("Training model...")
+    if fast_mode:
+        epochs = min(epochs, 5)
+
+    print(f"Training model... ({epochs} epochs)")
 
     criterion = nn.BCELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
@@ -269,37 +275,59 @@ def create_visualizations(baseline_acc, layer_results, bit_results):
     plt.show()
 
 
-def main():
+def main(fast_mode=False):
     """Main analysis pipeline."""
-    print("CNN ROBUSTNESS ANALYSIS - SEU INJECTION FRAMEWORK")
+    mode_str = " (FAST MODE)" if fast_mode else ""
+    print(f"CNN ROBUSTNESS ANALYSIS - SEU INJECTION FRAMEWORK{mode_str}")
     print("=" * 60)
 
     try:
         # 1. Prepare data and model
-        x_train, x_test, y_train, y_test = prepare_data()
+        x_train, x_test, y_train, y_test = prepare_data(fast_mode=fast_mode)
 
         # 2. Create and train model
         model = create_simple_cnn()
-        model = train_model(model, x_train, y_train)
+        model = train_model(model, x_train, y_train, fast_mode=fast_mode)
 
         # 3. Initialize SEU injection analysis
         injector, baseline_acc = run_baseline_analysis(model, x_test, y_test)
 
         # 4. Run SEU injection analyses
-        analyze_sign_bit_vulnerability(injector)
-        layer_results = analyze_layer_vulnerability(injector)
-        bit_results = analyze_bit_position_sensitivity(injector)
+        # Skip sign bit analysis in fast mode (too slow)
+        if not fast_mode:
+            analyze_sign_bit_vulnerability(injector)
+        else:
+            print("\n[SKIPPED] Sign bit vulnerability analysis (fast mode)")
 
-        # 5. Create visualizations
-        create_visualizations(baseline_acc, layer_results, bit_results)
+        # Skip layer vulnerability in fast mode (too slow)
+        if not fast_mode:
+            layer_results = analyze_layer_vulnerability(injector)
+        else:
+            layer_results = {}
+            print("\n[SKIPPED] Layer vulnerability analysis (fast mode)")
+
+        # Skip bit position sensitivity in fast mode (too slow)
+        if not fast_mode:
+            bit_results = analyze_bit_position_sensitivity(injector)
+        else:
+            bit_results = {}
+            print("\n[SKIPPED] Bit position sensitivity analysis (fast mode)")
+
+        # 5. Create visualizations (skip in fast mode)
+        if not fast_mode:
+            create_visualizations(baseline_acc, layer_results, bit_results)
 
         # 6. Summary
         print("\nANALYSIS COMPLETE")
         print("=" * 60)
         print(f"Baseline accuracy: {baseline_acc:.2%}")
-        print(f"Layers analyzed: {len(layer_results)}")
-        print(f"Bit positions tested: {len(bit_results)}")
-        print("Check 'cnn_robustness_analysis.png' for visualizations!")
+        if fast_mode:
+            print("Layers analyzed: Skipped in fast mode")
+            print("Bit positions tested: Skipped in fast mode")
+        else:
+            print(f"Layers analyzed: {len(layer_results)}")
+            print(f"Bit positions tested: {len(bit_results)}")
+            print("Check 'cnn_robustness_analysis.png' for visualizations!")
 
     except Exception as e:
         print(f"ERROR during analysis: {str(e)}")
@@ -307,4 +335,9 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Basic CNN Robustness Analysis Example")
+    parser.add_argument(
+        "--fast", action="store_true", help="Run in fast smoke-test mode with reduced parameters for quick validation"
+    )
+    args = parser.parse_args()
+    main(fast_mode=args.fast)

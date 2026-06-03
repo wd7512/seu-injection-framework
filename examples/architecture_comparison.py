@@ -50,6 +50,7 @@ class SimpleNN(nn.Module):
         self.fc3 = nn.Linear(hidden_size, num_classes)
         self.dropout = nn.Dropout(0.5)
 
+    def forward(self, x):
         x = x.view(x.size(0), -1)  # Flatten
         x = functional.relu(self.fc1(x))
         x = self.dropout(x)
@@ -577,7 +578,7 @@ def generate_comparative_report(results, complexity_data, robustness_scores, out
 
     # Correlation analysis
     param_robust_corr = np.corrcoef(
-        [complexity_data[name]["parameters"] for name in sorted_archs],
+        [complexity_data[name]["parameters"] for name, _ in sorted_archs],
         [score for _, score in sorted_archs],
     )[0, 1]
 
@@ -604,7 +605,7 @@ def generate_comparative_report(results, complexity_data, robustness_scores, out
     report_text = "\n".join(report)
     report_file = output_dir / "architecture_comparison_report.txt"
 
-    with open(report_file, "w") as f:
+    with open(report_file, "w", encoding="utf-8") as f:
         f.write(report_text)
 
     print(f"📄 Comparison report saved to: {report_file}")

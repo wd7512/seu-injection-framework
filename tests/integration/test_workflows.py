@@ -178,14 +178,16 @@ class TestSEUInjectionWorkflows:
 
         # Run 1 with seed
         torch.manual_seed(42)
-        np.random.seed(42)
-        injector1 = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test)
+        injector1 = StochasticSEUInjector(
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test, seed=42
+        )
         results1 = injector1.run_injector(bit_i=0, p=0.2)
 
         # Run 2 with same seed
         torch.manual_seed(42)
-        np.random.seed(42)
-        injector2 = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test)
+        injector2 = StochasticSEUInjector(
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test, seed=42
+        )
         results2 = injector2.run_injector(bit_i=0, p=0.2)
 
         # Results should be identical
