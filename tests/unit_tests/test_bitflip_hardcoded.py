@@ -116,10 +116,11 @@ class TestHardcodedBitflips:
             assert result == 0.0
             assert np.signbit(result)  # should be negative zero
 
-        # Flipping back should give positive zero
-        result2 = bitflip_float32(bitflip_float32(0.0, 0), 0)
-        assert result2 == 0.0
-        assert not np.signbit(result2)
+        # Double-flip: all 3 implementations should round-trip back to +0.0
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            result2 = impl(impl(0.0, 0), 0)
+            assert result2 == 0.0
+            assert not np.signbit(result2)
 
     def test_specific_small_value_flip(self):
         """Test flipping bits on a small specific value."""
@@ -175,19 +176,20 @@ class TestHardcodedBitflips:
         """Test a sequence of specific bit flips on the same value."""
         value = 10.0
 
-        # First flip bit 0 (sign bit)
-        step1 = bitflip_float32(value, 0)
-        assert step1 == -10.0
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            # First flip bit 0 (sign bit)
+            step1 = impl(value, 0)
+            assert step1 == -10.0, f"{impl.__name__} step1: {step1}"
 
-        # Then flip bit 0 again (should restore)
-        step2 = bitflip_float32(step1, 0)
-        assert step2 == 10.0
+            # Then flip bit 0 again (should restore)
+            step2 = impl(step1, 0)
+            assert step2 == 10.0, f"{impl.__name__} step2: {step2}"
 
-        # Now flip bit 31 (LSB of mantissa) — 10.0 + 2^-20
-        # 10.0 = 1.25 * 2^3, so LSB = 2^3 * 2^-23 = 2^-20
-        expected = np.float32(10.0 + 2**-20)
-        step3 = bitflip_float32(step2, 31)
-        assert step3 == expected, f"got {step3}, expected {expected}"
+            # Now flip bit 31 (LSB of mantissa) — 10.0 + 2^-20
+            # 10.0 = 1.25 * 2^3, so LSB = 2^3 * 2^-23 = 2^-20
+            expected = np.float32(10.0 + 2**-20)
+            step3 = impl(step2, 31)
+            assert step3 == expected, f"{impl.__name__} step3: got {step3}, expected {expected}"
 
     def test_all_implementations_consistent_hardcoded(self):
         """Verify all three implementations give identical results for hardcoded cases."""
@@ -252,20 +254,20 @@ class TestHardcodedBitflips:
         # For 1.0 in MSB-first indexing:
         # Bit layout: 0 01111111 00000000000000000000000
 
-        # Bit 0 (sign bit): 1.0 -> -1.0
-        assert bitflip_float32(1.0, 0) == -1.0
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            # Bit 0 (sign bit): 1.0 -> -1.0
+            assert impl(1.0, 0) == -1.0, f"{impl.__name__} bit 0"
 
-        # Bit 1 (exponent MSB): flipping creates all 1's -> infinity
-        result = bitflip_float32(1.0, 1)
-        assert np.isinf(result)
-        assert result > 0
+            # Bit 1 (exponent MSB): flipping creates all 1's -> infinity
+            result = impl(1.0, 1)
+            assert np.isinf(result), f"{impl.__name__} bit 1 not inf"
+            assert result > 0
 
-        # Bit 9 (first bit of mantissa): sets implicit 1.0 + 0.5 in mantissa
-        # Result should be exactly 1.5
-        assert bitflip_float32(1.0, 9) == np.float32(1.5)
+            # Bit 9 (first bit of mantissa): sets implicit 1.0 + 0.5 in mantissa
+            assert impl(1.0, 9) == np.float32(1.5), f"{impl.__name__} bit 9"
 
-        # Bit 31 (mantissa LSB): gives 1.0 + 2^-23 exactly
-        assert bitflip_float32(1.0, 31) == np.float32(1.0 + 2**-23)
+            # Bit 31 (mantissa LSB): gives 1.0 + 2^-23 exactly
+            assert impl(1.0, 31) == np.float32(1.0 + 2**-23), f"{impl.__name__} bit 31"
 
     # --- Edge case tests added from swarm review ---
 
