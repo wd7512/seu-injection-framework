@@ -5,6 +5,49 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-06-04
+
+### Added
+
+- **Fault injection training robustness study** — New example directory `examples/fault_injection_training/` with a comprehensive research study analysing how flood-level training improves model robustness to SEU faults. Includes:
+  - `fault_injection_training_study.py`: Full experimental pipeline comparing baseline vs flood-trained models across multiple architectures and flood levels
+  - `notebook.ipynb`: Interactive Jupyter notebook with visualisations and commentary
+  - `robustness_results.csv`: 200+ data points across architectures, flood levels, and injection rates
+  - Comprehensive README documenting methodology, threats to validity, and reproducibility notes
+  - All CI artifacts (PNG comparisons, regenerated on each full run) properly gitignored
+- **Hardcoded unit tests for bitflip implementations** (PR #58): New tests covering NaN, inf, denormal, and boundary conditions across all 3 bitflip implementations (exhaustive, stochastic, element). Tests parametrised to run against all injection modes.
+- **Seed parameter for `BaseInjector`** — New `seed` parameter enabling reproducible stochastic injections. `StochasticSEUInjector` now accepts optional seed for deterministic random streams.
+- **MPS (Apple Silicon GPU) support** — `examples/fault_injection_training/fault_injection_training_study.py` correctly detects MPS with `is_available() and is_built()` check. [#95](https://github.com/wd7512/seu-injection-framework/issues/95) opened to extend this to the core library.
+
+### Changed
+
+- **Strategy pattern refactor** (PR #59):
+  - `_run_injector_impl()` lifted to `BaseInjector` as a concrete template method, enabling clean subclassing for custom injection strategies
+  - Private helper methods extracted: `_inject_and_evaluate()`, `_iterate_layers()`, `_get_layers()` for reuse across injector implementations
+  - `ExhaustiveSEUInjector` optimised: uses `float(original_val)` for tensor restore instead of GPU indexing
+  - Lazy iteration pattern documented in docstring for extreme model sizes
+- **Dependencies workflow refactor** (PR #39):
+  - Reusable `test-matrix.yml` workflow created as single source of truth for CI config
+  - Cache naming, step name capitalisation, `fail-fast` comment added
+  - Full 9-config matrix (3 OS × 3 Python) restored
+  - Security permissions tightened with explicit GITHUB_TOKEN scopes
+  - Dependencies workflow runs full matrix before creating PR, eliminating CI surprise failures
+- **CI type checks fixed** — `_inject_and_evaluate()` type signature and accuracy.py return types corrected for `ty` strict mode
+
+### Removed
+
+- **`.review-output`** directory added to `.gitignore` — prevents accidental commits of review artifacts
+- **`versions_and_plan.md`** — human-only edit guard added, flagged as stale
+
+### Fixed
+
+- **Dead imports**: Removed unused imports in `fault_injection_training_study.py` and `notebook.ipynb`
+- **CSV formatting**: Fixed NaN/inf handling in `robustness_results.csv` to produce clean Markdown tables
+- **E402 lint**: Module-level import ordering fixed in `fault_injection_training_study.py`
+- **CRITICAL and HIGH swarm review findings**: Methodology confounds, statistical rigour, and documentation gaps addressed across all example scripts
+- **GPU tensor indexing**: Replaced tensor indexing on GPU for restore operations with `float(original_val)` — avoids D2H/D2D sync overhead
+- **Device assertion**: `StochasticSEUInjector` seed test now uses correct device parameter
+
 ## [1.2.2] - 2026-06-03
 
 ### Housekeeping

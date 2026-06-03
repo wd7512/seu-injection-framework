@@ -76,7 +76,7 @@ When using these examples in research, please cite:
   title = {SEU Injection Framework: Fault Tolerance Analysis for Neural Networks},
   year = {2025},
   url = {https://github.com/wd7512/seu-injection-framework},
-  version = {1.2.0}
+  version = {1.3.0}
 }
 ```
 
