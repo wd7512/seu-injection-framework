@@ -44,7 +44,7 @@ class TestInjector:
         assert 0.0 <= injector.baseline_score <= 1.0
 
     def test_injector_device_auto_detection(self, simple_model, sample_data):
-        """Test automatic device detection (CUDA vs CPU)."""
+        """Test automatic device detection (MPS > CUDA > CPU)."""
         X, y = sample_data
 
         # Test with device=None to trigger auto-detection
@@ -56,15 +56,12 @@ class TestInjector:
             y=y,
         )
 
-        # Should detect either CUDA or CPU
-        assert str(injector.device) in ["cuda", "cpu"]
-
-        # The detected device should match what torch.cuda.is_available() suggests
-        if torch.cuda.is_available():
-            # If CUDA is available, device could be either (depends on implementation)
-            assert str(injector.device) in ["cuda", "cpu"]
+        # Detection priority: MPS > CUDA > CPU (see utils.device.detect_device)
+        if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            assert str(injector.device) == "mps"
+        elif torch.cuda.is_available():
+            assert str(injector.device) == "cuda"
         else:
-            # If CUDA is not available, should default to CPU
             assert str(injector.device) == "cpu"
 
     def test_injector_cuda_path_coverage(self, simple_model, sample_data, device):
@@ -319,10 +316,10 @@ class TestInjector:
         )
         assert results["layer_name"][0] == target_layer
 
-        # Also test with non-existent layer to ensure all layers are skipped
-        # This MUST trigger the continue statement for ALL layers
-        results_empty = injector.run_injector(bit_i=0, layer_name="nonexistent_layer")
-        assert len(results_empty["layer_name"]) == 0, "Should have no results for non-existent layer"
+        # Also test with non-existent layer — invalid layer names must raise ValueError
+        # (the public contract documented in run_injector's docstring).
+        with pytest.raises(ValueError, match="nonexistent_layer"):
+            injector.run_injector(bit_i=0, layer_name="nonexistent_layer")
 
         # Test with first layer to ensure other layers are skipped
         results_first = injector.run_injector(bit_i=0, layer_name="0.weight")
@@ -385,32 +382,37 @@ class TestInjector:
             injector.run_injector(bit_i=0, p=1.1)
 
     def test_stochastic_seu_probability_effects(self, simple_model, sample_data, device):
-        """Test that different probabilities affect the number of injections."""
+        """Test that higher injection probability yields more injections."""
         X, y = sample_data
 
-        injector = StochasticSEUInjector(
+        # Seed each injector's per-instance RNG so the selection is deterministic.
+        injector_low = StochasticSEUInjector(
             trained_model=simple_model,
             criterion=classification_accuracy,
             device=device,
             x=X,
             y=y,
+            seed=42,
+        )
+        injector_high = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+            seed=42,
         )
 
-        # Set random seed for reproducible results
-        np.random.seed(42)
-        results_low = injector.run_injector(bit_i=0, p=0.1)
+        results_low = injector_low.run_injector(bit_i=0, p=0.1, run_at_least_one_injection=False)
+        results_high = injector_high.run_injector(bit_i=0, p=0.9, run_at_least_one_injection=False)
 
-        np.random.seed(42)
-        results_high = injector.run_injector(bit_i=0, p=0.9)
-
-        # Higher probability should generally result in more injections
-        # (though with randomness, this isn't guaranteed, so we use a loose check)
         low_count = len(results_low["tensor_location"])
         high_count = len(results_high["tensor_location"])
 
-        # At minimum, both should have some results
-        assert low_count >= 0, "Low probability should have some results"
-        assert high_count >= 0, "High probability should have some results"
+        # A higher probability must select strictly more parameters for injection.
+        assert high_count > low_count, (
+            f"Higher probability should yield more injections: p=0.9 gave {high_count}, p=0.1 gave {low_count}"
+        )
 
     def test_model_state_preservation(self, simple_model, sample_data, device):
         """Test that model parameters are restored after SEU injection."""
@@ -482,9 +484,9 @@ class TestInjector:
             f"Should only have results from 0.weight, got: {set(results['layer_name'])}"
         )
 
-        # Also test with nonexistent layer to trigger continue for all layers
-        results_empty = injector.run_injector(bit_i=0, p=1.0, layer_name="nonexistent_layer")
-        assert len(results_empty["layer_name"]) == 0, "Should have no results for nonexistent layer"
+        # Also test with nonexistent layer — invalid layer names must raise ValueError.
+        with pytest.raises(ValueError, match="nonexistent_layer"):
+            injector.run_injector(bit_i=0, p=1.0, layer_name="nonexistent_layer")
 
     def test_run_at_least_one_injection_default(self, simple_model, sample_data, device):
         """Test that run_at_least_one_injection defaults to True and ensures at least one injection per layer."""
@@ -520,10 +522,8 @@ class TestInjector:
             device=device,
             x=X,
             y=y,
+            seed=42,
         )
-
-        # Set seed for reproducibility
-        np.random.seed(42)
 
         # Run with p=0 and run_at_least_one_injection=False
         results = injector.run_injector(bit_i=0, p=0, run_at_least_one_injection=False)
@@ -555,3 +555,237 @@ class TestInjector:
         assert all(layer == target_layer for layer in results["layer_name"]), (
             f"All results should be from {target_layer}, got: {set(results['layer_name'])}"
         )
+
+    def test_initialize_results(self, simple_model, sample_data, device):
+        """Test that _initialize_results creates proper structure."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        results = injector._initialize_results()
+
+        # Verify structure
+        assert isinstance(results, dict)
+        assert "tensor_location" in results
+        assert "criterion_score" in results
+        assert "layer_name" in results
+        assert "value_before" in results
+        assert "value_after" in results
+
+        # Verify all are empty lists
+        for key, value in results.items():
+            assert isinstance(value, list)
+            assert len(value) == 0
+
+    def test_iterate_layers(self, simple_model, sample_data, device):
+        """Test _iterate_layers helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Test iterating all layers
+        all_layers = list(injector._iterate_layers(None))
+        assert len(all_layers) > 0
+        for name, param in all_layers:
+            assert isinstance(name, str), f"Layer name should be string, got {type(name)}"
+            assert isinstance(param, torch.nn.Parameter), f"Layer param should be torch.nn.Parameter, got {type(param)}"
+
+        # Test filtering by specific layer
+        target_layer = all_layers[0][0]
+        filtered_layers = list(injector._iterate_layers(target_layer))
+        assert len(filtered_layers) == 1
+        assert filtered_layers[0][0] == target_layer
+
+    def test_prepare_tensor_for_injection(self, simple_model, sample_data, device):
+        """Test _prepare_tensor_for_injection helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Get first layer
+        layer_name, tensor = next(injector._iterate_layers(None))
+
+        # Prepare tensor (returns a CPU numpy snapshot)
+        tensor_cpu = injector._prepare_tensor_for_injection(tensor)
+
+        # Verify outputs
+        assert isinstance(tensor_cpu, np.ndarray)
+        assert tensor_cpu.shape == tuple(tensor.shape)
+
+    def test_inject_and_evaluate(self, simple_model, sample_data, device):
+        """Test _inject_and_evaluate helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Get first layer
+        layer_name, tensor = next(injector._iterate_layers(None))
+        tensor_cpu = injector._prepare_tensor_for_injection(tensor)
+
+        # Get first index
+        idx = tuple(np.ndindex(tensor_cpu.shape))[0]
+        original_val = tensor_cpu[idx]
+
+        # Store original tensor value to verify restoration
+        original_tensor_val = tensor.data[idx].item()
+
+        # Inject and evaluate
+        criterion_score, seu_val = injector._inject_and_evaluate(tensor, idx, original_val, bit_i=15)
+
+        # Verify outputs
+        assert isinstance(criterion_score, float)
+        assert isinstance(seu_val, (float, np.floating))
+        assert 0.0 <= criterion_score <= 1.0
+
+        # Verify tensor was restored
+        assert tensor.data[idx].item() == original_tensor_val
+
+    def test_record_injection_result(self, simple_model, sample_data, device):
+        """Test _record_injection_result helper method."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        results = injector._initialize_results()
+        idx = (0, 1)
+        criterion_score = 0.95
+        layer_name = "test_layer"
+        original_val = 1.5
+        seu_val = 1.6
+
+        # Record result
+        injector._record_injection_result(results, idx, criterion_score, layer_name, original_val, seu_val)
+
+        # Verify recording
+        assert len(results["tensor_location"]) == 1
+        assert results["tensor_location"][0] == idx
+        assert results["criterion_score"][0] == criterion_score
+        assert results["layer_name"][0] == layer_name
+        assert results["value_before"][0] == original_val
+        assert results["value_after"][0] == seu_val
+
+    def test_get_injection_indices_exhaustive(self, simple_model, sample_data, device):
+        """Test _get_injection_indices for exhaustive strategy."""
+        X, y = sample_data
+
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Test with a small shape
+        tensor_shape = (2, 3)
+        indices = injector._get_injection_indices(tensor_shape)
+
+        # Should get all 6 indices
+        assert len(indices) == 6
+        assert isinstance(indices, np.ndarray)
+
+    def test_get_injection_indices_stochastic(self, simple_model, sample_data, device):
+        """Test _get_injection_indices for stochastic strategy."""
+        X, y = sample_data
+
+        injector = StochasticSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+
+        # Uses local default_rng (not global state), so no global state pollution
+        tensor_shape = (10, 10)
+
+        # Test with p=0.5 — probabilistic but statistically safe on 100 elements
+        indices = injector._get_injection_indices(tensor_shape, p=0.5)
+        assert len(indices) > 0
+        assert len(indices) < 100  # Should not be all indices
+        assert isinstance(indices, np.ndarray)
+
+        # Test with p=0 and run_at_least_one_injection=True
+        indices_min = injector._get_injection_indices(tensor_shape, p=0.0, run_at_least_one_injection=True)
+        assert len(indices_min) == 1  # Should have exactly one
+
+        # Test with p=1.0 — should be all 100 indices
+        indices_all = injector._get_injection_indices(tensor_shape, p=1.0)
+        assert len(indices_all) == 100
+
+        # Test error handling for invalid p
+        with pytest.raises(ValueError, match="Probability p must be in"):
+            injector._get_injection_indices(tensor_shape, p=1.5)
+
+    def test_run_injector_invalid_layer_raises(self, simple_model, sample_data, device):
+        """Invalid layer_name must raise ValueError (documented contract)."""
+        X, y = sample_data
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+        with pytest.raises(ValueError, match="not found in model"):
+            injector.run_injector(bit_i=0, layer_name="does_not_exist")
+
+    def test_exhaustive_injector_warns_on_extra_kwargs(self, simple_model, sample_data, device):
+        """ExhaustiveSEUInjector should warn when stochastic-only kwargs are passed."""
+        X, y = sample_data
+        injector = ExhaustiveSEUInjector(
+            trained_model=simple_model,
+            criterion=classification_accuracy,
+            device=device,
+            x=X,
+            y=y,
+        )
+        with pytest.warns(UserWarning, match="ignores extra kwargs"):
+            injector._get_injection_indices((2, 2), p=0.5)
+
+    def test_detect_device_prefers_mps_then_cuda(self, monkeypatch):
+        """Core device auto-detection should prefer MPS, then CUDA, then CPU."""
+
+        # MPS available -> mps
+        monkeypatch.setattr(torch.backends.mps, "is_available", lambda: True)
+        monkeypatch.setattr(torch.backends.mps, "is_built", lambda: True)
+        monkeypatch.setattr(torch.cuda, "is_available", lambda: True)
+        assert ExhaustiveSEUInjector._detect_device().type == "mps"
+
+        # MPS unavailable, CUDA available -> cuda
+        monkeypatch.setattr(torch.backends.mps, "is_available", lambda: False)
+        assert ExhaustiveSEUInjector._detect_device().type == "cuda"
+
+        # Neither -> cpu
+        monkeypatch.setattr(torch.cuda, "is_available", lambda: False)
+        assert ExhaustiveSEUInjector._detect_device().type == "cpu"

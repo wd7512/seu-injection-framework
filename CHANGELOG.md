@@ -5,6 +5,55 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-06-04
+
+### Added
+
+- **Fault injection training robustness study** — New example directory `examples/fault_injection_training/` with a comprehensive research study analysing how flood-level training improves model robustness to SEU faults. Includes:
+  - `fault_injection_training_study.py`: Full experimental pipeline comparing baseline vs flood-trained models across multiple architectures and flood levels
+  - `notebook.ipynb`: Interactive Jupyter notebook with visualisations and commentary
+  - `robustness_results.csv`: committed per-bit results (sign, exponent, and mantissa bit positions) for the single-seed run documented in the README
+  - Comprehensive README documenting methodology, threats to validity, and reproducibility notes
+  - Generated PNG comparison figures are untracked (covered by the `*.png` rule in `.gitignore`) and regenerated on each run
+- **Hardcoded unit tests for bitflip implementations** (PR #58): New tests covering NaN, inf, denormal, and boundary conditions across all 3 bitflip implementations (exhaustive, stochastic, element). Tests parametrised to run against all injection modes.
+- **Seed parameter for `BaseInjector`** — New `seed` parameter enabling reproducible stochastic injections. `StochasticSEUInjector` now accepts optional seed for deterministic random streams.
+- **MPS (Apple Silicon GPU) support** — Core device auto-detection in `BaseInjector` (and the shared `utils.device.detect_device` helper) now prefers MPS > CUDA > CPU, matching `examples/fault_injection_training/fault_injection_training_study.py`. Test fixtures and benchmarks were updated to the same policy. [#95](https://github.com/wd7512/seu-injection-framework/issues/95) tracks the remaining MPS architecture work.
+
+### Changed
+
+- **Strategy pattern refactor** (PR #59):
+  - `_run_injector_impl()` changed from an `@abstractmethod` to a concrete template method on `BaseInjector`. **Contract change:** subclasses no longer override `_run_injector_impl()`; the new abstract extension point is `_get_injection_indices()`, which each strategy implements to return the indices to inject. Any custom subclass that previously overrode `_run_injector_impl()` must move its logic to `_get_injection_indices()`.
+  - Private helper methods extracted for reuse across injector implementations: `_initialize_results()`, `_iterate_layers()`, `_prepare_tensor_for_injection()`, `_inject_and_evaluate()`, and `_record_injection_result()`
+  - `ExhaustiveSEUInjector` optimised: uses `float(original_val)` for tensor restore instead of GPU indexing
+  - Lazy iteration pattern documented in docstring for extreme model sizes
+  - `run_injector()` `bit_i` validation tightened from `range(33)` to `range(32)` (valid float32 bit positions are 0–31; the previous range erroneously accepted 32)
+- **Dependencies workflow refactor** (PR #39):
+  - Reusable `test-matrix.yml` workflow created as single source of truth for CI config
+  - Cache naming, step name capitalisation, `fail-fast` comment added
+  - Full 9-config matrix (3 OS × 3 Python) restored
+  - Security permissions tightened with explicit GITHUB_TOKEN scopes
+  - Dependencies workflow runs full matrix before creating PR, eliminating CI surprise failures
+- **CI type checks fixed** — `_inject_and_evaluate()` type signature and accuracy.py return types corrected for `ty` strict mode
+
+### Removed
+
+- **`.review-output`** directory added to `.gitignore` — prevents accidental commits of review artifacts
+- **`versions_and_plan.md`** — human-only edit guard added, flagged as stale
+
+### Fixed
+
+- **Dead imports**: Removed unused imports in `fault_injection_training_study.py` and `notebook.ipynb`
+- **CSV formatting**: Fixed NaN/inf handling in `robustness_results.csv` to produce clean Markdown tables
+- **E402 lint**: Module-level import ordering fixed in `fault_injection_training_study.py`
+- **CRITICAL and HIGH swarm review findings**: Methodology confounds, statistical rigour, and documentation gaps addressed across all example scripts
+- **GPU tensor indexing**: Replaced tensor indexing on GPU for restore operations with `float(original_val)` — avoids D2H/D2D sync overhead
+- **Device assertion**: `StochasticSEUInjector` seed test now uses correct device parameter
+- **Invalid `layer_name` now raises `ValueError`**: `run_injector()` previously only `print()`ed a warning and silently returned empty results for an unknown layer, contradicting its docstring. It now raises `ValueError` listing the available layers.
+- **GPU stream race**: `BaseInjector` now synchronizes the CUDA/MPS stream between the injection write and the evaluation forward pass, preventing a rare race on asynchronous GPU streams (no-op on CPU).
+- **Persistent RNG**: `BaseInjector` initialises its `numpy` `Generator` once in `__init__` instead of recreating it per call, so seeded stochastic injections produce a reproducible stream across multiple `run_injector()` calls.
+- **Removed unused clone**: `_prepare_tensor_for_injection()` no longer clones the full parameter tensor for restoration (restoration uses the CPU scalar `original_val`), reducing per-layer memory overhead.
+- **Notebook methodology** (`examples/fault_injection_training/notebook.ipynb`): paired design via `copy.deepcopy()` (identical initial weights), calibrated hypothesis assessment replacing unsupported "CONFIRMED" claims, an 8-point limitations section, and import ordering fixed (E402).
+
 ## [1.2.2] - 2026-06-03
 
 ### Housekeeping

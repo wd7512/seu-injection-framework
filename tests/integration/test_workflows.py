@@ -178,20 +178,26 @@ class TestSEUInjectionWorkflows:
 
         # Run 1 with seed
         torch.manual_seed(42)
-        np.random.seed(42)
-        injector1 = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test)
+        injector1 = StochasticSEUInjector(
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test, seed=42
+        )
         results1 = injector1.run_injector(bit_i=0, p=0.2)
 
         # Run 2 with same seed
         torch.manual_seed(42)
-        np.random.seed(42)
-        injector2 = StochasticSEUInjector(trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test)
+        injector2 = StochasticSEUInjector(
+            trained_model=model, criterion=classification_accuracy, x=X_test, y=y_test, seed=42
+        )
         results2 = injector2.run_injector(bit_i=0, p=0.2)
 
-        # Results should be identical
+        # Results should be reproducible: identical count AND identical injection set.
         assert len(results1["criterion_score"]) == len(results2["criterion_score"])
 
-        # Compare first few results (may vary due to randomness in injection selection)
-        if len(results1["criterion_score"]) > 0 and len(results2["criterion_score"]) > 0:
-            # At least baseline scores should be identical
-            assert abs(injector1.baseline_score - injector2.baseline_score) < 1e-6
+        # The exact set of injected locations must match for a fixed seed.
+        assert results1["tensor_location"] == results2["tensor_location"]
+        assert results1["layer_name"] == results2["layer_name"]
+        assert results1["value_after"] == results2["value_after"]
+        assert results1["criterion_score"] == results2["criterion_score"]
+
+        # Baseline scores must also be identical.
+        assert abs(injector1.baseline_score - injector2.baseline_score) < 1e-6

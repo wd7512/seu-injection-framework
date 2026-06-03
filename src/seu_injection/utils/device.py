@@ -22,10 +22,11 @@ def detect_device(
     """Detect the best available computing device.
 
     Args:
-        preferred_device: Preferred device specification ('cpu', 'cuda', or torch.device)
+        preferred_device: Preferred device specification ('cpu', 'cuda', 'mps', or torch.device)
 
     Returns:
-        Detected or specified torch.device
+        Detected or specified torch.device. Auto-detection preference order is
+        MPS (Apple Silicon GPU) > CUDA (NVIDIA GPU) > CPU.
 
     Example:
         >>> device = detect_device()  # Auto-detect
@@ -33,10 +34,11 @@ def detect_device(
 
     """
     if preferred_device is None:
+        if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            return torch.device("mps")
         if torch.cuda.is_available():
             return torch.device("cuda")
-        else:
-            return torch.device("cpu")
+        return torch.device("cpu")
     else:
         return torch.device(preferred_device)
 
