@@ -32,6 +32,7 @@ import torch
 from tqdm import tqdm
 
 from ..bitops import bitflip_float32_optimized
+from ..utils.device import detect_device
 
 
 class BaseInjector(ABC):
@@ -91,12 +92,15 @@ class BaseInjector(ABC):
         """
         # Device detection and setup
         if device is None:
-            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.device = self._detect_device()
         else:
             self.device = torch.device(device)
 
-        # Random number generator for reproducibility (used by stochastic injector)
-        self._rng: Union[np.random.Generator, None] = np.random.default_rng(seed) if seed is not None else None
+        # Random number generator for reproducibility (used by stochastic injector).
+        # Created once per instance so the random stream is persistent across calls.
+        # ``seed=None`` yields a fresh generator seeded from OS entropy, so separate
+        # instances (and separate runs) will generally produce different sequences.
+        self._rng: np.random.Generator = np.random.default_rng(seed)
 
         # Model setup
         self.criterion = criterion  # type: ignore[assignment]
@@ -146,6 +150,31 @@ class BaseInjector(ABC):
 
         self._layer_names = [name for name, _ in self.model.named_parameters()]
 
+    @staticmethod
+    def _detect_device() -> torch.device:
+        """Auto-detect the best available compute device.
+
+        Preference order: MPS (Apple Silicon GPU) > CUDA (NVIDIA GPU) > CPU.
+        Delegates to :func:`seu_injection.utils.device.detect_device` so the
+        whole framework shares a single device-detection policy.
+
+        Returns:
+            torch.device: The detected device.
+
+        """
+        return detect_device()
+
+    def _synchronize_device(self) -> None:
+        """Block until pending device work completes.
+
+        Ensures the injection write is visible to the subsequent evaluation
+        forward pass on asynchronous GPU streams (CUDA/MPS). No-op on CPU.
+        """
+        if self.device.type == "cuda":
+            torch.cuda.synchronize(self.device)
+        elif self.device.type == "mps":
+            torch.mps.synchronize()
+
     def run_injector(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Run the fault injection process.
 
@@ -164,7 +193,7 @@ class BaseInjector(ABC):
             raise ValueError(f"bit_i must be in [0, 31], got {bit_i}")
 
         if layer_name is not None and layer_name not in self._layer_names:
-            print(f"WARNING - layer '{layer_name}' missing. Skipping...")
+            raise ValueError(f"layer_name '{layer_name}' not found in model. Available layers: {self._layer_names}")
 
         self.model.eval()
         return self._run_injector_impl(bit_i, layer_name, **kwargs)
@@ -190,16 +219,14 @@ class BaseInjector(ABC):
             for current_layer_name, tensor in self._iterate_layers(layer_name):
                 print(f"Testing Layer: {current_layer_name}")
 
-                original_tensor, tensor_cpu = self._prepare_tensor_for_injection(tensor)
+                tensor_cpu = self._prepare_tensor_for_injection(tensor)
                 injection_indices = self._get_injection_indices(tensor_cpu.shape, **kwargs)
 
                 for idx in tqdm(injection_indices, desc=f"Injecting into {current_layer_name}"):
                     idx = tuple(idx)
                     original_val = tensor_cpu[idx]
 
-                    criterion_score, seu_val = self._inject_and_evaluate(
-                        tensor, idx, original_tensor, original_val, bit_i
-                    )
+                    criterion_score, seu_val = self._inject_and_evaluate(tensor, idx, original_val, bit_i)
 
                     self._record_injection_result(
                         results, idx, criterion_score, current_layer_name, original_val, seu_val
@@ -238,15 +265,15 @@ class BaseInjector(ABC):
             if layer_name is not None:
                 break
 
-    def _prepare_tensor_for_injection(self, tensor: torch.nn.Parameter) -> tuple[torch.Tensor, np.ndarray]:
-        """Prepare a tensor for injection by cloning and converting to numpy.
+    def _prepare_tensor_for_injection(self, tensor: torch.nn.Parameter) -> np.ndarray:
+        """Prepare a tensor for injection by snapshotting its values to CPU.
 
         Args:
             tensor: The parameter tensor to prepare.
 
         Returns:
-            tuple: (original_tensor, tensor_cpu) where original_tensor is a clone
-                   and tensor_cpu is a numpy array on CPU.
+            np.ndarray: A CPU numpy snapshot of the tensor used to read original
+                values prior to injection.
 
         Raises:
             ValueError: If tensor dtype is not float32.
@@ -257,15 +284,12 @@ class BaseInjector(ABC):
                 f"Expected float32 tensor, got {tensor.dtype}. "
                 f"SEU injection operates on IEEE 754 float32 bit representations."
             )
-        original_tensor = tensor.data.clone()
-        tensor_cpu = original_tensor.cpu().numpy()
-        return original_tensor, tensor_cpu
+        return tensor.data.detach().cpu().numpy().copy()
 
     def _inject_and_evaluate(
         self,
         tensor: torch.nn.Parameter,
-        idx: tuple,
-        original_tensor: torch.Tensor,
+        idx: tuple[int, ...],
         original_val: float,
         bit_i: int,
     ) -> tuple[float, float]:
@@ -274,16 +298,12 @@ class BaseInjector(ABC):
         Args:
             tensor: The parameter tensor to inject into.
             idx: The index location for injection.
-            original_tensor: The original tensor values for restoration.
             original_val: The original value at the injection location.
             bit_i: The bit position to flip (0-31).
 
         Returns:
             tuple: (criterion_score, seu_val) where criterion_score is the model
                    performance after injection and seu_val is the injected value.
-
-        Raises:
-            ValueError: If bit_i is out of range.
 
         """
         # Perform bitflip
@@ -292,6 +312,9 @@ class BaseInjector(ABC):
         # Inject fault using direct scalar assignment (avoids tensor allocation per call)
         tensor.data[idx] = float(seu_val)
         try:
+            # Ensure the injection write is visible before the evaluation forward
+            # pass on asynchronous GPU streams (CUDA/MPS); no-op on CPU.
+            self._synchronize_device()
             # Evaluate model
             criterion_score = self._get_criterion_score()
         finally:
@@ -303,7 +326,7 @@ class BaseInjector(ABC):
     def _record_injection_result(
         self,
         results: dict[str, list[Any]],
-        idx: tuple,
+        idx: tuple[int, ...],
         criterion_score: float,
         layer_name: str,
         original_val: float,

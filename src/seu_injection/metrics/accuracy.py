@@ -236,7 +236,6 @@ def classification_accuracy_loader(
         for batch_X, batch_y in data_loader:
             if device:
                 batch_X = batch_X.to(device, non_blocking=True)
-                batch_y = batch_y.to(device, non_blocking=True)
             batch_pred = model(batch_X)
             y_pred_list.append(batch_pred)
             y_true_list.append(batch_y)
