@@ -5,6 +5,20 @@ All notable changes to the SEU Injection Framework will be documented in this fi
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.2] - 2026-06-03
+
+### Housekeeping
+
+- **AGENTS.md**: Added workflow rules document defining the dev→main branching strategy for AI agents
+- **Changelog cleanup**: Folded orphaned 1.1.13 entry into 1.2.0 (Sphinx documentation feature)
+- **Remove generated artifact**: Deleted `architecture_comparison.png` from root and added `*.png` to `.gitignore`
+- **GitHub settings**: Disabled squash and rebase merging — only merge commits allowed
+- **CONTRIBUTING.md**: Updated branching strategy to reflect dev→main workflow, removed duplicate sections, corrected test counts and coverage numbers
+
+### Fixed
+
+- **Stale documentation references**: Updated CONTRIBUTING.md to reflect current dev workflow, removed references to non-existent files
+
 ## [1.2.1] - 2026-06-03
 
 ### Fixed
@@ -17,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Sphinx documentation**: Auto-built and deployed to GitHub Pages on push to main. See https://wd7512.github.io/seu-injection-framework/
 - **Smoke test suite**: New `tests/smoke/test_examples_run.py` that runs all example scripts, with `--fast` mode for CI validation
 - **Autouse cleanup fixture**: Generated artifacts from smoke tests are automatically cleaned up after each run
 
@@ -34,10 +49,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Dependency updates**: Automated via PR #82 (deps/auto-update)
 - **Issue sync & cleanup**: Documentation artifacts pruned from main branch
 - **Version**: 1.1.12 → 1.2.0 (minor bump reflecting new testing infrastructure and bug fixes)
-
-## [1.1.13] - sometime
-
-- **Added documentation using sphinx**: when a push is made to main docs should be update to https://wd7512.github.io/seu-injection-framework/
 
 ## [1.1.12] - 2025-12-09
 
