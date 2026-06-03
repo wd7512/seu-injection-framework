@@ -6,6 +6,8 @@ robustness under exhaustive fault injection scenarios.
 
 from typing import Any, Union
 
+import warnings
+
 import numpy as np
 import torch
 from tqdm import tqdm
@@ -36,15 +38,23 @@ class ExhaustiveSEUInjector(BaseInjector):
 
         Args:
             tensor_shape: Shape of the tensor to inject into.
-            **kwargs: Unused for exhaustive strategy.
+            **kwargs: Unused for exhaustive strategy. If provided, a warning is issued.
 
         Returns:
             np.ndarray: All possible indices in the tensor.
+                       Shape: (N, len(tensor_shape)).
 
         """
-        # Generate all indices exhaustively
-        all_indices = list(np.ndindex(tensor_shape))
-        return np.array(all_indices)
+        if kwargs:
+            warnings.warn(
+                f"ExhaustiveSEUInjector ignores extra kwargs: {set(kwargs.keys())}. "
+                f"These parameters are only used by StochasticSEUInjector.",
+                UserWarning,
+                stacklevel=2,
+            )
+        # Build exhaustive indices without materializing intermediate Python list
+        # Using argwhere(ones(...)) is O(N) memory but avoids O(N) tuple overhead
+        return np.argwhere(np.ones(tensor_shape, dtype=bool))
 
     def _run_injector_impl(self, bit_i: int, layer_name: Union[str, None] = None, **kwargs) -> dict[str, list[Any]]:
         """Perform systematic SEU injection across model parameters.
@@ -86,8 +96,7 @@ class ExhaustiveSEUInjector(BaseInjector):
                     injection_indices,
                     desc=f"Injecting into {current_layer_name}",
                 ):
-                    # Ensure idx is a tuple for consistent indexing
-                    idx = tuple(idx) if not isinstance(idx, tuple) else idx
+                    idx = tuple(idx)
 
                     original_val = tensor_cpu[idx]
 

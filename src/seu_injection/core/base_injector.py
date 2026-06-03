@@ -155,8 +155,8 @@ class BaseInjector(ABC):
         Raises:
             ValueError: If `bit_i` is out of range or `layer_name` is invalid.
         """
-        if bit_i not in range(33):
-            raise ValueError(f"bit_i must be in [0, 32], got {bit_i}")
+        if bit_i not in range(32):
+            raise ValueError(f"bit_i must be in [0, 31], got {bit_i}")
 
         if layer_name is not None and layer_name not in self._layer_names:
             print(f"WARNING - layer '{layer_name}' missing. Skipping...")
@@ -191,11 +191,11 @@ class BaseInjector(ABC):
         """
         for current_layer_name, tensor in self.model.named_parameters():
             # Skip layer if specific layer requested and this isn't it
-            if layer_name and layer_name != current_layer_name:
+            if layer_name is not None and layer_name != current_layer_name:
                 continue
             yield current_layer_name, tensor
             # Layer names are unique — stop iterating once we find the target
-            if layer_name:
+            if layer_name is not None:
                 break
 
     def _prepare_tensor_for_injection(self, tensor: torch.nn.Parameter) -> tuple[torch.Tensor, np.ndarray]:
@@ -208,7 +208,15 @@ class BaseInjector(ABC):
             tuple: (original_tensor, tensor_cpu) where original_tensor is a clone
                    and tensor_cpu is a numpy array on CPU.
 
+        Raises:
+            ValueError: If tensor dtype is not float32.
+
         """
+        if tensor.dtype != torch.float32:
+            raise ValueError(
+                f"Expected float32 tensor, got {tensor.dtype}. "
+                f"SEU injection operates on IEEE 754 float32 bit representations."
+            )
         original_tensor = tensor.data.clone()
         tensor_cpu = original_tensor.cpu().numpy()
         return original_tensor, tensor_cpu
@@ -234,18 +242,21 @@ class BaseInjector(ABC):
             tuple: (criterion_score, seu_val) where criterion_score is the model
                    performance after injection and seu_val is the injected value.
 
+        Raises:
+            ValueError: If bit_i is out of range.
+
         """
         # Perform bitflip
         seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)
 
         # Inject fault using direct scalar assignment (avoids tensor allocation per call)
         tensor.data[idx] = seu_val
-
-        # Evaluate model
-        criterion_score = self._get_criterion_score()
-
-        # Restore original value
-        tensor.data[idx] = original_tensor[idx]
+        try:
+            # Evaluate model
+            criterion_score = self._get_criterion_score()
+        finally:
+            # Always restore original value, even if evaluation fails
+            tensor.data[idx] = original_tensor[idx]
 
         return criterion_score, seu_val
 
@@ -272,8 +283,8 @@ class BaseInjector(ABC):
         results["tensor_location"].append(idx)
         results["criterion_score"].append(criterion_score)
         results["layer_name"].append(layer_name)
-        results["value_before"].append(original_val)
-        results["value_after"].append(seu_val)
+        results["value_before"].append(float(original_val))
+        results["value_after"].append(float(seu_val))
 
     def _initialize_results(self) -> dict[str, list[Any]]:
         """Initialize the results dictionary structure.

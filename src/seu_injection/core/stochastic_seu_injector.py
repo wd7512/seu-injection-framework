@@ -51,13 +51,16 @@ class StochasticSEUInjector(BaseInjector):
         if not (0.0 <= p <= 1.0):
             raise ValueError(f"Probability p must be in [0, 1], got {p}")
 
+        # Use a local RNG to avoid polluting the global numpy random state
+        rng = np.random.default_rng()
+
         # Build a boolean mask for stochastic selection
-        injection_mask = np.random.random(tensor_shape) < p
+        injection_mask = rng.random(tensor_shape) < p
 
         # Check if at least one injection will occur
         if run_at_least_one_injection and not injection_mask.any() and np.prod(tensor_shape) > 0:
             # If no injections selected and we need at least one, pick one randomly
-            random_idx = tuple(np.random.randint(0, dim) for dim in tensor_shape)
+            random_idx = tuple(rng.integers(0, dim) for dim in tensor_shape)
             injection_mask[random_idx] = True
 
         # Get indices where injections should occur

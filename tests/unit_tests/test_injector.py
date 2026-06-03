@@ -728,26 +728,23 @@ class TestInjector:
             y=y,
         )
 
-        # Test with p=0.5 and a reasonable shape
-        # Use a controlled RNG to avoid global state effects
-        original_state = np.random.get_state()
-        try:
-            np.random.seed(42)
-            tensor_shape = (10, 10)
-            indices = injector._get_injection_indices(tensor_shape, p=0.5)
+        # Uses local default_rng (not global state), so no global state pollution
+        tensor_shape = (10, 10)
 
-            # Should get roughly 50% of indices (but exact count varies with randomness)
-            assert len(indices) > 0
-            assert len(indices) < 100  # Should not be all indices
-            assert isinstance(indices, np.ndarray)
+        # Test with p=0.5 — probabilistic but statistically safe on 100 elements
+        indices = injector._get_injection_indices(tensor_shape, p=0.5)
+        assert len(indices) > 0
+        assert len(indices) < 100  # Should not be all indices
+        assert isinstance(indices, np.ndarray)
 
-            # Test with p=0 and run_at_least_one_injection=True
-            indices_min = injector._get_injection_indices(tensor_shape, p=0.0, run_at_least_one_injection=True)
-            assert len(indices_min) == 1  # Should have exactly one
+        # Test with p=0 and run_at_least_one_injection=True
+        indices_min = injector._get_injection_indices(tensor_shape, p=0.0, run_at_least_one_injection=True)
+        assert len(indices_min) == 1  # Should have exactly one
 
-            # Test error handling for invalid p
-            with pytest.raises(ValueError, match="Probability p must be in"):
-                injector._get_injection_indices(tensor_shape, p=1.5)
-        finally:
-            # Restore the original random state
-            np.random.set_state(original_state)
+        # Test with p=1.0 — should be all 100 indices
+        indices_all = injector._get_injection_indices(tensor_shape, p=1.0)
+        assert len(indices_all) == 100
+
+        # Test error handling for invalid p
+        with pytest.raises(ValueError, match="Probability p must be in"):
+            injector._get_injection_indices(tensor_shape, p=1.5)
