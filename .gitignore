@@ -2,6 +2,10 @@ shipsnet.json
 Research/data
 testing/data
 
+# Generated example artifacts
+*.png
+*.pdf
+
 ##### ----- default ignores ----- ######
 
 # Byte-compiled / optimized / DLL files
