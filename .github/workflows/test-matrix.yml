@@ -1,0 +1,61 @@
+name: Test Matrix (Reusable)
+
+on:
+  workflow_call:
+    inputs:
+      checkout-ref:
+        description: 'Git ref to checkout (default: repository default branch)'
+        required: false
+        type: string
+        default: ''
+
+jobs:
+  test-matrix:
+    name: Test (Python ${{ matrix.python-version }})
+    strategy:
+      fail-fast: false  # Continue other configs even if one fails
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10', '3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.checkout-ref }}
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: latest
+
+      # Cache virtual environment for faster CI runs
+      - name: Cache virtual environment
+        if: ${{ !inputs.checkout-ref }}
+        uses: actions/cache@v4
+        with:
+          path: .venv
+          key: test-matrix-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
+          restore-keys: |
+            test-matrix-${{ runner.os }}-
+            full-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: uv sync --extra dev --frozen
+
+      - name: Full test suite (enforced coverage 70%)
+        run: uv run python run_tests.py all
+
+      - name: Upload HTML coverage (Python 3.11, Ubuntu only)
+        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: htmlcov
