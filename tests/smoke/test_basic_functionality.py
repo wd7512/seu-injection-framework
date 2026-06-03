@@ -99,7 +99,9 @@ def test_device_compatibility():
     x = torch.randn(5, 2, device=device)
     output = model(x)
 
-    assert output.device == device, "Model output should be on correct device"
+    # Compare device types, not exact device objects.
+    # On MPS, torch.device('mps') has no index but tensors report 'mps:0'.
+    assert output.device.type == device.type, f"Model output should be on {device.type}, got {output.device}"
 
 
 def test_example_networks_import():

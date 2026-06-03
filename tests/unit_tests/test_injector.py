@@ -44,7 +44,7 @@ class TestInjector:
         assert 0.0 <= injector.baseline_score <= 1.0
 
     def test_injector_device_auto_detection(self, simple_model, sample_data):
-        """Test automatic device detection (CUDA vs CPU)."""
+        """Test automatic device detection (MPS > CUDA > CPU)."""
         X, y = sample_data
 
         # Test with device=None to trigger auto-detection
@@ -56,15 +56,12 @@ class TestInjector:
             y=y,
         )
 
-        # Should detect either CUDA or CPU
-        assert str(injector.device) in ["cuda", "cpu"]
-
-        # The detected device should match what torch.cuda.is_available() suggests
-        if torch.cuda.is_available():
-            # If CUDA is available, device could be either (depends on implementation)
-            assert str(injector.device) in ["cuda", "cpu"]
+        # Detection priority: MPS > CUDA > CPU (see utils.device.detect_device)
+        if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+            assert str(injector.device) == "mps"
+        elif torch.cuda.is_available():
+            assert str(injector.device) == "cuda"
         else:
-            # If CUDA is not available, should default to CPU
             assert str(injector.device) == "cpu"
 
     def test_injector_cuda_path_coverage(self, simple_model, sample_data, device):
