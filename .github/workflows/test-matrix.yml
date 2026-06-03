@@ -28,7 +28,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ inputs.checkout-ref || '' }}
+          ref: ${{ inputs.checkout-ref }}
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -47,7 +47,9 @@ jobs:
         with:
           path: .venv
           key: test-matrix-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'uv.lock') }}
-          restore-keys: test-matrix-${{ runner.os }}-
+          restore-keys: |
+            test-matrix-${{ runner.os }}-
+            full-${{ runner.os }}-
 
       - name: Install dependencies
         run: uv sync --extra dev --frozen
@@ -56,7 +58,7 @@ jobs:
         run: uv run python run_tests.py all
 
       - name: Upload HTML coverage (Python 3.11, Ubuntu only)
-        if: matrix.python-version == '3.11'
+        if: matrix.python-version == '3.11' && matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-html

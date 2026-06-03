@@ -40,6 +40,9 @@ jobs:
         uv lock --upgrade
         uv sync --all-extras
 
+    - name: Run tests on upgraded dependencies
+      run: uv run python run_tests.py all
+
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v5
       with:
@@ -48,20 +51,20 @@ jobs:
         title: "Automated dependency update"
         body: |
           This is an automated pull request to update project dependencies.
-          
+
           ## Test Results
-          
+
           ✅ **Full test suite completed successfully**
-          
+
           Tests passed on the following configurations:
           - **OS**: Ubuntu (latest)
-          - **Python**: 3.11, 3.12  # Keep in sync with test-matrix.yml
+          - **Python**: 3.11, 3.12
           - **Coverage**: 70% minimum enforced
-          
+
           ### Changes
           - Dependencies updated via `uv lock --upgrade`
           - Full test suite (smoke, unit, integration) passed
-          
+
           This PR is ready for review and merging.
         branch: deps/auto-update
         base: dev
