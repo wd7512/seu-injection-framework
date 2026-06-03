@@ -52,16 +52,16 @@ jobs:
           
           ## Test Results
           
-          ✅ **Full test matrix completed successfully**
+          ✅ **Full test suite completed successfully**
           
-          All tests passed on the following configurations:
-          - **Operating Systems**: Ubuntu, Windows, macOS
-          - **Python Versions**: 3.10, 3.11, 3.12
-          - **Test Coverage**: 70% minimum enforced
+          Tests passed on the following configurations:
+          - **OS**: Ubuntu (latest)
+          - **Python**: 3.11, 3.12
+          - **Coverage**: 70% minimum enforced
           
           ### Changes
           - Dependencies updated via `uv lock --upgrade`
-          - Full test suite (smoke, unit, integration) passed on all OS/Python combinations
+          - Full test suite (smoke, unit, integration) passed
           
           This PR is ready for review and merging.
         branch: deps/auto-update
