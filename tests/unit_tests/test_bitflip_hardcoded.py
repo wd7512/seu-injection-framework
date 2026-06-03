@@ -69,13 +69,15 @@ class TestHardcodedBitflips:
         Expected: [[0,1],[2,-3]]
         """
         matrix = np.array([[0.0, 1.0], [2.0, 3.0]], dtype=np.float32)
-        flipped_value = bitflip_float32(matrix[1, 1], 0)
-        assert flipped_value == -3.0
 
-        result_matrix = matrix.copy()
-        result_matrix[1, 1] = flipped_value
-        expected = np.array([[0.0, 1.0], [2.0, -3.0]], dtype=np.float32)
-        np.testing.assert_array_equal(result_matrix, expected)
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            flipped_value = impl(matrix[1, 1], 0)
+            assert flipped_value == -3.0, f"{impl.__name__}: got {flipped_value}"
+
+            result_matrix = matrix.copy()
+            result_matrix[1, 1] = flipped_value
+            expected = np.array([[0.0, 1.0], [2.0, -3.0]], dtype=np.float32)
+            np.testing.assert_array_equal(result_matrix, expected)
 
     def test_array_sign_bit_flips_all_elements(self):
         """Test that flipping bit 0 on an entire array changes all signs."""
@@ -163,11 +165,11 @@ class TestHardcodedBitflips:
         """Test flipping specific elements in a 2D array."""
         matrix = np.array([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0]], dtype=np.float32)
 
-        result_matrix = matrix.copy()
-        result_matrix[1, 1] = bitflip_float32(matrix[1, 1], 0)
-
-        expected = np.array([[1.0, 2.0, 3.0], [4.0, -5.0, 6.0], [7.0, 8.0, 9.0]], dtype=np.float32)
-        np.testing.assert_array_equal(result_matrix, expected)
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            result_matrix = matrix.copy()
+            result_matrix[1, 1] = impl(matrix[1, 1], 0)
+            expected = np.array([[1.0, 2.0, 3.0], [4.0, -5.0, 6.0], [7.0, 8.0, 9.0]], dtype=np.float32)
+            np.testing.assert_array_equal(result_matrix, expected)
 
     def test_sequence_of_specific_flips(self):
         """Test a sequence of specific bit flips on the same value."""
@@ -216,21 +218,24 @@ class TestHardcodedBitflips:
         input_vec = np.array([10.0, 20.0, 30.0, 40.0, 50.0], dtype=np.float32)
         expected = np.array([-10.0, -20.0, -30.0, -40.0, -50.0], dtype=np.float32)
 
-        np.testing.assert_array_equal(bitflip_float32(input_vec, 0), expected)
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            np.testing.assert_array_equal(impl(input_vec, 0), expected)
 
     def test_mixed_signs_array_hardcoded(self):
         """Test bitflip on array with mixed positive and negative values."""
         input_array = np.array([5.0, -10.0, 15.0, -20.0], dtype=np.float32)
         expected = np.array([-5.0, 10.0, -15.0, 20.0], dtype=np.float32)
 
-        np.testing.assert_array_equal(bitflip_float32(input_array, 0), expected)
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            np.testing.assert_array_equal(impl(input_array, 0), expected)
 
     def test_single_element_array_hardcoded(self):
         """Test bitflip on a single-element array."""
         input_array = np.array([7.0], dtype=np.float32)
         expected = np.array([-7.0], dtype=np.float32)
 
-        np.testing.assert_array_equal(bitflip_float32(input_array, 0), expected)
+        for impl in [bitflip_float32, bitflip_float32_optimized, bitflip_float32_fast]:
+            np.testing.assert_array_equal(impl(input_array, 0), expected)
 
     def test_power_of_two_values(self):
         """Test bitflip on powers of two (simple binary representations)."""
