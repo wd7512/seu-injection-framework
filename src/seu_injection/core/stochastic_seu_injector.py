@@ -47,8 +47,8 @@ class StochasticSEUInjector(BaseInjector):
         if not (0.0 <= p <= 1.0):
             raise ValueError(f"Probability p must be in [0, 1], got {p}")
 
-        # Use a local RNG to avoid polluting the global numpy random state
-        rng = np.random.default_rng()
+        # Use per-instance RNG for reproducibility, fall back to local if none set
+        rng = self._rng if self._rng is not None else np.random.default_rng()
 
         # Build a boolean mask for stochastic selection
         injection_mask = rng.random(tensor_shape) < p

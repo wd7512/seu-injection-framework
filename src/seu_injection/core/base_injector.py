@@ -61,6 +61,7 @@ class BaseInjector(ABC):
         x: Union[torch.Tensor, np.ndarray, None] = None,
         y: Union[torch.Tensor, np.ndarray, None] = None,
         data_loader: Union[torch.utils.data.DataLoader, None] = None,
+        seed: Union[int, None] = None,
     ) -> None:
         # TODO API COMPLEXITY: Constructor requires too much domain knowledge per improvement plans
         # ISSUES:
@@ -93,6 +94,9 @@ class BaseInjector(ABC):
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         else:
             self.device = torch.device(device)
+
+        # Random number generator for reproducibility (used by stochastic injector)
+        self._rng: Union[np.random.Generator, None] = np.random.default_rng(seed) if seed is not None else None
 
         # Model setup
         self.criterion = criterion  # type: ignore[assignment]
