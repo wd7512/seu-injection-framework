@@ -40,6 +40,15 @@ class ExhaustiveSEUInjector(BaseInjector):
             np.ndarray: All possible indices in the tensor.
                        Shape: (N, len(tensor_shape)).
 
+        Notes:
+            Uses ``np.argwhere(np.ones(...))`` which materialises all indices
+            in memory (O(N) on total parameter count — ~176 MB for ResNet-18).
+            For extreme models (>100M params) consider returning ``np.ndindex(tensor_shape)``
+            instead for O(1) memory, at the cost of: (a) changing the return type to
+            ``Iterable[tuple]`` (weaker contract), (b) losing tqdm progress info without
+            an explicit ``total=``, and (c) inconsistent return types across strategies
+            (stochastic is always eager).
+
         """
         if kwargs:
             warnings.warn(
