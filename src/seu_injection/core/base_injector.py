@@ -194,6 +194,9 @@ class BaseInjector(ABC):
             if layer_name and layer_name != current_layer_name:
                 continue
             yield current_layer_name, tensor
+            # Layer names are unique — stop iterating once we find the target
+            if layer_name:
+                break
 
     def _prepare_tensor_for_injection(self, tensor: torch.nn.Parameter) -> tuple[torch.Tensor, np.ndarray]:
         """Prepare a tensor for injection by cloning and converting to numpy.
@@ -235,8 +238,8 @@ class BaseInjector(ABC):
         # Perform bitflip
         seu_val = bitflip_float32_optimized(original_val, bit_i, inplace=False)
 
-        # Inject fault
-        tensor.data[idx] = torch.tensor(seu_val, device=self.device, dtype=tensor.dtype)
+        # Inject fault using direct scalar assignment (avoids tensor allocation per call)
+        tensor.data[idx] = seu_val
 
         # Evaluate model
         criterion_score = self._get_criterion_score()
