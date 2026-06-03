@@ -116,7 +116,7 @@ The README has 8 well-written limitations (single seed, synthetic data, small mo
 |-------|-------|
 | **State** | open |
 | **Created** | 2026-06-03T19:14:39Z |
-| **Updated** | 2026-06-03T19:14:45Z |
+| **Updated** | 2026-06-03T19:17:40Z |
 | **Labels** | enhancement |
 | **Author** | @wd7512 |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/97 |
