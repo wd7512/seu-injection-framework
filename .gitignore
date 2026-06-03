@@ -36,6 +36,9 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# Swarm review output
+.review-output/
+
 # Backup files
 *.backup
 *.bak
