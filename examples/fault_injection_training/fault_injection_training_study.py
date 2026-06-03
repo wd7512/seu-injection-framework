@@ -528,7 +528,7 @@ def create_results_summary(baseline_results, fault_results):
         improvement = (
             ((baseline_drop - fault_drop) / baseline_drop * 100)
             if baseline_drop > NUMERICAL_TOLERANCE
-            else float("nan")
+            else None
         )
 
         # Robustness factor (ratio of drops)
@@ -548,6 +548,10 @@ def create_results_summary(baseline_results, fault_results):
         )
 
     df = pd.DataFrame(summary_data)
+    # Format Improvement column: display "N/A" for None values
+    df["Improvement (%)"] = df["Improvement (%)"].apply(
+        lambda x: f"{x:.1f}" if x is not None else "N/A"
+    )
     return df
 
 
@@ -650,9 +654,9 @@ def run_complete_experiment():
         b_drop = row["Baseline Acc Drop (%)"]
         f_drop = row["Fault-Aware Acc Drop (%)"]
         impr = row["Improvement (%)"]
-        if not np.isnan(impr) and b_drop > 0.5:
+        if impr != "N/A" and b_drop > 0.5:
             print(f"  Bit {bit:2d}: baseline {b_drop:.2f}% → fault-aware {f_drop:.2f}% "
-                  f"(+{impr:.1f}% improvement)")
+                  f"(+{impr}% improvement)")
         elif b_drop > NUMERICAL_TOLERANCE * 100:
             print(f"  Bit {bit:2d}: baseline {b_drop:.4f}% → fault-aware {f_drop:.4f}% "
                   f"(noise-level drop)")
@@ -672,8 +676,8 @@ def run_complete_experiment():
     fig2.savefig("robustness_comparison.png", dpi=300, bbox_inches="tight")
     print("✅ Saved: robustness_comparison.png")
 
-    # Save summary with proper formatting
-    summary_df.to_csv("robustness_results.csv", index=False, float_format="%.4f")
+    # Save summary
+    summary_df.to_csv("robustness_results.csv", index=False)
     print("✅ Saved: robustness_results.csv")
 
     print("\n" + "=" * 80)
