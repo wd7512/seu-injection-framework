@@ -127,7 +127,7 @@ def synchronize(device=None):
 |-------|-------|
 | **State** | open |
 | **Created** | 2026-06-03T18:32:28Z |
-| **Updated** | 2026-06-03T18:32:28Z |
+| **Updated** | 2026-06-03T18:32:50Z |
 | **Labels** | enhancement, question |
 | **Author** | @wd7512 |
 | **URL** | https://github.com/wd7512/seu-injection-framework/issues/95 |
