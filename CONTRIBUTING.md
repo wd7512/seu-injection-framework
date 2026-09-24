@@ -155,7 +155,7 @@ Targets:
 
 ## 🛡️ Security
 
-Report security vulnerabilities to <wwdennis.home@gmail.com> (not public issues). Response within 48 hours.
+Report security vulnerabilities to <wwdennis.research@gmail.com> (not public issues). Response within 48 hours.
 
 ## 📚 Resources
 
@@ -232,7 +232,7 @@ def my_function(param1, param2):
 
 - Documentation: README.md and docs/
 - Issues: GitHub issues
-- Email: <wwdennis.home@gmail.com>
+- Email: <wwdennis.research@gmail.com>
 
 Response times: 48 hours for bugs, 1 week for features/PRs.
 
