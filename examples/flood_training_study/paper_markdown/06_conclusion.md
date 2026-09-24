@@ -274,7 +274,7 @@ ______________________________________________________________________
 
 **Research Status**: Complete ✅\
 **Last Updated**: March 15, 2026\
-**Contact**: wwdennis.home@gmail.com\
+**Contact**: wwdennis.research@gmail.com\
 **GitHub**: [SEU Injection Framework](https://github.com/wd7512/seu-injection-framework)
 
 ______________________________________________________________________

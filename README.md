@@ -132,7 +132,7 @@ Recent updates include reproducible ShipsNet experiments and improvements to inj
 - Documentation: [https://wd7512.github.io/seu-injection-framework/](https://wd7512.github.io/seu-injection-framework/)
 - Contributing: [`CONTRIBUTING.md`](CONTRIBUTING.md)
 - Issues: [GitHub Issues](https://github.com/wd7512/seu-injection-framework/issues)
-- Contact: <wwdennis.home@gmail.com>
+- Contact: <wwdennis.research@gmail.com>
 
 ## Citation
 
